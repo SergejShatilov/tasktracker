@@ -63,6 +63,16 @@ QList<Employee> DBManagerPostgres::getEmployees(
 }
 
 // =============================================================================
+void DBManagerPostgres::changeEmployee(
+    const DBAuthorization& authorization,
+    const QString& dbname,
+    const Employee& employee)
+{
+    QSqlDatabase db = addDatabase(authorization);
+    DBPostgresQuery::changeEmployee(db, dbname, employee);
+}
+
+// =============================================================================
 QSqlDatabase
 DBManagerPostgres::addDatabase(const DBAuthorization& authorization) const
 {

@@ -27,12 +27,14 @@ public:
     bool addEmployee(const Employee& employee);
     bool deleteEmployee(qint32 id);
     bool getEmployees(QList<Employee>& list);
+    bool changeEmployee(qint32 id, const Employee& employee);
 
 private:
     void showError();
     bool checkAuthorization();
     bool post(const QString& endPoint, const QJsonObject& jObj);
     bool get(const QString& endPoint, QJsonObject& jObj);
+    bool put(const QString& endPoint, const QJsonObject& jObj);
     bool del(const QString& endPoint);
 
 signals:

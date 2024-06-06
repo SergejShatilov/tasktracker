@@ -13,6 +13,8 @@ public:
     explicit EmployeeObject(const Employee& employee,
                             QObject* parent = nullptr);
 
+    QString fullName() const;
+
 public:
     Q_PROPERTY(qint32 id READ id WRITE setId);
     Q_PROPERTY(QString lastName READ lastName WRITE setLastName);
@@ -21,4 +23,5 @@ public:
     Q_PROPERTY(QString position READ position WRITE setPosition);
     Q_PROPERTY(QString email READ email WRITE setEmail);
     Q_PROPERTY(QString phone READ phone WRITE setPhone);
+    Q_PROPERTY(QString fullName READ fullName);
 };

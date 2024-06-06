@@ -33,6 +33,10 @@ public:
 
     virtual QList<Employee> getEmployees(const DBAuthorization& authorization,
                                          const QString& dbname);
+
+    virtual void changeEmployee(const DBAuthorization& authorization,
+                                const QString& dbname,
+                                const Employee& employee);
 protected:
     QString m_hostName;
     int     m_port;

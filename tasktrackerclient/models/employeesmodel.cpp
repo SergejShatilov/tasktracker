@@ -7,7 +7,8 @@
 // =============================================================================
 EmployeesModel::EmployeesModel(QObject* parent) :
     QAbstractItemModel(parent),
-    m_columns({"id", "lastName", "firstName", "patronymic", "position", "email", "phone"}),
+    m_columns({"id", "lastName", "firstName", "patronymic",
+               "fullName", "position", "email", "phone"}),
     m_rootItem(new EmployeeObject(this))
 {
 }
@@ -34,8 +35,9 @@ void EmployeesModel::addEmployee(const Employee& employee)
 // =============================================================================
 void EmployeesModel::removeEmployee(const QModelIndex& index)
 {
-    beginRemoveRows(QModelIndex(), index.row(), index.row());
-    removeRow(index.row());
+    beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
+    auto obj = employeeObjectByIndex(index);
+    obj->deleteLater();
     endRemoveRows();
 }
 
@@ -103,12 +105,64 @@ QVariant EmployeesModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (role == Qt::DisplayRole) {
-        return employeeObjectByIndex(index)->property(
-                    m_columns.at(index.column()).toUtf8());
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+        {
+            return employeeObjectByIndex(index)->property
+            (
+                m_columns.at(index.column()).toUtf8()
+            );
+        }
+        default:
+            return QVariant();
+    }
+}
+
+// =============================================================================
+bool EmployeesModel::setData(const QModelIndex &index,
+                             const QVariant &value,
+                             int role)
+{
+    if (!index.isValid())
+        return false;
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+        {
+            return employeeObjectByIndex(index)->setProperty
+            (
+                m_columns.at(index.column()).toUtf8(),
+                value
+            );
+        }
+        default:
+            return false;
+    }
+}
+
+// =============================================================================
+QVariant EmployeesModel::headerData(int section,
+                                    Qt::Orientation orientation,
+                                    int role) const
+{
+    if ((orientation != Qt::Orientation::Horizontal) ||
+        (role != Qt::DisplayRole))
+    {
+        return QVariant();
     }
 
-    return QVariant();
+    switch (section)
+    {
+        case 4: return QString(tr("Full Name"));
+        case 5: return QString(tr("Position"));
+        case 6: return QString(tr("Email"));
+        case 7: return QString(tr("Phone"));
+        default: return QVariant();
+    }
 }
 
 // =============================================================================

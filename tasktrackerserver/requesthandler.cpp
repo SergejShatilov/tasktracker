@@ -59,6 +59,15 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
             return handlerGetEmployees(request);
         }
     );
+
+    // Регистрируем обработчик изменения данных о сотруднике
+    httpServer.route(
+        HttpRequest::Method::Put,
+        "/dbname-{dbname}/employees/id-{id}/",
+        [this](const HttpRequest& request) {
+            return handlerChangeEmployee(request);
+        }
+    );
 }
 
 // =============================================================================
@@ -181,3 +190,28 @@ HttpResponse RequestHandler::handlerGetEmployees(const HttpRequest &request)
         QJsonDocument(jobj).toJson(QJsonDocument::JsonFormat::Compact)
     );
 }
+
+// =============================================================================
+HttpResponse RequestHandler::handlerChangeEmployee(const HttpRequest& request)
+{
+    qDebug() << "Change employee...";
+
+    // Получаем данные сотрудника
+    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
+    Employee employee = Employee::fromJsonObject(jdoc.object());
+
+    // Объект для авторизации
+    DBAuthorization authorization(request.userName(), request.password());
+
+    try {
+        m_db->changeEmployee(authorization, request.dbname(), employee);
+    } catch (const DBException& ex) {
+        qDebug() << ex;
+        return HttpResponse(HttpResponse::Status::BadRequest,
+                            ex.error().text().toLocal8Bit());
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
+}
+
+// =============================================================================

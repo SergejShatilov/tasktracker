@@ -27,4 +27,8 @@ void deleteEmployee(QSqlDatabase& db,
 QList<Employee> getEmployees(QSqlDatabase& db,
                              const QString& dbname);
 
+void changeEmployee(QSqlDatabase& db,
+                    const QString& dbname,
+                    const Employee& employee);
+
 }

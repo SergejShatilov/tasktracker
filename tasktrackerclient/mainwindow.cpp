@@ -28,12 +28,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionDeleteEmployee, &QAction::triggered,
             this, &MainWindow::deleteEmployee);
 
+    connect(ui->treeView, &QTreeView::doubleClicked,
+            this, &MainWindow::employeeViewDoubleClicked);
+
     setWindowTitle(qApp->applicationName());
 
     m_employeesModel = new EmployeesModel(this);
     ui->treeView->setModel(m_employeesModel);
-
-    //ui->treeView.add
+    ui->treeView->setColumnHidden(0, true);
+    ui->treeView->setColumnHidden(1, true);
+    ui->treeView->setColumnHidden(2, true);
+    ui->treeView->setColumnHidden(3, true);
 }
 
 // =============================================================================
@@ -75,7 +80,8 @@ void MainWindow::openDb()
 // =============================================================================
 void MainWindow::newEmployee()
 {
-    auto dialog = std::make_unique<DialogEditEmployee>(m_httpClient, this);
+    auto dialog = std::make_unique<DialogEditEmployee>(m_httpClient,
+                                                       false, this);
     dialog->show();
     if (dialog->exec() != QDialog::Accepted)
         return;
@@ -94,7 +100,7 @@ void MainWindow::deleteEmployee()
     QMessageBox::StandardButton reply = QMessageBox::question(
         this,
         tr("Delete employee?"),
-        tr("After deleting an employee, it will be impossible to restore it."
+        tr("After deleting an employee, it will be impossible to restore it. "
            "His tasks will not be assigned. Are you sure you want to delete an employee?"),
         QMessageBox::Yes | QMessageBox::Cancel
     );
@@ -107,7 +113,7 @@ void MainWindow::deleteEmployee()
     if (!m_httpClient->deleteEmployee(id))
         return;
 
-    updateEmployees(); // FIXME: лучше заменить на удаление из модели
+    m_employeesModel->removeEmployee(index);
 }
 
 // =============================================================================
@@ -118,6 +124,23 @@ void MainWindow::updateEmployees()
         return;
 
     m_employeesModel->loadFromList(listEmployees);
+}
+
+// =============================================================================
+void MainWindow::employeeViewDoubleClicked(const QModelIndex& index)
+{
+    auto dialog = std::make_unique<DialogEditEmployee>
+    (
+        m_httpClient,
+        true,
+        this
+    );
+
+    dialog->setModel(m_employeesModel);
+    dialog->setCurrentModelIndex(index);
+
+    if (dialog->exec() != QDialog::Accepted)
+        return;
 }
 
 // =============================================================================

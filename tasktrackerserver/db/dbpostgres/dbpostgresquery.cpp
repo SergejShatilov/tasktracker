@@ -264,3 +264,41 @@ QList<Employee> DBPostgresQuery::getEmployees(QSqlDatabase& db,
 }
 
 // =============================================================================
+void DBPostgresQuery::changeEmployee(QSqlDatabase& db,
+                                     const QString& dbname,
+                                     const Employee& employee)
+{
+    db.setDatabaseName(dbname);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "UPDATE employees\r\n"
+            "SET lastname = '%1',\r\n"
+            "    firstname = '%2',\r\n"
+            "    patronymic = '%3',\r\n"
+            "    position = '%4',\r\n"
+            "    email = '%5',\r\n"
+            "    phone = '%6'\r\n"
+            "WHERE id = %7;\r\n"
+        )
+        .arg(employee.lastName())
+        .arg(employee.firstName())
+        .arg(employee.patronymic())
+        .arg(employee.position())
+        .arg(employee.email())
+        .arg(employee.phone())
+        .arg(employee.id())
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    if (!db.commit()) {
+        throw DBException(db.lastError(), __FILE__, __LINE__);
+    }
+}
+
+// =============================================================================

@@ -28,6 +28,10 @@ public:
     QList<Employee> getEmployees(const DBAuthorization& authorization,
                                  const QString& dbname) override;
 
+    void changeEmployee(const DBAuthorization& authorization,
+                        const QString& dbname,
+                        const Employee& employee) override;
+
 private:
     QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
 };

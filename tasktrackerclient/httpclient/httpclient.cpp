@@ -74,7 +74,8 @@ bool HttpClient::addEmployee(const Employee &employee)
 // =============================================================================
 bool HttpClient::deleteEmployee(qint32 id)
 {
-    return del(
+    return del
+    (
         QString("/dbname-%1/employees/id-%2/")
         .arg(m_dataBaseName)
         .arg(id)
@@ -96,6 +97,18 @@ bool HttpClient::getEmployees(QList<Employee>& list)
     }
 
     return true;
+}
+
+// =============================================================================
+bool HttpClient::changeEmployee(qint32 id, const Employee& employee)
+{
+    return put
+    (
+        QString("/dbname-%1/employees/id-%2/")
+            .arg(m_dataBaseName)
+            .arg(id),
+        employee.toJsonObject()
+    );
 }
 
 // =============================================================================
@@ -205,6 +218,51 @@ bool HttpClient::get(const QString& endPoint, QJsonObject& jObj)
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
 
     manager.get(request);
+
+    // Ждем ответ
+    QEventLoop eventLoop;
+    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec();
+
+    return result;
+}
+
+// =============================================================================
+bool HttpClient::put(const QString& endPoint, const QJsonObject& jObj)
+{
+    bool result = false;
+
+    if (!checkAuthorization())
+        return false;
+
+    QNetworkAccessManager manager(this);
+    connect(&manager, &QNetworkAccessManager::finished,
+            this, [this, &result](QNetworkReply* reply)
+    {
+        if (reply->error() == QNetworkReply::NetworkError::NoError) {
+            m_isAuthorized = true;
+            result = true;
+        }
+        else
+        {
+            m_lastErrorString = QString("%1\r\n%2")
+                .arg(reply->errorString())
+                .arg(QString(reply->readAll()));
+            showError();
+        }
+
+        emit finished();
+    });
+
+    const QString authorization = QString("%1, %2").arg(m_userName).arg(m_password);
+
+    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", authorization.toLocal8Bit());
+    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
+    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
+
+    manager.put(request, QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact));
 
     // Ждем ответ
     QEventLoop eventLoop;

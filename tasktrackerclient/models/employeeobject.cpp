@@ -19,3 +19,12 @@ EmployeeObject::EmployeeObject(const Employee& employee,
 }
 
 // =============================================================================
+QString EmployeeObject::fullName() const
+{
+    return QString("%1 %2 %3")
+        .arg(m_lastName)
+        .arg(m_firstName)
+        .arg(m_patronymic);
+}
+
+// =============================================================================

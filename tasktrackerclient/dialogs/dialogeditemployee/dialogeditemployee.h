@@ -2,6 +2,7 @@
 #define DIALOGEDITEMPLOYEE_H
 
 #include <QDialog>
+#include <QDataWidgetMapper>
 
 #include "httpclient/httpclient.h"
 
@@ -15,8 +16,12 @@ class DialogEditEmployee : public QDialog
 
 public:
     explicit DialogEditEmployee(std::shared_ptr<HttpClient> httpClient,
+                                bool isEdit = false,
                                 QWidget *parent = nullptr);
     ~DialogEditEmployee();
+
+    void setModel(QAbstractItemModel* model);
+    void setCurrentModelIndex(const QModelIndex& index);
 
     void setLastName(const QString& lastName);
     void setFirstName(const QString& firstName);
@@ -29,11 +34,13 @@ public:
 
 private slots:
     void changed(const QString &);
+    void submit();
     void createNewEmployee();
 
 private:
     Ui::DialogEditEmployee *ui;
     std::shared_ptr<HttpClient> m_httpClient;
+    QDataWidgetMapper* m_mapper;
     Employee m_employee;
 };
 

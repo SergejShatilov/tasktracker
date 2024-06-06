@@ -26,6 +26,8 @@ private slots:
     void deleteEmployee();
     void updateEmployees();
 
+    void employeeViewDoubleClicked(const QModelIndex& index);
+
 private:
     void setWindowDbName(const QString& name);
 
