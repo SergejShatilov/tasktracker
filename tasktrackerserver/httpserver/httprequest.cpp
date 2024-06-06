@@ -1,18 +1,21 @@
 
-#include "request.h"
+#include "httprequest.h"
 
-Request::Request(const QString &request)
+// =============================================================================
+HttpRequest::HttpRequest(const QByteArray& request)
 {
-    if (request.isEmpty())
+    const QString requestString(request);
+
+    if (requestString.isEmpty())
         throw std::runtime_error("the request is empty");
 
     // Разделяем заголовок и тело запроса, должно быть минимум
     // одна пустая строка, иначе непредвиденный конец запроса
-    const QStringList requestParts = request.split("\r\n\r\n");
+    const QStringList requestParts = requestString.split("\r\n\r\n");
     if (requestParts.size() < 2)
         throw std::runtime_error("unexpected end of the request");
 
-    m_data = requestParts.last();
+    m_data = requestParts.last().toLocal8Bit();
 
     // Получаем стартовую строку и заголовки
     QStringList headers = requestParts.first().split("\r\n");
@@ -23,31 +26,51 @@ Request::Request(const QString &request)
     headersParse(headers);
 }
 
-Request::Method Request::method() const {
+// =============================================================================
+HttpRequest::Method HttpRequest::method() const {
     return m_method;
 }
 
-const QString& Request::methodString() const {
+const QString& HttpRequest::methodString() const {
     return m_methodString;
 }
 
-const QString& Request::uri() const {
+const QString& HttpRequest::uri() const {
     return m_uri;
 }
 
-const QString& Request::httpVersion() const {
+const QString& HttpRequest::httpVersion() const {
     return m_httpVersion;
 }
 
-const QHash<QString, QString>& Request::headers() const {
+const QHash<QString, QString>& HttpRequest::headers() const {
     return m_headers;
 }
 
-const QString &Request::data() const {
+// =============================================================================
+const QString& HttpRequest::userName() const {
+    return m_userName;
+}
+
+const QString& HttpRequest::password() const {
+    return m_password;
+}
+
+// =============================================================================
+QString HttpRequest::dbname() const {
+    return findValueInUri(m_uri, "dbname");
+}
+
+qint32 HttpRequest::id() const {
+    return findValueInUri(m_uri, "id").toInt();
+}
+
+const QByteArray &HttpRequest::data() const {
     return m_data;
 }
 
-void Request::startLineParse(const QString& startLine)
+// =============================================================================
+void HttpRequest::startLineParse(const QString& startLine)
 {
     // Разбираем стартовую строку, должна состоять из трех частей:
     // Метода, URI и версии HTTP
@@ -84,7 +107,8 @@ void Request::startLineParse(const QString& startLine)
         throw std::runtime_error("unsupported http version");
 }
 
-void Request::headersParse(const QStringList& headers)
+// =============================================================================
+void HttpRequest::headersParse(const QStringList& headers)
 {
     for (const auto& header : headers)
     {
@@ -97,9 +121,19 @@ void Request::headersParse(const QStringList& headers)
         const QString& value = header.mid(index + 2);
         m_headers.insert(key, value);
     }
+
+    // Ищем информацию для авторизации пользователя
+    auto it = m_headers.find("Authorization");
+    if (it != m_headers.end())
+    {
+        QStringList authorization = it.value().split(',');
+        m_userName = authorization.first();
+        m_password = authorization.last().simplified();
+    }
 }
 
-const QString Request::uriToEndPoint(const QString& uri)
+// =============================================================================
+QString HttpRequest::uriToEndPoint(const QString& uri)
 {
     // Разделяем на элементы все, что между символами /
     QStringList tree = uri.split('/');
@@ -111,12 +145,13 @@ const QString Request::uriToEndPoint(const QString& uri)
         if (item.isEmpty())
             continue;
 
-        bool result = false;
-
-        // Если элеент приводится к числу, значит это шаблон идентификатора
-        (void) item.toInt(&result);
-        if (result)
-            item = "{id}";
+        // Если есть разделительное тире,
+        // то заменяем вторую часть на абстракцию
+        if (item.contains('-'))
+        {
+            const QString key = item.split('-').first();
+            item = QString("%1-{%1}").arg(key);
+        }
 
         endPoint += (item);
 
@@ -124,7 +159,27 @@ const QString Request::uriToEndPoint(const QString& uri)
             endPoint += '/';
     }
 
-    //endPoint.replace(QRegExp("/[0-9]"), "/{id}");
-
     return endPoint;
 }
+
+// =============================================================================
+QString HttpRequest::findValueInUri(const QString& uri, const QString& key)
+{
+    QStringList tree = uri.split('/');
+
+    for (auto& item : tree)
+    {
+        if (item.isEmpty())
+            continue;
+
+        if (item.contains(QString("%1-").arg(key)))
+        {
+            const QString value = item.split('-').last();
+            return value;
+        }
+    }
+
+    return QString();
+}
+
+// =============================================================================

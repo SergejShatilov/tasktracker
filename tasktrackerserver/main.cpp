@@ -1,6 +1,9 @@
+
 #include <QCoreApplication>
 
+#include "requesthandler.h"
 #include "httpserver/httpserver.h"
+#include "db/dbpostgres/dbmanagerpostgres.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,17 +11,16 @@ int main(int argc, char *argv[])
 
     HttpServer httpServer;
 
-    httpServer.route(Request::Method::Get, "/data/{id}", [](const Request&) {
-        Response response(Response::Status::OK);
-        response.setData(QTime::currentTime().toString());
-        return response;
-    });
+    DBManagerPostgres db("127.0.0.1", 5432);
 
-    //QSimpleServer server;
+    RequestHandler(httpServer, &db);
 
-    //QMultiThreadServer server;
-
-    //QPoolThreadServer server;
+    if (httpServer.listen(QHostAddress::Any, 80)) {
+        qDebug() << "Listering...";
+    }
+    else {
+        qDebug() << "Error while starting:" << httpServer.errorString();
+    }
 
     return a.exec();
 }

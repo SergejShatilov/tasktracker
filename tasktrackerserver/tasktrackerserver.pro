@@ -1,5 +1,5 @@
 QT -= gui
-QT += core network
+QT += core network sql
 
 CONFIG += c++17 console
 CONFIG -= app_bundle
@@ -15,12 +15,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+COMMON = $${PWD}/../common
+
+INCLUDEPATH += \
+    $${COMMON}/ \
+
 SOURCES += \
     main.cpp \
+    requesthandler.cpp \
     httpserver/httpserver.cpp \
-    httpserver/sockethandler.cpp \
-    httpserver/request.cpp \
-    httpserver/response.cpp \
+    httpserver/httpsockethandler.cpp \
+    httpserver/httprequest.cpp \
+    httpserver/httpresponse.cpp \
+    db/dbmanager.cpp \
+    db/dbpostgres/dbmanagerpostgres.cpp \
+    db/dbpostgres/dbpostgresquery.cpp \
+    $${COMMON}/employee.cpp \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -28,7 +38,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    requesthandler.h \
     httpserver/httpserver.h \
-    httpserver/sockethandler.h \
-    httpserver/request.h \
-    httpserver/response.h \
+    httpserver/httpsockethandler.h \
+    httpserver/httprequest.h \
+    httpserver/httpresponse.h \
+    db/dbmanager.h \
+    db/dbexception.h \
+    db/dbopener.h \
+    db/dbauthorization.h \
+    db/dbpostgres/dbmanagerpostgres.h \
+    db/dbpostgres/dbpostgresquery.h \
+    $${COMMON}/employee.h   \
+

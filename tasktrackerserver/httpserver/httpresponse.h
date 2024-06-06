@@ -4,7 +4,7 @@
 #include <QString>
 #include <QHash>
 
-class Response
+class HttpResponse
 {
 public:
     enum class Status
@@ -16,15 +16,16 @@ public:
     };
 
 public:
-    Response(const Status status);
+    explicit HttpResponse(const Status status);
+    explicit HttpResponse(const Status status, const QByteArray& data);
 
-    void setData(const QString& data);
+    void setData(const QByteArray& data);
     void addHeader(const QString& key, const QString& value);
 
-    const QByteArray toByteArray() const;
+    QByteArray toByteArray() const;
 
 private:
     QString m_status;
-    QString m_data;
+    QByteArray m_data;
     QHash<QString, QString> m_headers;
 };

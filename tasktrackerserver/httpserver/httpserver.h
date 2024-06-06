@@ -5,7 +5,7 @@
 #include <QThreadPool>
 #include <functional>
 
-#include "sockethandler.h"
+#include "httpsockethandler.h"
 
 class HttpServer : public QTcpServer
 {
@@ -14,7 +14,7 @@ class HttpServer : public QTcpServer
 public:
     explicit HttpServer(QObject* parent = nullptr);
 
-    void route(const Request::Method method,
+    void route(const HttpRequest::Method method,
                const QString& endPoint,
                RouteHandler handler);
 
