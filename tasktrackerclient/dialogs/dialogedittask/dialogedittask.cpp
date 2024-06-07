@@ -68,10 +68,10 @@ void DialogEditTask::createNewTask()
 {
     m_task.setName(ui->lineEditName->text());
     m_task.setState(Task::State::NotStarted);
-    m_task.setExecutor(1);
+    m_task.setExecutorId(1);
     m_task.setStart(ui->dateEditStart->date());
     m_task.setDuration(ui->spinBoxDuration->value());
-    m_task.setParent(1);
+    m_task.setParentId(1);
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);

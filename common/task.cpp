@@ -67,12 +67,12 @@ QString Task::stateString() const
 }
 
 // =============================================================================
-void Task::setExecutor(qint32 executorId) {
-    m_executor = executorId;
+void Task::setExecutorId(qint32 executorId) {
+    m_executorId = executorId;
 }
 
-qint32 Task::executor() const {
-    return m_executor;
+qint32 Task::executorId() const {
+    return m_executorId;
 }
 
 // =============================================================================
@@ -106,12 +106,12 @@ qint32 Task::duration() const {
 }
 
 // =============================================================================
-void Task::setParent(qint32 parentId) {
-    m_parent = parentId;
+void Task::setParentId(qint32 parentId) {
+    m_parentId = parentId;
 }
 
-qint32 Task::parent() const {
-    return m_parent;
+qint32 Task::parentId() const {
+    return m_parentId;
 }
 
 // =============================================================================
@@ -129,10 +129,10 @@ QJsonObject Task::toJsonObject() const {
     jObj.insert("id", m_id);
     jObj.insert("name", m_name);
     jObj.insert("state", stateString());
-    jObj.insert("executor", m_executor);
+    jObj.insert("executor", m_executorId);
     jObj.insert("start", startString());
     jObj.insert("duration", m_duration);
-    jObj.insert("parent", m_parent);
+    jObj.insert("parent", m_parentId);
     jObj.insert("description", m_description);
     return jObj;
 }
@@ -144,10 +144,10 @@ Task Task::fromJsonObject(const QJsonObject& jObj)
     task.setId(jObj["id"].toInt());
     task.setName(jObj["name"].toString());
     task.setStateString(jObj["state"].toString());
-    task.setExecutor(jObj["executor"].toInt());
+    task.setExecutorId(jObj["executor"].toInt());
     task.setStartString(jObj["start"].toString());
     task.setDuration(jObj["duration"].toInt());
-    task.setParent(jObj["parent"].toInt());
+    task.setParentId(jObj["parent"].toInt());
     task.setDescription(jObj["description"].toString());
 
     return task;

@@ -31,8 +31,8 @@ public:
     void setStateString(const QString& stateString);
     QString stateString() const;
 
-    void setExecutor(qint32 executorId);
-    qint32 executor() const;
+    void setExecutorId(qint32 executorId);
+    qint32 executorId() const;
 
     void setStart(const QDate& start);
     const QDate& start() const;
@@ -43,8 +43,8 @@ public:
     void setDuration(qint32 duration);
     qint32 duration() const;
 
-    void setParent(qint32 parentId);
-    qint32 parent() const;
+    void setParentId(qint32 parentId);
+    qint32 parentId() const;
 
     void setDescription(const QString& description);
     const QString& description() const;
@@ -56,9 +56,9 @@ protected:
     qint32  m_id;
     QString m_name;
     State   m_state;
-    qint32  m_executor;
+    qint32  m_executorId;
     QDate   m_start;
     qint32  m_duration;
-    qint32  m_parent;
+    qint32  m_parentId;
     QString m_description;
 };

@@ -24,7 +24,9 @@ INCLUDEPATH += \
 SOURCES += \
     dialogs/dialogedittask/dialogedittask.cpp \
     models/employeesmodel.cpp \
+    models/tasksmodel.cpp \
     models/employeeobject.cpp \
+    models/taskobject.cpp \
     dialogs/dialogauthorization/dialogauthorization.cpp \
     dialogs/dialogeditemployee/dialogeditemployee.cpp \
     dialogs/dialogopendb/dialogopendb.cpp \
@@ -38,6 +40,8 @@ HEADERS += \
     dialogs/dialogedittask/dialogedittask.h \
     models/employeesmodel.h \
     models/employeeobject.h \
+    models/tasksmodel.h \
+    models/taskobject.h \
     dialogs/dialogauthorization/dialogauthorization.h \
     dialogs/dialogeditemployee/dialogeditemployee.h \
     dialogs/dialogopendb/dialogopendb.h \

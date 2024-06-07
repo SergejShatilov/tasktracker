@@ -32,20 +32,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCreateTask, &QAction::triggered,
             this, &MainWindow::newTask);
 
-    connect(ui->treeView, &QTreeView::doubleClicked,
-            this, &MainWindow::employeeViewDoubleClicked);
-
     setWindowTitle(qApp->applicationName());
 
     m_employeesModel = new EmployeesModel(this);
-    ui->treeView->setModel(m_employeesModel);
+    /*ui->treeView->setModel(m_employeesModel);
     ui->treeView->setColumnHidden(0, true);
     ui->treeView->setColumnHidden(1, true);
     ui->treeView->setColumnHidden(2, true);
     ui->treeView->setColumnHidden(3, true);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, &QTreeView::doubleClicked,
+            this, &MainWindow::employeeViewDoubleClicked);
     connect(ui->treeView, &QTreeView::customContextMenuRequested,
-            this, &MainWindow::employeesViewContextMenu);
+            this, &MainWindow::employeesViewContextMenu);*/
+
+    m_tasksModel = new TasksModel(this);
+    ui->treeView->setModel(m_tasksModel);
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, &QTreeView::customContextMenuRequested,
+            this, &MainWindow::tasksViewContextMenu);
 }
 
 // =============================================================================
@@ -144,6 +149,18 @@ void MainWindow::newTask()
 }
 
 // =============================================================================
+void MainWindow::deleteTask()
+{
+
+}
+
+// =============================================================================
+void MainWindow::updateTasks()
+{
+
+}
+
+// =============================================================================
 void MainWindow::employeeViewDoubleClicked(const QModelIndex& index)
 {
     auto dialog = std::make_unique<DialogEditEmployee>
@@ -181,6 +198,47 @@ void MainWindow::employeesViewContextMenu(const QPoint& pos)
     }
 
     menu.addAction(QStringLiteral("Update"), this, &MainWindow::updateEmployees);
+    menu.exec(QCursor::pos());
+}
+
+// =============================================================================
+void MainWindow::tasksViewDoubleClicked(const QModelIndex& index)
+{
+    auto dialog = std::make_unique<DialogEditTask>
+    (
+        m_httpClient,
+        true,
+        this
+    );
+
+    dialog->setModel(m_tasksModel);
+    dialog->setCurrentModelIndex(index);
+
+    if (dialog->exec() != QDialog::Accepted)
+        return;
+}
+
+// =============================================================================
+void MainWindow::tasksViewContextMenu(const QPoint& pos)
+{
+    QModelIndex index = ui->treeView->indexAt(pos);
+
+    QMenu menu;
+    menu.addAction(QStringLiteral("New..."), this, &MainWindow::newTask);
+    menu.addSeparator();
+
+    if (index.isValid())
+    {
+        menu.addAction(QStringLiteral("Edit..."), this, [this, &index](){
+            tasksViewDoubleClicked(index);
+        });
+        menu.addAction(QStringLiteral("Delete"), this,
+                       &MainWindow::deleteTask);
+        menu.addSeparator();
+
+    }
+
+    menu.addAction(QStringLiteral("Update"), this, &MainWindow::updateTasks);
     menu.exec(QCursor::pos());
 }
 

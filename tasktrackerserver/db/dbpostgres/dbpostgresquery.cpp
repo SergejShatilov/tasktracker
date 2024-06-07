@@ -323,10 +323,10 @@ void DBPostgresQuery::createNewTask(QSqlDatabase& db,
         )
         .arg(task.name())
         .arg(task.stateString())
-        .arg(task.executor())
+        .arg(task.executorId())
         .arg(task.startString())
         .arg(task.duration())
-        .arg(task.parent())
+        .arg(task.parentId())
         .arg(task.description())
     );
 
