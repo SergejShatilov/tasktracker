@@ -26,6 +26,8 @@ private slots:
     void deleteEmployee();
     void updateEmployees();
 
+    void newTask();
+
     void employeeViewDoubleClicked(const QModelIndex& index);
     void employeesViewContextMenu(const QPoint& pos);
 

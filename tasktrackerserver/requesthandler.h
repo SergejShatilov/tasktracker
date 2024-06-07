@@ -17,6 +17,7 @@ private:
     HttpResponse handlerDeleteEmployee(const HttpRequest& request);
     HttpResponse handlerGetEmployees(const HttpRequest& request);
     HttpResponse handlerChangeEmployee(const HttpRequest& request);
+    HttpResponse handlerCreateNewTask(const HttpRequest& request);
 
 private:
     DBManager* m_db;

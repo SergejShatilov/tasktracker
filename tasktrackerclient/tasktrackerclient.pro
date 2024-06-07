@@ -22,6 +22,7 @@ INCLUDEPATH += \
     $${COMMON}/ \
 
 SOURCES += \
+    dialogs/dialogedittask/dialogedittask.cpp \
     models/employeesmodel.cpp \
     models/employeeobject.cpp \
     dialogs/dialogauthorization/dialogauthorization.cpp \
@@ -29,22 +30,26 @@ SOURCES += \
     dialogs/dialogopendb/dialogopendb.cpp \
     httpclient/httpclient.cpp \
     $${COMMON}/employee.cpp \
+    $${COMMON}/task.cpp \
     main.cpp \
     mainwindow.cpp \
 
 HEADERS += \
+    dialogs/dialogedittask/dialogedittask.h \
     models/employeesmodel.h \
     models/employeeobject.h \
     dialogs/dialogauthorization/dialogauthorization.h \
     dialogs/dialogeditemployee/dialogeditemployee.h \
     dialogs/dialogopendb/dialogopendb.h \
     $${COMMON}/employee.h \
+    $${COMMON}/task.h \
     httpclient/httpclient.h \
     mainwindow.h
 
 FORMS += \
     dialogs/dialogauthorization/dialogauthorization.ui \
     dialogs/dialogeditemployee/dialogeditemployee.ui \
+    dialogs/dialogedittask/dialogedittask.ui \
     dialogs/dialogopendb/dialogopendb.ui \
     mainwindow.ui
 

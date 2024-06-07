@@ -43,8 +43,15 @@
     <addaction name="actionNewEmployee"/>
     <addaction name="actionDeleteEmployee"/>
    </widget>
+   <widget class="QMenu" name="menuTask">
+    <property name="title">
+     <string>Task</string>
+    </property>
+    <addaction name="actionCreateTask"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuTask"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNewDb">
@@ -65,6 +72,11 @@
   <action name="actionDeleteEmployee">
    <property name="text">
     <string>Delete Employee</string>
+   </property>
+  </action>
+  <action name="actionCreateTask">
+   <property name="text">
+    <string>Create Task ...</string>
    </property>
   </action>
  </widget>

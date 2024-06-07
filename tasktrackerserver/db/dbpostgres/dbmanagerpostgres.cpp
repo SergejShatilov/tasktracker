@@ -73,6 +73,16 @@ void DBManagerPostgres::changeEmployee(
 }
 
 // =============================================================================
+void DBManagerPostgres::createNewTask(
+    const DBAuthorization& authorization,
+    const QString& dbname,
+    const Task& task)
+{
+    QSqlDatabase db = addDatabase(authorization);
+    DBPostgresQuery::createNewTask(db, dbname, task);
+}
+
+// =============================================================================
 QSqlDatabase
 DBManagerPostgres::addDatabase(const DBAuthorization& authorization) const
 {

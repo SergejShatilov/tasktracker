@@ -32,6 +32,10 @@ public:
                         const QString& dbname,
                         const Employee& employee) override;
 
+    void createNewTask(const DBAuthorization& authorization,
+                       const QString& dbname,
+                       const Task& task) override;
+
 private:
     QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
 };

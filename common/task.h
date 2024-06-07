@@ -37,6 +37,9 @@ public:
     void setStart(const QDate& start);
     const QDate& start() const;
 
+    void setStartString(const QString& startString);
+    QString startString() const;
+
     void setDuration(qint32 duration);
     qint32 duration() const;
 

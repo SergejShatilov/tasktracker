@@ -6,6 +6,7 @@
 #include <QJsonObject>
 
 #include "employee.h"
+#include "task.h"
 
 class HttpClient : public QObject
 {
@@ -28,6 +29,7 @@ public:
     bool deleteEmployee(qint32 id);
     bool getEmployees(QList<Employee>& list);
     bool changeEmployee(qint32 id, const Employee& employee);
+    bool addTask(const Task& task);
 
 private:
     void showError();

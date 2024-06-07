@@ -7,6 +7,7 @@
 
 #include "dialogs/dialogopendb/dialogopendb.h"
 #include "dialogs/dialogeditemployee/dialogeditemployee.h"
+#include "dialogs/dialogedittask/dialogedittask.h"
 
 // =============================================================================
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionDeleteEmployee, &QAction::triggered,
             this, &MainWindow::deleteEmployee);
+
+    connect(ui->actionCreateTask, &QAction::triggered,
+            this, &MainWindow::newTask);
 
     connect(ui->treeView, &QTreeView::doubleClicked,
             this, &MainWindow::employeeViewDoubleClicked);
@@ -127,6 +131,16 @@ void MainWindow::updateEmployees()
         return;
 
     m_employeesModel->loadFromList(listEmployees);
+}
+
+// =============================================================================
+void MainWindow::newTask()
+{
+    auto dialog = std::make_unique<DialogEditTask>(m_httpClient,
+                                                   false, this);
+    dialog->show();
+    if (dialog->exec() != QDialog::Accepted)
+        return;
 }
 
 // =============================================================================

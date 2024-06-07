@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 
 #include "employee.h"
+#include "task.h"
 
 namespace DBPostgresQuery
 {
@@ -30,5 +31,9 @@ QList<Employee> getEmployees(QSqlDatabase& db,
 void changeEmployee(QSqlDatabase& db,
                     const QString& dbname,
                     const Employee& employee);
+
+void createNewTask(QSqlDatabase& db,
+                   const QString& dbname,
+                   const Task& task);
 
 }

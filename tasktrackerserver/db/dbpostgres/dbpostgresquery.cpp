@@ -54,9 +54,9 @@ namespace
                 "\tstart DATE,\r\n"                         // Дата начала
                 "\tduration INTEGER,\r\n"                       // Длительность задачи в днях
                 "\tparent INTEGER,\r\n"                         // ID родительской задачи
-                "\tdescription TEXT,\r\n"                       // Описание задачи
-                "\tFOREIGN KEY (executor) REFERENCES employees (id),\r\n"
-                "\tFOREIGN KEY (parent) REFERENCES tasks (id)\r\n"
+                "\tdescription TEXT\r\n"                       // Описание задачи
+               // "\tFOREIGN KEY (executor) REFERENCES employees (id),\r\n"
+                //"\tFOREIGN KEY (parent) REFERENCES tasks (id)\r\n"
                 ");\r\n"
             )
         );
@@ -289,6 +289,45 @@ void DBPostgresQuery::changeEmployee(QSqlDatabase& db,
         .arg(employee.email())
         .arg(employee.phone())
         .arg(employee.id())
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    if (!db.commit()) {
+        throw DBException(db.lastError(), __FILE__, __LINE__);
+    }
+}
+
+// =============================================================================
+void DBPostgresQuery::createNewTask(QSqlDatabase& db,
+                                    const QString& dbname,
+                                    const Task& task)
+{
+    db.setDatabaseName(dbname);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "INSERT INTO tasks ("
+            "name, "
+            "state, "
+            "executor, "
+            "start, "
+            "duration, "
+            "parent, "
+            "description)\r\n"
+            "VALUES ('%1', '%2', %3, '%4', %5, %6, '%7');\r\n"
+        )
+        .arg(task.name())
+        .arg(task.stateString())
+        .arg(task.executor())
+        .arg(task.startString())
+        .arg(task.duration())
+        .arg(task.parent())
+        .arg(task.description())
     );
 
     if (!result) {

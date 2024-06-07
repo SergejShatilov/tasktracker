@@ -85,6 +85,18 @@ const QDate& Task::start() const {
 }
 
 // =============================================================================
+void Task::setStartString(const QString& startString)
+{
+    m_start = QDate::fromString(startString, Qt::DateFormat::ISODate);
+}
+
+// =============================================================================
+QString Task::startString() const
+{
+    return m_start.toString(Qt::DateFormat::ISODate);
+}
+
+// =============================================================================
 void Task::setDuration(qint32 duration) {
     m_duration = duration;
 }
@@ -118,7 +130,7 @@ QJsonObject Task::toJsonObject() const {
     jObj.insert("name", m_name);
     jObj.insert("state", stateString());
     jObj.insert("executor", m_executor);
-    jObj.insert("start", m_start.toString());
+    jObj.insert("start", startString());
     jObj.insert("duration", m_duration);
     jObj.insert("parent", m_parent);
     jObj.insert("description", m_description);
@@ -133,10 +145,11 @@ Task Task::fromJsonObject(const QJsonObject& jObj)
     task.setName(jObj["name"].toString());
     task.setStateString(jObj["state"].toString());
     task.setExecutor(jObj["executor"].toInt());
-    task.setStart(QDate().fromString(jObj["start"].toString()));
+    task.setStartString(jObj["start"].toString());
     task.setDuration(jObj["duration"].toInt());
     task.setParent(jObj["parent"].toInt());
     task.setDescription(jObj["description"].toString());
+
     return task;
 }
 

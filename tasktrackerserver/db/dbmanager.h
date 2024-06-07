@@ -8,6 +8,7 @@
 #include <QList>
 #include "dbauthorization.h"
 #include "employee.h"
+#include "task.h"
 
 class DBManager
 {
@@ -37,6 +38,10 @@ public:
     virtual void changeEmployee(const DBAuthorization& authorization,
                                 const QString& dbname,
                                 const Employee& employee);
+
+    virtual void createNewTask(const DBAuthorization& authorization,
+                               const QString& dbname,
+                               const Task& task);
 protected:
     QString m_hostName;
     int     m_port;

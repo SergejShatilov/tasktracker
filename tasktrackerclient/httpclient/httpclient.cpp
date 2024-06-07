@@ -112,6 +112,17 @@ bool HttpClient::changeEmployee(qint32 id, const Employee& employee)
 }
 
 // =============================================================================
+bool HttpClient::addTask(const Task& task)
+{
+    return post
+    (
+        QString("/dbname-%1/tasks/")
+            .arg(m_dataBaseName),
+        task.toJsonObject()
+    );
+}
+
+// =============================================================================
 void HttpClient::showError()
 {
     QMessageBox message(QMessageBox::Critical,
