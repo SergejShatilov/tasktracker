@@ -31,6 +31,7 @@ SOURCES += \
     db/dbpostgres/dbmanagerpostgres.cpp \
     db/dbpostgres/dbpostgresquery.cpp \
     $${COMMON}/employee.cpp \
+    $${COMMON}/task.cpp \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -50,4 +51,5 @@ HEADERS += \
     db/dbpostgres/dbmanagerpostgres.h \
     db/dbpostgres/dbpostgresquery.h \
     $${COMMON}/employee.h   \
+    $${COMMON}/task.h \
 

@@ -27,6 +27,7 @@ private slots:
     void updateEmployees();
 
     void employeeViewDoubleClicked(const QModelIndex& index);
+    void employeesViewContextMenu(const QPoint& pos);
 
 private:
     void setWindowDbName(const QString& name);

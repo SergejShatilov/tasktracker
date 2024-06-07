@@ -51,10 +51,9 @@ namespace
                 "\tname CHARACTER VARYING(60),\r\n"             // Наименование задачи
                 "\tstate task_state,\r\n"                       // Состояние задачи
                 "\texecutor INTEGER,\r\n"                       // ID исполнителя
-                "\tstartdate DATE,\r\n"                         // Дата начала
-                "\tenddate DATE,\r\n"                           // Дата окончания
+                "\tstart DATE,\r\n"                         // Дата начала
+                "\tduration INTEGER,\r\n"                       // Длительность задачи в днях
                 "\tparent INTEGER,\r\n"                         // ID родительской задачи
-                "\tdependencies INTEGER[],\r\n"                 // Список ID предшествующих задач
                 "\tdescription TEXT,\r\n"                       // Описание задачи
                 "\tFOREIGN KEY (executor) REFERENCES employees (id),\r\n"
                 "\tFOREIGN KEY (parent) REFERENCES tasks (id)\r\n"

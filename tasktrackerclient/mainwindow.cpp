@@ -39,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeView->setColumnHidden(1, true);
     ui->treeView->setColumnHidden(2, true);
     ui->treeView->setColumnHidden(3, true);
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, &QTreeView::customContextMenuRequested,
+            this, &MainWindow::employeesViewContextMenu);
 }
 
 // =============================================================================
@@ -141,6 +144,30 @@ void MainWindow::employeeViewDoubleClicked(const QModelIndex& index)
 
     if (dialog->exec() != QDialog::Accepted)
         return;
+}
+
+// =============================================================================
+void MainWindow::employeesViewContextMenu(const QPoint& pos)
+{
+    QModelIndex index = ui->treeView->indexAt(pos);
+
+    QMenu menu;
+    menu.addAction(QStringLiteral("New..."), this, &MainWindow::newEmployee);
+    menu.addSeparator();
+
+    if (index.isValid())
+    {
+        menu.addAction(QStringLiteral("Edit..."), this, [this, &index](){
+            employeeViewDoubleClicked(index);
+        });
+        menu.addAction(QStringLiteral("Delete"), this,
+                       &MainWindow::deleteEmployee);
+        menu.addSeparator();
+
+    }
+
+    menu.addAction(QStringLiteral("Update"), this, &MainWindow::updateEmployees);
+    menu.exec(QCursor::pos());
 }
 
 // =============================================================================
