@@ -402,3 +402,43 @@ void DBPostgresQuery::deleteTask(QSqlDatabase& db,
 }
 
 // =============================================================================
+void DBPostgresQuery::changeTask(QSqlDatabase& db,
+                                 const QString& dbname,
+                                 const Task& task)
+{
+    db.setDatabaseName(dbname);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "UPDATE tasks\r\n"
+            "SET name = '%1',\r\n"
+            "    state = '%2',\r\n"
+            "    executor = %3,\r\n"
+            "    start = '%4',\r\n"
+            "    duration = %5,\r\n"
+            "    parent = %6,\r\n"
+            "    description = '%7'\r\n"
+            "WHERE id = %8;\r\n"
+        )
+        .arg(task.name())
+        .arg(task.stateString())
+        .arg(task.executorId())
+        .arg(task.startString())
+        .arg(task.duration())
+        .arg(task.parentId())
+        .arg(task.description())
+        .arg(task.id())
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    if (!db.commit()) {
+        throw DBException(db.lastError(), __FILE__, __LINE__);
+    }
+}
+
+// =============================================================================

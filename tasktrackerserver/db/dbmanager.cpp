@@ -136,3 +136,16 @@ void DBManager::deleteTask(
 }
 
 // =============================================================================
+void DBManager::changeTask(
+    const DBAuthorization& authorization,
+    const QString& dbname,
+    const Task& task)
+{
+    Q_UNUSED(authorization);
+    Q_UNUSED(dbname);
+    Q_UNUSED(task);
+
+    throw EXCEPTION_NOT_IMPLEMENTED();
+}
+
+// =============================================================================

@@ -151,6 +151,18 @@ bool HttpClient::deleteTask(qint32 id)
 }
 
 // =============================================================================
+bool HttpClient::changeTask(qint32 id, const Task& task)
+{
+    return put
+    (
+        QString("/dbname-%1/tasks/id-%2/")
+            .arg(m_dataBaseName)
+            .arg(id),
+        task.toJsonObject()
+    );
+}
+
+// =============================================================================
 void HttpClient::showError()
 {
     QMessageBox message(QMessageBox::Critical,

@@ -95,6 +95,15 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
             return handlerDeleteTask(request);
         }
     );
+
+    // Регистрируем обработчик изменения данных о задаче
+    httpServer.route(
+        HttpRequest::Method::Put,
+        "/dbname-{dbname}/tasks/id-{id}/",
+        [this](const HttpRequest& request) {
+            return handlerChangeTask(request);
+        }
+    );
 }
 
 // =============================================================================
@@ -309,6 +318,29 @@ HttpResponse RequestHandler::handlerDeleteTask(const HttpRequest& request)
 
     try {
         m_db->deleteTask(authorization, request.dbname(), request.id());
+    } catch (const DBException& ex) {
+        qDebug() << ex;
+        return HttpResponse(HttpResponse::Status::BadRequest,
+                            ex.error().text().toLocal8Bit());
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerChangeTask(const HttpRequest& request)
+{
+    qDebug() << "Change task...";
+
+    // Получаем данные сотрудника
+    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
+    Task task = Task::fromJsonObject(jdoc.object());
+
+    // Объект для авторизации
+    DBAuthorization authorization(request.userName(), request.password());
+
+    try {
+        m_db->changeTask(authorization, request.dbname(), task);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,

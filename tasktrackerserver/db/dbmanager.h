@@ -49,6 +49,10 @@ public:
     virtual void deleteTask(const DBAuthorization& authorization,
                             const QString& dbname,
                             qint32 id);
+
+    virtual void changeTask(const DBAuthorization& authorization,
+                            const QString& dbname,
+                            const Task& task);
 protected:
     QString m_hostName;
     int     m_port;

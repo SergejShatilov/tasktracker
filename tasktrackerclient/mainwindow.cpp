@@ -87,6 +87,7 @@ void MainWindow::openDb()
     setWindowDbName(dialog->dbName());
 
     updateEmployees();
+    updateTasks();
 }
 
 // =============================================================================
@@ -146,6 +147,8 @@ void MainWindow::newTask()
     dialog->show();
     if (dialog->exec() != QDialog::Accepted)
         return;
+
+    m_tasksModel->addTask(dialog->task());
 }
 
 // =============================================================================

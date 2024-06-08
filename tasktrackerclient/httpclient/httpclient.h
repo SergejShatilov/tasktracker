@@ -34,6 +34,7 @@ public:
     bool addTask(const Task& task);
     bool getTasks(QList<Task>& list);
     bool deleteTask(qint32 id);
+    bool changeTask(qint32 id, const Task& task);
 
 private:
     void showError();

@@ -22,6 +22,7 @@ private:
     HttpResponse handlerCreateNewTask(const HttpRequest& request);
     HttpResponse handlerGetTasks(const HttpRequest& request);
     HttpResponse handlerDeleteTask(const HttpRequest& request);
+    HttpResponse handlerChangeTask(const HttpRequest& request);
 
 private:
     DBManager* m_db;

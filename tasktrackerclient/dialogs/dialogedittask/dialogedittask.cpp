@@ -39,10 +39,22 @@ void DialogEditTask::setModel(QAbstractItemModel* model)
 {
     m_mapper->setSubmitPolicy(QDataWidgetMapper::SubmitPolicy::ManualSubmit);
     m_mapper->setModel(model);
+    m_mapper->addMapping(ui->lineEditName, 1);
+    m_mapper->addMapping(ui->textEditDescription, 7, "plainText");
+    m_mapper->addMapping(ui->dateEditStart, 4);
+    m_mapper->addMapping(ui->spinBoxDuration, 5);
 }
 
 // =============================================================================
-void DialogEditTask::setCurrentModelIndex(const QModelIndex& index) {
+void DialogEditTask::setCurrentModelIndex(const QModelIndex& index)
+{
+    if (m_mapper->model() == nullptr)
+        return;
+
+    QModelIndex idIndex = m_mapper->model()->index(index.row(), 0);
+
+    m_task.setId(m_mapper->model()->data(idIndex).toInt());
+
     m_mapper->setCurrentModelIndex(index);
 }
 
@@ -60,7 +72,22 @@ void DialogEditTask::changed(const QString &)
 // =============================================================================
 void DialogEditTask::submit()
 {
+    m_task.setName(ui->lineEditName->text());
+    m_task.setState(Task::State::NotStarted);
+    m_task.setExecutorId(1);
+    m_task.setStart(ui->dateEditStart->date());
+    m_task.setDuration(ui->spinBoxDuration->value());
+    m_task.setParentId(1);
+    m_task.setDescription(ui->textEditDescription->toPlainText());
 
+    ui->pushButtonOk->setEnabled(false);
+    if (!m_httpClient->changeTask(m_task.id(), m_task)) {
+        ui->pushButtonOk->setEnabled(true);
+        return;
+    }
+
+    m_mapper->submit();
+    accept();
 }
 
 // =============================================================================

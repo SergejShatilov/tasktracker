@@ -102,6 +102,16 @@ void DBManagerPostgres::deleteTask(
 }
 
 // =============================================================================
+void DBManagerPostgres::changeTask(
+    const DBAuthorization& authorization,
+    const QString& dbname,
+    const Task& task)
+{
+    QSqlDatabase db = addDatabase(authorization);
+    DBPostgresQuery::changeTask(db, dbname, task);
+}
+
+// =============================================================================
 QSqlDatabase
 DBManagerPostgres::addDatabase(const DBAuthorization& authorization) const
 {

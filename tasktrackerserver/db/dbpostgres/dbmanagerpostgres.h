@@ -43,6 +43,10 @@ public:
                     const QString& dbname,
                     qint32 id) override;
 
+    void changeTask(const DBAuthorization& authorization,
+                    const QString& dbname,
+                    const Task& task) override;
+
 private:
     QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
 };
