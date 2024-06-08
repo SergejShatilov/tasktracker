@@ -33,6 +33,7 @@ public:
 
     bool addTask(const Task& task);
     bool getTasks(QList<Task>& list);
+    bool deleteTask(qint32 id);
 
 private:
     void showError();

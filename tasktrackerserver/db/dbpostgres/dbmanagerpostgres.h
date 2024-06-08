@@ -39,6 +39,10 @@ public:
     QList<Task> getTasks(const DBAuthorization& authorization,
                          const QString& dbname) override;
 
+    void deleteTask(const DBAuthorization& authorization,
+                    const QString& dbname,
+                    qint32 id) override;
+
 private:
     QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
 };

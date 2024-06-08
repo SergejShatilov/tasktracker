@@ -151,7 +151,28 @@ void MainWindow::newTask()
 // =============================================================================
 void MainWindow::deleteTask()
 {
+    auto index = ui->treeView->currentIndex();
 
+    if (!index.isValid())
+        return;
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        tr("Delete task?"),
+        tr("Deleting a task will delete the entire subtask tree. "
+           "Are you sure you want to delete the task?"),
+        QMessageBox::Yes | QMessageBox::Cancel
+    );
+
+    if (reply != QMessageBox::Yes)
+        return;
+
+    auto id = m_tasksModel->idByIndex(index);
+
+    if (!m_httpClient->deleteTask(id))
+        return;
+
+    m_tasksModel->removeTask(index);
 }
 
 // =============================================================================

@@ -39,4 +39,8 @@ void createNewTask(QSqlDatabase& db,
 QList<Task> getTasks(QSqlDatabase& db,
                      const QString& dbname);
 
+void deleteTask(QSqlDatabase& db,
+                const QString& dbname,
+                qint32 id);
+
 }

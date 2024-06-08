@@ -376,3 +376,29 @@ QList<Task> DBPostgresQuery::getTasks(QSqlDatabase& db,
 }
 
 // =============================================================================
+void DBPostgresQuery::deleteTask(QSqlDatabase& db,
+                                 const QString& dbname,
+                                 qint32 id)
+{
+    db.setDatabaseName(dbname);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "DELETE FROM tasks\r\n"
+            "WHERE id=%1;\r\n"
+        )
+        .arg(id)
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    if (!db.commit()) {
+        throw DBException(db.lastError(), __FILE__, __LINE__);
+    }
+}
+
+// =============================================================================

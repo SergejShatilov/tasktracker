@@ -140,6 +140,17 @@ bool HttpClient::getTasks(QList<Task>& list)
 }
 
 // =============================================================================
+bool HttpClient::deleteTask(qint32 id)
+{
+    return del
+    (
+        QString("/dbname-%1/tasks/id-%2/")
+        .arg(m_dataBaseName)
+        .arg(id)
+    );
+}
+
+// =============================================================================
 void HttpClient::showError()
 {
     QMessageBox message(QMessageBox::Critical,

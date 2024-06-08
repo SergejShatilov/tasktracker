@@ -74,7 +74,6 @@ void DBManager::deleteEmployee(
     throw EXCEPTION_NOT_IMPLEMENTED();
 }
 
-
 // =============================================================================
 void DBManager::changeEmployee(
     const DBAuthorization& authorization,
@@ -119,6 +118,19 @@ QList<Task> DBManager::getTasks(
 {
     Q_UNUSED(authorization);
     Q_UNUSED(dbname);
+
+    throw EXCEPTION_NOT_IMPLEMENTED();
+}
+
+// =============================================================================
+void DBManager::deleteTask(
+    const DBAuthorization& authorization,
+    const QString& dbname,
+    qint32 id)
+{
+    Q_UNUSED(authorization);
+    Q_UNUSED(dbname);
+    Q_UNUSED(id);
 
     throw EXCEPTION_NOT_IMPLEMENTED();
 }

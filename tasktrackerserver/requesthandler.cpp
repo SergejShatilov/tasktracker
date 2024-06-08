@@ -86,6 +86,15 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
             return handlerGetTasks(request);
         }
     );
+
+    // Регистрируем обработчик удаления задачи
+    httpServer.route(
+        HttpRequest::Method::Delete,
+        "/dbname-{dbname}/tasks/id-{id}/",
+        [this](const HttpRequest& request) {
+            return handlerDeleteTask(request);
+        }
+    );
 }
 
 // =============================================================================
@@ -288,6 +297,25 @@ HttpResponse RequestHandler::handlerGetTasks(const HttpRequest &request)
         HttpResponse::Status::OK,
         QJsonDocument(jobj).toJson(QJsonDocument::JsonFormat::Compact)
     );
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerDeleteTask(const HttpRequest& request)
+{
+    qDebug() << "Delete task...";
+
+    // Объект для авторизации
+    DBAuthorization authorization(request.userName(), request.password());
+
+    try {
+        m_db->deleteTask(authorization, request.dbname(), request.id());
+    } catch (const DBException& ex) {
+        qDebug() << ex;
+        return HttpResponse(HttpResponse::Status::BadRequest,
+                            ex.error().text().toLocal8Bit());
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
 }
 
 // =============================================================================

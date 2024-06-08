@@ -45,6 +45,10 @@ public:
 
     virtual QList<Task> getTasks(const DBAuthorization& authorization,
                                  const QString& dbname);
+
+    virtual void deleteTask(const DBAuthorization& authorization,
+                            const QString& dbname,
+                            qint32 id);
 protected:
     QString m_hostName;
     int     m_port;
