@@ -36,4 +36,7 @@ void createNewTask(QSqlDatabase& db,
                    const QString& dbname,
                    const Task& task);
 
+QList<Task> getTasks(QSqlDatabase& db,
+                     const QString& dbname);
+
 }

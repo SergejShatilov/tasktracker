@@ -83,6 +83,15 @@ void DBManagerPostgres::createNewTask(
 }
 
 // =============================================================================
+QList<Task> DBManagerPostgres::getTasks(
+    const DBAuthorization& authorization,
+    const QString& dbname)
+{
+    QSqlDatabase db = addDatabase(authorization);
+    return DBPostgresQuery::getTasks(db, dbname);
+}
+
+// =============================================================================
 QSqlDatabase
 DBManagerPostgres::addDatabase(const DBAuthorization& authorization) const
 {

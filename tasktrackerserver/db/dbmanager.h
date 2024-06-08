@@ -42,6 +42,9 @@ public:
     virtual void createNewTask(const DBAuthorization& authorization,
                                const QString& dbname,
                                const Task& task);
+
+    virtual QList<Task> getTasks(const DBAuthorization& authorization,
+                                 const QString& dbname);
 protected:
     QString m_hostName;
     int     m_port;

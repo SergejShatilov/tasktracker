@@ -123,6 +123,23 @@ bool HttpClient::addTask(const Task& task)
 }
 
 // =============================================================================
+bool HttpClient::getTasks(QList<Task>& list)
+{
+    QJsonObject jObj;
+    if (!get(QString("/dbname-%1/tasks/").arg(m_dataBaseName), jObj))
+        return false;
+
+    list.clear();
+
+    QJsonArray jarray = jObj["tasks"].toArray();
+    for (const auto& jtask : jarray) {
+        list.append(Task::fromJsonObject(jtask.toObject()));
+    }
+
+    return true;
+}
+
+// =============================================================================
 void HttpClient::showError()
 {
     QMessageBox message(QMessageBox::Critical,

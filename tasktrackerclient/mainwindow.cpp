@@ -157,7 +157,11 @@ void MainWindow::deleteTask()
 // =============================================================================
 void MainWindow::updateTasks()
 {
+    QList<Task> listTasks;
+    if (!m_httpClient->getTasks(listTasks))
+        return;
 
+    m_tasksModel->loadFromList(listTasks);
 }
 
 // =============================================================================

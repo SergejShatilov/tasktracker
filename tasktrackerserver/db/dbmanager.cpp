@@ -113,3 +113,14 @@ void DBManager::createNewTask(
 }
 
 // =============================================================================
+QList<Task> DBManager::getTasks(
+    const DBAuthorization& authorization,
+    const QString& dbname)
+{
+    Q_UNUSED(authorization);
+    Q_UNUSED(dbname);
+
+    throw EXCEPTION_NOT_IMPLEMENTED();
+}
+
+// =============================================================================

@@ -77,6 +77,15 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
             return handlerCreateNewTask(request);
         }
     );
+
+    // Регистрируем обработчик запроса задач
+    httpServer.route(
+        HttpRequest::Method::Get,
+        "/dbname-{dbname}/tasks/",
+        [this](const HttpRequest& request) {
+            return handlerGetTasks(request);
+        }
+    );
 }
 
 // =============================================================================
@@ -245,6 +254,40 @@ RequestHandler::handlerCreateNewTask(const HttpRequest &request)
     }
 
     return HttpResponse(HttpResponse::Status::Created);
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerGetTasks(const HttpRequest &request)
+{
+    qDebug() << "Get tasks...";
+
+    DBAuthorization authorization(request.userName(), request.password());
+    QList<Task> listTasks;
+
+    try {
+        listTasks = m_db->getTasks(authorization, request.dbname());
+    } catch (const DBException& ex) {
+        qDebug() << ex;
+        return HttpResponse(HttpResponse::Status::BadRequest,
+                            ex.error().text().toLocal8Bit());
+    }
+
+    QJsonArray jarray;
+    for (const auto& employee : listTasks) {
+        jarray.append(employee.toJsonObject());
+    }
+
+    QJsonObject jobj;
+    jobj.insert("tasks", QJsonValue(jarray));
+
+    QJsonDocument jdoc;
+    jdoc.setObject(jobj);
+
+    return HttpResponse
+    (
+        HttpResponse::Status::OK,
+        QJsonDocument(jobj).toJson(QJsonDocument::JsonFormat::Compact)
+    );
 }
 
 // =============================================================================

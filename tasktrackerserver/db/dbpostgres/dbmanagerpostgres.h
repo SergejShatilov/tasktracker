@@ -36,6 +36,9 @@ public:
                        const QString& dbname,
                        const Task& task) override;
 
+    QList<Task> getTasks(const DBAuthorization& authorization,
+                         const QString& dbname) override;
+
 private:
     QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
 };
