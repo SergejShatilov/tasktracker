@@ -4,9 +4,8 @@
 #include <QMainWindow>
 
 #include "httpclient/httpclient.h"
-
-#include "models/employeesmodel.h"
-#include "models/tasksmodel.h"
+#include "views/tasksview.h"
+#include "views/employeesview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,28 +23,16 @@ private slots:
     void newDb();
     void openDb();
 
-    void newEmployee();
-    void deleteEmployee();
-    void updateEmployees();
-
-    void newTask();
-    void deleteTask();
-    void updateTasks();
-
-    void employeeViewDoubleClicked(const QModelIndex& index);
-    void employeesViewContextMenu(const QPoint& pos);
-
-    void tasksViewDoubleClicked(const QModelIndex& index);
-    void tasksViewContextMenu(const QPoint& pos);
-
 private:
     void setWindowDbName(const QString& name);
+    void uiViewDisconnected();
+    void uiViewConnected();
 
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<HttpClient> m_httpClient;
-    EmployeesModel* m_employeesModel;
-    TasksModel* m_tasksModel;
+    TasksView*     m_tasksView;
+    EmployeesView* m_employeesView;
 };
 
 #endif // MAINWINDOW_H

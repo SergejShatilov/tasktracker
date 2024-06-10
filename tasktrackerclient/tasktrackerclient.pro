@@ -27,6 +27,8 @@ SOURCES += \
     models/tasksmodel.cpp \
     models/employeeobject.cpp \
     models/taskobject.cpp \
+    views/employeesview.cpp \
+    views/tasksview.cpp \
     dialogs/dialogauthorization/dialogauthorization.cpp \
     dialogs/dialogeditemployee/dialogeditemployee.cpp \
     dialogs/dialogopendb/dialogopendb.cpp \
@@ -42,6 +44,8 @@ HEADERS += \
     models/employeeobject.h \
     models/tasksmodel.h \
     models/taskobject.h \
+    views/tasksview.h \
+    views/employeesview.h \
     dialogs/dialogauthorization/dialogauthorization.h \
     dialogs/dialogeditemployee/dialogeditemployee.h \
     dialogs/dialogopendb/dialogopendb.h \
