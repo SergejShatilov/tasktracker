@@ -19,14 +19,14 @@ TasksModel::~TasksModel()
 }
 
 // =============================================================================
-void TasksModel::addTask(const Task& task)
+void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
 {
-    auto parentIndex = QModelIndex();
-
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
 
     TaskObject* taskObject = new TaskObject(task);
-    taskObject->setParent(m_rootItem);
+
+    auto parent = taskObjectByIndex(parentIndex);
+    taskObject->setParent(parent);
 
     endInsertRows();
 }
@@ -54,10 +54,20 @@ void TasksModel::loadFromList(const QList<Task>& list)
 qint32 TasksModel::idByIndex(const QModelIndex& index) const
 {
     if (!index.isValid())
-        return -1;
+        return 0;
 
     TaskObject* taskObject = taskObjectByIndex(index);
     return taskObject->id();
+}
+
+// =============================================================================
+QString TasksModel::nameByIndex(const QModelIndex& index) const
+{
+    if (!index.isValid())
+        return QString("");
+
+    TaskObject* taskObject = taskObjectByIndex(index);
+    return taskObject->name();
 }
 
 // =============================================================================

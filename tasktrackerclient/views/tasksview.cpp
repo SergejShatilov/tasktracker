@@ -18,8 +18,8 @@ TasksView::TasksView(std::shared_ptr<HttpClient> httpClient,
     connect(this, &QTreeView::customContextMenuRequested,
             this, &TasksView::slotContextMenu);
 
-    connect(this, &QTreeView::doubleClicked,
-            this, &TasksView::slotDoubleClicked);
+    /*connect(this, &QTreeView::doubleClicked,
+            this, &TasksView::slotDoubleClicked);*/
 }
 
 // =============================================================================
@@ -46,6 +46,29 @@ void TasksView::slotCreate()
         return;
 
     m_tasksModel->addTask(dialog->task());
+}
+
+// =============================================================================
+void TasksView::slotCreateSub(const QModelIndex& index)
+{
+    auto dialog = std::make_unique<DialogEditTask>
+    (
+        m_httpClient,
+        false,
+        this
+    );
+
+    auto idTaskParent = m_tasksModel->idByIndex(index);
+    auto nameTaskParent = m_tasksModel->nameByIndex(index);
+
+    dialog->setParentTask(idTaskParent, nameTaskParent);
+
+    if (dialog->exec() != QDialog::Accepted)
+        return;
+
+    m_tasksModel->addTask(dialog->task(), index);
+
+    repaint();
 }
 
 // =============================================================================
@@ -106,6 +129,13 @@ void TasksView::slotContextMenu(const QPoint& pos)
 
     QMenu menu;
     menu.addAction(tr("Add..."), this, &TasksView::slotCreate);
+
+    if (index.isValid()) {
+        menu.addAction(tr("Add Subtask..."), this, [this, &index](){
+            slotCreateSub(index);
+        });
+    }
+
     menu.addSeparator();
 
     if (index.isValid())

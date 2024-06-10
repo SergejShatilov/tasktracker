@@ -10,43 +10,32 @@ public:
 
     QString dbtype() const override;
 
-    void createNewDB(const DBAuthorization& authorization,
-                     const QString& dbname,
-                     const QString& dbowner) override;
+    void createNewDB(const QString& dbname) override;
 
-    void checkExistDb(const DBAuthorization& authorization,
-                      const QString& dbname) override;
+    void checkExistDb(const QString& dbname) override;
 
-    void createNewEmployee(const DBAuthorization& authorization,
-                           const QString& dbname,
+    void createNewEmployee(const QString& dbname,
                            const Employee& employee) override;
 
-    void deleteEmployee(const DBAuthorization& authorization,
-                        const QString& dbname,
+    void deleteEmployee(const QString& dbname,
                         qint32 id) override;
 
-    QList<Employee> getEmployees(const DBAuthorization& authorization,
-                                 const QString& dbname) override;
+    QList<Employee> getEmployees(const QString& dbname) override;
 
-    void changeEmployee(const DBAuthorization& authorization,
-                        const QString& dbname,
+    void changeEmployee(const QString& dbname,
                         const Employee& employee) override;
 
-    void createNewTask(const DBAuthorization& authorization,
-                       const QString& dbname,
+    void createNewTask(const QString& dbname,
                        const Task& task) override;
 
-    QList<Task> getTasks(const DBAuthorization& authorization,
-                         const QString& dbname) override;
+    QList<Task> getTasks(const QString& dbname) override;
 
-    void deleteTask(const DBAuthorization& authorization,
-                    const QString& dbname,
+    void deleteTask(const QString& dbname,
                     qint32 id) override;
 
-    void changeTask(const DBAuthorization& authorization,
-                    const QString& dbname,
+    void changeTask(const QString& dbname,
                     const Task& task) override;
 
 private:
-    QSqlDatabase addDatabase(const DBAuthorization& authorization) const;
+    QSqlDatabase addDatabase() const;
 };

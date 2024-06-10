@@ -25,36 +25,25 @@ DBManager::DBManager(const QString& hostName, int port) :
 }
 
 // =============================================================================
-void DBManager::createNewDB(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const QString& dbowner)
+void DBManager::createNewDB(const QString& dbname)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
-    Q_UNUSED(dbowner);
 
     throw EXCEPTION_NOT_IMPLEMENTED();
 };
 
 // =============================================================================
-void DBManager::checkExistDb(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+void DBManager::checkExistDb(const QString& dbname)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
 
     throw EXCEPTION_NOT_IMPLEMENTED();
 }
 
 // =============================================================================
-void DBManager::createNewEmployee(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Employee& employee)
+void DBManager::createNewEmployee(const QString& dbname,
+                                  const Employee& employee)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(employee);
 
@@ -62,12 +51,8 @@ void DBManager::createNewEmployee(
 }
 
 // =============================================================================
-void DBManager::deleteEmployee(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    qint32 id)
+void DBManager::deleteEmployee(const QString& dbname, qint32 id)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(id);
 
@@ -75,12 +60,9 @@ void DBManager::deleteEmployee(
 }
 
 // =============================================================================
-void DBManager::changeEmployee(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Employee& employee)
+void DBManager::changeEmployee(const QString& dbname,
+                               const Employee& employee)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(employee);
 
@@ -88,23 +70,16 @@ void DBManager::changeEmployee(
 }
 
 // =============================================================================
-QList<Employee> DBManager::getEmployees(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+QList<Employee> DBManager::getEmployees(const QString& dbname)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
 
     throw EXCEPTION_NOT_IMPLEMENTED();
 }
 
 // =============================================================================
-void DBManager::createNewTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Task& task)
+void DBManager::createNewTask(const QString& dbname, const Task& task)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(task);
 
@@ -112,23 +87,16 @@ void DBManager::createNewTask(
 }
 
 // =============================================================================
-QList<Task> DBManager::getTasks(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+QList<Task> DBManager::getTasks(const QString& dbname)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
 
     throw EXCEPTION_NOT_IMPLEMENTED();
 }
 
 // =============================================================================
-void DBManager::deleteTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    qint32 id)
+void DBManager::deleteTask(const QString& dbname, qint32 id)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(id);
 
@@ -136,12 +104,8 @@ void DBManager::deleteTask(
 }
 
 // =============================================================================
-void DBManager::changeTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Task& task)
+void DBManager::changeTask(const QString& dbname, const Task& task)
 {
-    Q_UNUSED(authorization);
     Q_UNUSED(dbname);
     Q_UNUSED(task);
 

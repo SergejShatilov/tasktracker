@@ -24,6 +24,8 @@ public:
 
     const Task& task() const;
 
+    void setParentTask(qint32 parentId, const QString& parentName);
+
 private slots:
     void changed(const QString &);
     void submit();

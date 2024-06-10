@@ -64,6 +64,13 @@ const Task& DialogEditTask::task() const {
 }
 
 // =============================================================================
+void DialogEditTask::setParentTask(qint32 parentId, const QString& parentName)
+{
+    m_task.setParentId(parentId);
+    ui->labelParent->setText(parentName);
+}
+
+// =============================================================================
 void DialogEditTask::changed(const QString &)
 {
     ui->pushButtonOk->setEnabled(!ui->lineEditName->text().isEmpty());
@@ -77,7 +84,6 @@ void DialogEditTask::submit()
     m_task.setExecutorId(1);
     m_task.setStart(ui->dateEditStart->date());
     m_task.setDuration(ui->spinBoxDuration->value());
-    m_task.setParentId(1);
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);
@@ -98,7 +104,6 @@ void DialogEditTask::createNewTask()
     m_task.setExecutorId(1);
     m_task.setStart(ui->dateEditStart->date());
     m_task.setDuration(ui->spinBoxDuration->value());
-    m_task.setParentId(1);
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);

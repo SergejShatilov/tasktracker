@@ -18,6 +18,7 @@ public slots:
 
 private slots:
     void slotCreate();
+    void slotCreateSub(const QModelIndex& index);
     void slotDelete();
     void slotEdit(const QModelIndex& index);
 

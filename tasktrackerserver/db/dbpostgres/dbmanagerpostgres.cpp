@@ -15,111 +15,88 @@ QString DBManagerPostgres::dbtype() const {
 }
 
 // =============================================================================
-void DBManagerPostgres::createNewDB(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const QString& dbowner)
+void DBManagerPostgres::createNewDB(const QString& dbname)
 {
-    QSqlDatabase db = addDatabase(authorization);
-    DBPostgresQuery::createNewDB(db, dbname, dbowner);
+    QSqlDatabase db = addDatabase();
+    DBPostgresQuery::createNewDB(db, dbname, "postgres");
 }
 
 // =============================================================================
-void DBManagerPostgres::checkExistDb(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+void DBManagerPostgres::checkExistDb(const QString& dbname)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::checkExistDb(db, dbname);
 }
 
 // =============================================================================
 void DBManagerPostgres::createNewEmployee(
-    const DBAuthorization& authorization,
     const QString& dbname,
     const Employee& employee)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::createNewEmployee(db, dbname, employee);
 }
 
 // =============================================================================
-void DBManagerPostgres::deleteEmployee(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    qint32 id)
+void DBManagerPostgres::deleteEmployee(const QString& dbname, qint32 id)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::deleteEmployee(db, dbname, id);
 }
 
 // =============================================================================
-QList<Employee> DBManagerPostgres::getEmployees(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+QList<Employee> DBManagerPostgres::getEmployees(const QString& dbname)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     return DBPostgresQuery::getEmployees(db, dbname);
 }
 
 // =============================================================================
 void DBManagerPostgres::changeEmployee(
-    const DBAuthorization& authorization,
     const QString& dbname,
     const Employee& employee)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::changeEmployee(db, dbname, employee);
 }
 
 // =============================================================================
-void DBManagerPostgres::createNewTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Task& task)
+void DBManagerPostgres::createNewTask(const QString& dbname, const Task& task)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::createNewTask(db, dbname, task);
 }
 
 // =============================================================================
-QList<Task> DBManagerPostgres::getTasks(
-    const DBAuthorization& authorization,
-    const QString& dbname)
+QList<Task> DBManagerPostgres::getTasks(const QString& dbname)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     return DBPostgresQuery::getTasks(db, dbname);
 }
 
 // =============================================================================
-void DBManagerPostgres::deleteTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    qint32 id)
+void DBManagerPostgres::deleteTask(const QString& dbname, qint32 id)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::deleteTask(db, dbname, id);
 }
 
 // =============================================================================
-void DBManagerPostgres::changeTask(
-    const DBAuthorization& authorization,
-    const QString& dbname,
-    const Task& task)
+void DBManagerPostgres::changeTask(const QString& dbname, const Task& task)
 {
-    QSqlDatabase db = addDatabase(authorization);
+    QSqlDatabase db = addDatabase();
     DBPostgresQuery::changeTask(db, dbname, task);
 }
 
 // =============================================================================
 QSqlDatabase
-DBManagerPostgres::addDatabase(const DBAuthorization& authorization) const
+DBManagerPostgres::addDatabase() const
 {
     QSqlDatabase db = QSqlDatabase::addDatabase(dbtype());
     db.setHostName(m_hostName);
     db.setPort(m_port);
-    db.setUserName(authorization.userName());
-    db.setPassword(authorization.passWord());
+    db.setUserName("postgres");
+    db.setPassword("123");
 
     return db;
 }

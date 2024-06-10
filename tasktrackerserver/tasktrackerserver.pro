@@ -47,7 +47,6 @@ HEADERS += \
     db/dbmanager.h \
     db/dbexception.h \
     db/dbopener.h \
-    db/dbauthorization.h \
     db/dbpostgres/dbmanagerpostgres.h \
     db/dbpostgres/dbpostgresquery.h \
     $${COMMON}/employee.h   \

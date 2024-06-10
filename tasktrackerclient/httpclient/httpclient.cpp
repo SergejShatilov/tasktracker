@@ -7,16 +7,13 @@
 #include <QJsonArray>
 #include <QEventLoop>
 
-#include "dialogs/dialogauthorization/dialogauthorization.h"
-
 // =============================================================================
 HttpClient::HttpClient(QObject *parent) :
     QObject(parent),
     m_lastErrorString(""),
     m_hostName("127.0.0.1"),
     m_port(80),
-    m_dataBaseName("undefined"),
-    m_isAuthorized(false)
+    m_dataBaseName("undefined")
 {
 
 }
@@ -173,34 +170,15 @@ void HttpClient::showError()
 }
 
 // =============================================================================
-bool HttpClient::checkAuthorization()
-{
-    if (m_isAuthorized)
-        return true;
-
-    DialogAuthorization dialog;
-    if (dialog.exec() != QDialog::Accepted)
-        return false;
-
-    m_userName = dialog.userName();
-    m_password = dialog.password();
-    return true;
-}
-
-// =============================================================================
 bool HttpClient::post(const QString& endPoint, const QJsonObject& jObj)
 {
     bool result = false;
-
-    if (!checkAuthorization())
-        return false;
 
     QNetworkAccessManager manager(this);
     connect(&manager, &QNetworkAccessManager::finished,
             this, [this, &result](QNetworkReply* reply)
     {
         if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            m_isAuthorized = true;
             result = true;
         }
         else
@@ -214,11 +192,8 @@ bool HttpClient::post(const QString& endPoint, const QJsonObject& jObj)
         emit finished();
     });
 
-    const QString authorization = QString("%1, %2").arg(m_userName).arg(m_password);
-
     const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
     QNetworkRequest request(url);
-    request.setRawHeader("Authorization", authorization.toLocal8Bit());
     request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
 
@@ -237,16 +212,12 @@ bool HttpClient::get(const QString& endPoint, QJsonObject& jObj)
 {
     bool result = false;
 
-    if (!checkAuthorization())
-        return false;
-
     QNetworkAccessManager manager(this);
     connect(&manager, &QNetworkAccessManager::finished,
             this, [this, &result, &jObj](QNetworkReply* reply)
     {
         if (reply->error() == QNetworkReply::NetworkError::NoError) {
             jObj = QJsonDocument::fromJson(reply->readAll()).object();
-            m_isAuthorized = true;
             result = true;
         }
         else
@@ -260,11 +231,8 @@ bool HttpClient::get(const QString& endPoint, QJsonObject& jObj)
         emit finished();
     });
 
-    const QString authorization = QString("%1, %2").arg(m_userName).arg(m_password);
-
     const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
     QNetworkRequest request(url);
-    request.setRawHeader("Authorization", authorization.toLocal8Bit());
     request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
 
@@ -283,15 +251,11 @@ bool HttpClient::put(const QString& endPoint, const QJsonObject& jObj)
 {
     bool result = false;
 
-    if (!checkAuthorization())
-        return false;
-
     QNetworkAccessManager manager(this);
     connect(&manager, &QNetworkAccessManager::finished,
             this, [this, &result](QNetworkReply* reply)
     {
         if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            m_isAuthorized = true;
             result = true;
         }
         else
@@ -305,11 +269,8 @@ bool HttpClient::put(const QString& endPoint, const QJsonObject& jObj)
         emit finished();
     });
 
-    const QString authorization = QString("%1, %2").arg(m_userName).arg(m_password);
-
     const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
     QNetworkRequest request(url);
-    request.setRawHeader("Authorization", authorization.toLocal8Bit());
     request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
 
@@ -328,15 +289,11 @@ bool HttpClient::del(const QString& endPoint)
 {
     bool result = false;
 
-    if (!checkAuthorization())
-        return false;
-
     QNetworkAccessManager manager(this);
     connect(&manager, &QNetworkAccessManager::finished,
             this, [this, &result](QNetworkReply* reply)
     {
         if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            m_isAuthorized = true;
             result = true;
         }
         else
@@ -350,11 +307,8 @@ bool HttpClient::del(const QString& endPoint)
         emit finished();
     });
 
-    const QString authorization = QString("%1, %2").arg(m_userName).arg(m_password);
-
     const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
     QNetworkRequest request(url);
-    request.setRawHeader("Authorization", authorization.toLocal8Bit());
     request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
     request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
 

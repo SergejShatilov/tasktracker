@@ -17,7 +17,7 @@ public:
     };
 
 public:
-    Task() = default;
+    Task();
 
     void setId(qint32 id);
     qint32 id() const;

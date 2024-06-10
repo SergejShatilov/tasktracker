@@ -38,7 +38,6 @@ public:
 
 private:
     void showError();
-    bool checkAuthorization();
     bool post(const QString& endPoint, const QJsonObject& jObj);
     bool get(const QString& endPoint, QJsonObject& jObj);
     bool put(const QString& endPoint, const QJsonObject& jObj);
@@ -52,7 +51,4 @@ private:
     QString m_hostName;
     int     m_port;
     QString m_dataBaseName;
-    bool    m_isAuthorized;
-    QString m_userName;
-    QString m_password;
 };

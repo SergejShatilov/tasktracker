@@ -116,11 +116,8 @@ HttpResponse RequestHandler::handlerCreateNewDB(const HttpRequest &request)
     QJsonObject jobj = jdoc.object();
     const QString dbname = jobj["dbname"].toString();
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->createNewDB(authorization, dbname, authorization.userName());
+        m_db->createNewDB(dbname);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -135,11 +132,8 @@ HttpResponse RequestHandler::handlerCheckExistDb(const HttpRequest& request)
 {
     qDebug() << "Check exist db...";
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->checkExistDb(authorization, request.dbname());
+        m_db->checkExistDb(request.dbname());
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -159,11 +153,8 @@ RequestHandler::handlerCreateNewEmployee(const HttpRequest &request)
     QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
     Employee employee = Employee::fromJsonObject(jdoc.object());
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->createNewEmployee(authorization, request.dbname(), employee);
+        m_db->createNewEmployee(request.dbname(), employee);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -178,11 +169,8 @@ HttpResponse RequestHandler::handlerDeleteEmployee(const HttpRequest& request)
 {
     qDebug() << "Delete employees...";
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->deleteEmployee(authorization, request.dbname(), request.id());
+        m_db->deleteEmployee(request.dbname(), request.id());
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -197,12 +185,10 @@ HttpResponse RequestHandler::handlerGetEmployees(const HttpRequest &request)
 {
     qDebug() << "Get employees...";
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
     QList<Employee> listEmployees;
 
     try {
-        listEmployees = m_db->getEmployees(authorization, request.dbname());
+        listEmployees = m_db->getEmployees(request.dbname());
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -236,11 +222,8 @@ HttpResponse RequestHandler::handlerChangeEmployee(const HttpRequest& request)
     QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
     Employee employee = Employee::fromJsonObject(jdoc.object());
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->changeEmployee(authorization, request.dbname(), employee);
+        m_db->changeEmployee(request.dbname(), employee);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -260,11 +243,8 @@ RequestHandler::handlerCreateNewTask(const HttpRequest &request)
     QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
     Task task = Task::fromJsonObject(jdoc.object());
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->createNewTask(authorization, request.dbname(), task);
+        m_db->createNewTask(request.dbname(), task);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -279,11 +259,10 @@ HttpResponse RequestHandler::handlerGetTasks(const HttpRequest &request)
 {
     qDebug() << "Get tasks...";
 
-    DBAuthorization authorization(request.userName(), request.password());
     QList<Task> listTasks;
 
     try {
-        listTasks = m_db->getTasks(authorization, request.dbname());
+        listTasks = m_db->getTasks(request.dbname());
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -313,11 +292,8 @@ HttpResponse RequestHandler::handlerDeleteTask(const HttpRequest& request)
 {
     qDebug() << "Delete task...";
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->deleteTask(authorization, request.dbname(), request.id());
+        m_db->deleteTask(request.dbname(), request.id());
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
@@ -336,11 +312,8 @@ HttpResponse RequestHandler::handlerChangeTask(const HttpRequest& request)
     QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
     Task task = Task::fromJsonObject(jdoc.object());
 
-    // Объект для авторизации
-    DBAuthorization authorization(request.userName(), request.password());
-
     try {
-        m_db->changeTask(authorization, request.dbname(), task);
+        m_db->changeTask(request.dbname(), task);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
