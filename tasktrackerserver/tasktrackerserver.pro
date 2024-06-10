@@ -27,9 +27,8 @@ SOURCES += \
     httpserver/httpsockethandler.cpp \
     httpserver/httprequest.cpp \
     httpserver/httpresponse.cpp \
-    db/dbmanager.cpp \
-    db/dbpostgres/dbmanagerpostgres.cpp \
-    db/dbpostgres/dbpostgresquery.cpp \
+    db/dbpostgres.cpp \
+    db/dbpostgresquery.cpp \
     $${COMMON}/employee.cpp \
     $${COMMON}/task.cpp \
 
@@ -47,8 +46,8 @@ HEADERS += \
     db/dbmanager.h \
     db/dbexception.h \
     db/dbopener.h \
-    db/dbpostgres/dbmanagerpostgres.h \
-    db/dbpostgres/dbpostgresquery.h \
+    db/dbpostgres.h \
+    db/dbpostgresquery.h \
     $${COMMON}/employee.h   \
     $${COMMON}/task.h \
 

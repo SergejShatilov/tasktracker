@@ -3,7 +3,7 @@
 
 #include "requesthandler.h"
 #include "httpserver/httpserver.h"
-#include "db/dbpostgres/dbmanagerpostgres.h"
+#include "db/dbpostgres.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     HttpServer httpServer;
 
-    DBManagerPostgres db("127.0.0.1", 5432);
+    DBPostgres db("127.0.0.1", 5432);
 
     RequestHandler(httpServer, &db);
 

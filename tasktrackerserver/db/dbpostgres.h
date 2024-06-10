@@ -1,12 +1,12 @@
 
 #include <QSqlDatabase>
 
-#include "db/dbmanager.h"
+#include "dbmanager.h"
 
-class DBManagerPostgres : public DBManager
+class DBPostgres : public DBManager
 {
 public:
-    explicit DBManagerPostgres(const QString& hostName, int port);
+    explicit DBPostgres(const QString& hostName, int port);
 
     QString dbtype() const override;
 
@@ -25,7 +25,7 @@ public:
     void changeEmployee(const QString& dbname,
                         const Employee& employee) override;
 
-    void createNewTask(const QString& dbname,
+    Task createNewTask(const QString& dbname,
                        const Task& task) override;
 
     QList<Task> getTasks(const QString& dbname) override;
@@ -38,4 +38,6 @@ public:
 
 private:
     QSqlDatabase addDatabase() const;
+    QString m_hostName;
+    int     m_port;
 };

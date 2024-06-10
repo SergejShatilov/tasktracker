@@ -301,45 +301,6 @@ void DBPostgresQuery::changeEmployee(QSqlDatabase& db,
 }
 
 // =============================================================================
-void DBPostgresQuery::createNewTask(QSqlDatabase& db,
-                                    const QString& dbname,
-                                    const Task& task)
-{
-    db.setDatabaseName(dbname);
-    DBOpener opener(&db);
-
-    QSqlQuery query(db);
-    bool result = query.exec(
-        QString(
-            "INSERT INTO tasks ("
-            "name, "
-            "state, "
-            "executor, "
-            "start, "
-            "duration, "
-            "parent, "
-            "description)\r\n"
-            "VALUES ('%1', '%2', %3, '%4', %5, %6, '%7');\r\n"
-        )
-        .arg(task.name())
-        .arg(task.stateString())
-        .arg(task.executorId())
-        .arg(task.startString())
-        .arg(task.duration())
-        .arg(task.parentId())
-        .arg(task.description())
-    );
-
-    if (!result) {
-        throw DBException(query.lastError(), __FILE__, __LINE__);
-    }
-
-    if (!db.commit()) {
-        throw DBException(db.lastError(), __FILE__, __LINE__);
-    }
-}
-
-// =============================================================================
 QList<Task> DBPostgresQuery::getTasks(QSqlDatabase& db,
                                       const QString& dbname)
 {

@@ -239,19 +239,21 @@ RequestHandler::handlerCreateNewTask(const HttpRequest &request)
 {
     qDebug() << "Create new task...";
 
-    // Получаем данные сотрудника
-    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
-    Task task = Task::fromJsonObject(jdoc.object());
+    Task task = Task::fromJson(request.data());
 
     try {
-        m_db->createNewTask(request.dbname(), task);
+        task = m_db->createNewTask(request.dbname(), task);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
                             ex.error().text().toLocal8Bit());
     }
 
-    return HttpResponse(HttpResponse::Status::Created);
+    return HttpResponse
+    (
+        HttpResponse::Status::Created,
+        task.toJson()
+    );
 }
 
 // =============================================================================

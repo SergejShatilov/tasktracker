@@ -12,36 +12,33 @@
 class DBManager
 {
 public:
-    explicit DBManager(const QString& hostName, int port);
+    DBManager() = default;
 
     virtual QString dbtype() const = 0;
 
-    virtual void createNewDB(const QString& dbname);
+    virtual void createNewDB(const QString& dbname) = 0;
 
-    virtual void checkExistDb(const QString& dbname);
+    virtual void checkExistDb(const QString& dbname) = 0;
 
     virtual void createNewEmployee(const QString& dbname,
-                                   const Employee& employee);
+                                   const Employee& employee) = 0;
 
     virtual void deleteEmployee(const QString& dbname,
-                                qint32 id);
+                                qint32 id) = 0;
 
-    virtual QList<Employee> getEmployees(const QString& dbname);
+    virtual QList<Employee> getEmployees(const QString& dbname) = 0;
 
     virtual void changeEmployee(const QString& dbname,
-                                const Employee& employee);
+                                const Employee& employee) = 0;
 
-    virtual void createNewTask(const QString& dbname,
-                               const Task& task);
+    virtual Task createNewTask(const QString& dbname,
+                               const Task& task) = 0;
 
-    virtual QList<Task> getTasks(const QString& dbname);
+    virtual QList<Task> getTasks(const QString& dbname) = 0;
 
     virtual void deleteTask(const QString& dbname,
-                            qint32 id);
+                            qint32 id) = 0;
 
     virtual void changeTask(const QString& dbname,
-                            const Task& task);
-protected:
-    QString m_hostName;
-    int     m_port;
+                            const Task& task) = 0;
 };

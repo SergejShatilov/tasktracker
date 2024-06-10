@@ -12,6 +12,11 @@ Task::Task() :
 }
 
 // =============================================================================
+bool Task::isValid() const {
+    return (m_id != 0);
+}
+
+// =============================================================================
 void Task::setId(qint32 val) {
     m_id = val;
 }
@@ -131,6 +136,22 @@ const QString& Task::description() const {
 }
 
 // =============================================================================
+Task Task::fromJsonObject(const QJsonObject& jObj)
+{
+    Task task;
+    task.setId(jObj["id"].toInt());
+    task.setName(jObj["name"].toString());
+    task.setStateString(jObj["state"].toString());
+    task.setExecutorId(jObj["executor"].toInt());
+    task.setStartString(jObj["start"].toString());
+    task.setDuration(jObj["duration"].toInt());
+    task.setParentId(jObj["parent"].toInt());
+    task.setDescription(jObj["description"].toString());
+
+    return task;
+}
+
+// =============================================================================
 QJsonObject Task::toJsonObject() const {
     QJsonObject jObj;
     jObj.insert("id", m_id);
@@ -145,19 +166,22 @@ QJsonObject Task::toJsonObject() const {
 }
 
 // =============================================================================
-Task Task::fromJsonObject(const QJsonObject& jObj)
-{
-    Task task;
-    task.setId(jObj["id"].toInt());
-    task.setName(jObj["name"].toString());
-    task.setStateString(jObj["state"].toString());
-    task.setExecutorId(jObj["executor"].toInt());
-    task.setStartString(jObj["start"].toString());
-    task.setDuration(jObj["duration"].toInt());
-    task.setParentId(jObj["parent"].toInt());
-    task.setDescription(jObj["description"].toString());
+Task Task::fromJson(const QByteArray& data) {
+    return Task::fromJsonObject(QJsonDocument::fromJson(data).object());
+}
 
-    return task;
+// =============================================================================
+QByteArray Task::toJson() const {
+    return QJsonDocument(toJsonObject()).toJson(QJsonDocument::Compact);
+}
+
+// =============================================================================
+QDebug operator<<(QDebug d, const Task& task)
+{
+    d << "id:" << task.id() << "\r\n";
+    d << "Name:" << task.name() << "\r\n";
+
+    return d;
 }
 
 // =============================================================================

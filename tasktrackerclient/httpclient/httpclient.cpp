@@ -109,14 +109,16 @@ bool HttpClient::changeEmployee(qint32 id, const Employee& employee)
 }
 
 // =============================================================================
-bool HttpClient::addTask(const Task& task)
+Task HttpClient::addTask(const Task& task)
 {
-    return post
+    const auto data = post2
     (
         QString("/dbname-%1/tasks/")
             .arg(m_dataBaseName),
-        task.toJsonObject()
+        task.toJson()
     );
+
+    return Task::fromJson(data);
 }
 
 // =============================================================================
@@ -205,6 +207,45 @@ bool HttpClient::post(const QString& endPoint, const QJsonObject& jObj)
     eventLoop.exec();
 
     return result;
+}
+
+// =============================================================================
+QByteArray HttpClient::post2(const QString& uri, const QByteArray& data)
+{
+    QByteArray dataResult;
+
+    QNetworkAccessManager manager(this);
+    connect(&manager, &QNetworkAccessManager::finished,
+            this, [this, &dataResult](QNetworkReply* reply)
+    {
+        if (reply->error() == QNetworkReply::NetworkError::NoError) {
+            dataResult = reply->readAll();
+            qDebug() << dataResult;
+        }
+        else
+        {
+            m_lastErrorString = QString("%1\r\n%2")
+                .arg(reply->errorString())
+                .arg(QString(reply->readAll()));
+            showError();
+        }
+
+        emit finished();
+    });
+
+    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(uri));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
+    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
+
+    manager.post(request, data);
+
+    // Ждем ответ
+    QEventLoop eventLoop;
+    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
+    eventLoop.exec();
+
+    return dataResult;
 }
 
 // =============================================================================

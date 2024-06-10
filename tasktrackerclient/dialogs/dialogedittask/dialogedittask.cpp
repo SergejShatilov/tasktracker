@@ -107,10 +107,17 @@ void DialogEditTask::createNewTask()
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);
-    if (!m_httpClient->addTask(m_task)) {
+
+    Task task = m_httpClient->addTask(m_task);
+
+    qDebug() << task;
+
+    if (!task.isValid()) {
         ui->pushButtonOk->setEnabled(true);
         return;
     }
+
+    m_task = task;
 
     accept();
 }

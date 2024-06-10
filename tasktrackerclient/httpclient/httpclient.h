@@ -31,7 +31,7 @@ public:
     bool getEmployees(QList<Employee>& list);
     bool changeEmployee(qint32 id, const Employee& employee);
 
-    bool addTask(const Task& task);
+    Task addTask(const Task& task);
     bool getTasks(QList<Task>& list);
     bool deleteTask(qint32 id);
     bool changeTask(qint32 id, const Task& task);
@@ -39,6 +39,7 @@ public:
 private:
     void showError();
     bool post(const QString& endPoint, const QJsonObject& jObj);
+    QByteArray post2(const QString& uri, const QByteArray& data);
     bool get(const QString& endPoint, QJsonObject& jObj);
     bool put(const QString& endPoint, const QJsonObject& jObj);
     bool del(const QString& endPoint);

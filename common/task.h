@@ -4,6 +4,8 @@
 #include <QString>
 #include <QDate>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QDebug>
 
 class Task
 {
@@ -18,6 +20,8 @@ public:
 
 public:
     Task();
+
+    bool isValid() const;
 
     void setId(qint32 id);
     qint32 id() const;
@@ -49,8 +53,11 @@ public:
     void setDescription(const QString& description);
     const QString& description() const;
 
-    QJsonObject toJsonObject() const;
     static Task fromJsonObject(const QJsonObject& jObj);
+    QJsonObject toJsonObject() const;
+
+    static Task fromJson(const QByteArray& data);
+    QByteArray toJson() const;
 
 protected:
     qint32  m_id;
@@ -62,3 +69,5 @@ protected:
     qint32  m_parentId;
     QString m_description;
 };
+
+QDebug operator<<(QDebug d, const Task& task);
