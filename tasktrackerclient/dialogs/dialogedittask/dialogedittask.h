@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QDataWidgetMapper>
 #include "httpclient/httpclient.h"
+#include "models/employeesmodel.h"
 
 namespace Ui {
 class DialogEditTask;
@@ -22,6 +23,8 @@ public:
     void setModel(QAbstractItemModel* model);
     void setCurrentModelIndex(const QModelIndex& index);
 
+    void setEmployeesModel(EmployeesModel* model);
+
     const Task& task() const;
 
     void setParentTask(qint32 parentId, const QString& parentName);
@@ -32,10 +35,11 @@ private slots:
     void createNewTask();
 
 private:
-    Ui::DialogEditTask* ui;
-    HttpClient*         m_httpClient;
-    QDataWidgetMapper*  m_mapper;
-    Task                m_task;
+    Ui::DialogEditTask*     ui;
+    HttpClient*             m_httpClient;
+    QDataWidgetMapper*      m_mapper;
+    Task                    m_task;
+    EmployeesModel*         m_employeesModel;
 };
 
 #endif // DIALOGEDITTASK_H

@@ -27,6 +27,11 @@ EmployeesView::EmployeesView(HttpClient* httpClient,
 }
 
 // =============================================================================
+EmployeesModel* EmployeesView::employeesModel() const {
+    return m_employeesModel;
+}
+
+// =============================================================================
 void EmployeesView::slotUpdate()
 {
     QList<Employee> listEmployees;

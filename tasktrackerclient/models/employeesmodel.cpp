@@ -62,6 +62,25 @@ qint32 EmployeesModel::idByIndex(const QModelIndex& index) const
 }
 
 // =============================================================================
+qint32 EmployeesModel::idByFullName(const QString& fullName) const
+{
+    const auto& children = m_rootItem->children();
+    auto it = std::find_if
+    (
+        children.cbegin(),
+        children.cend(),
+        [&fullName](const QObject* obj) {
+            return (obj->property("fullName").toString() == fullName);
+        }
+    );
+
+    if (it == children.cend())
+        return 0;
+
+    return (*it)->property("id").toInt();
+}
+
+// =============================================================================
 QModelIndex EmployeesModel::index(int row, int column,
                                   const QModelIndex &parent) const
 {

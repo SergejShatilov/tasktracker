@@ -18,6 +18,7 @@ public:
     void loadFromList(const QList<Employee>& list);
 
     qint32 idByIndex(const QModelIndex& index) const;
+    qint32 idByFullName(const QString& fullName) const;
 
 public:
     QModelIndex index(int row, int column,

@@ -23,8 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::openDb);
 
     ui->tabTasks->setLayout(ui->tasksLayout);
-    ui->tabEmployees->setLayout(ui->employeesLayout);
     ui->tasksLayout->addWidget(m_tasksView);
+    m_tasksView->setEmployeesModel(m_employeesView->employeesModel());
+
+    ui->tabEmployees->setLayout(ui->employeesLayout);
     ui->employeesLayout->addWidget(m_employeesView);
 
     uiViewDisconnected();

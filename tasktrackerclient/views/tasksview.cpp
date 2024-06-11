@@ -10,7 +10,8 @@ TasksView::TasksView(HttpClient* httpClient,
                      QWidget* parent) :
     QTreeView(parent),
     m_httpClient(httpClient),
-    m_tasksModel(new TasksModel(this))
+    m_tasksModel(new TasksModel(this)),
+    m_employeesModel(nullptr)
 {
     setModel(m_tasksModel);
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -20,6 +21,11 @@ TasksView::TasksView(HttpClient* httpClient,
 
     /*connect(this, &QTreeView::doubleClicked,
             this, &TasksView::slotDoubleClicked);*/
+}
+
+// =============================================================================
+void TasksView::setEmployeesModel(EmployeesModel* model) {
+    m_employeesModel = model;
 }
 
 // =============================================================================
@@ -33,23 +39,7 @@ void TasksView::slotUpdate()
 }
 
 // =============================================================================
-void TasksView::slotCreate()
-{
-    auto dialog = std::make_unique<DialogEditTask>
-    (
-        m_httpClient,
-        false,
-        this
-    );
-
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-
-    m_tasksModel->addTask(dialog->task());
-}
-
-// =============================================================================
-void TasksView::slotCreateSub(const QModelIndex& index)
+void TasksView::slotCreate(const QModelIndex& index)
 {
     auto dialog = std::make_unique<DialogEditTask>
     (
@@ -62,6 +52,7 @@ void TasksView::slotCreateSub(const QModelIndex& index)
     auto nameTaskParent = m_tasksModel->nameByIndex(index);
 
     dialog->setParentTask(idTaskParent, nameTaskParent);
+    dialog->setEmployeesModel(m_employeesModel);
 
     if (dialog->exec() != QDialog::Accepted)
         return;
@@ -133,10 +124,12 @@ void TasksView::slotContextMenu(const QPoint& pos)
     // Если индекс валидный, то предлагаем создать подзадачу
     if (index.isValid()) {
         menu.addAction(tr("Add Subtask..."), this, [this, &index](){
-            slotCreateSub(index);
+            slotCreate(index);
         });
     } else {
-        menu.addAction(tr("Add..."), this, &TasksView::slotCreate);
+        menu.addAction(tr("Add..."), this, [this](){
+            slotCreate(QModelIndex());
+        });
     }
 
     menu.addSeparator();

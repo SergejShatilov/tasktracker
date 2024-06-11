@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include "httpclient/httpclient.h"
 #include "models/tasksmodel.h"
+#include "models/employeesmodel.h"
 
 class TasksView : public QTreeView
 {
@@ -13,12 +14,13 @@ public:
     explicit TasksView(HttpClient* httpClient,
                        QWidget* parent = nullptr);
 
+    void setEmployeesModel(EmployeesModel* model);
+
 public slots:
     void slotUpdate();
 
 private slots:
-    void slotCreate();
-    void slotCreateSub(const QModelIndex& index);
+    void slotCreate(const QModelIndex& index);
     void slotDelete();
     void slotEdit(const QModelIndex& index);
 
@@ -26,7 +28,8 @@ private slots:
     void slotContextMenu(const QPoint& pos);
 
 private:
-    HttpClient* m_httpClient;
-    TasksModel* m_tasksModel;
+    HttpClient*     m_httpClient;
+    TasksModel*     m_tasksModel;
+    EmployeesModel* m_employeesModel;
 
 };

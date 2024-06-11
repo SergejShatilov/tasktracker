@@ -13,6 +13,8 @@ public:
     explicit EmployeesView(HttpClient* httpClient,
                            QWidget* parent = nullptr);
 
+    EmployeesModel* employeesModel() const;
+
 public slots:
     void slotUpdate();
 

@@ -10,7 +10,8 @@ DialogEditTask::DialogEditTask(HttpClient* httpClient,
     ui(new Ui::DialogEditTask),
     m_httpClient(httpClient),
     m_mapper(new QDataWidgetMapper(this)),
-    m_task(Task())
+    m_task(Task()),
+    m_employeesModel(nullptr)
 {
     ui->setupUi(this);
 
@@ -33,6 +34,17 @@ DialogEditTask::DialogEditTask(HttpClient* httpClient,
 DialogEditTask::~DialogEditTask()
 {
     delete ui;
+}
+
+// =============================================================================
+void DialogEditTask::setEmployeesModel(EmployeesModel* model)
+{
+    if (model == nullptr)
+        return;
+
+    m_employeesModel = model;
+    ui->comboBoxExecutor->setModel(model);
+    ui->comboBoxExecutor->setModelColumn(4);
 }
 
 // =============================================================================
@@ -100,9 +112,12 @@ void DialogEditTask::createNewTask()
 {
     m_task.setName(ui->lineEditName->text());
     m_task.setState(Task::State::NotStarted);
-    m_task.setExecutorId(1);
     m_task.setDeadline(ui->dateEditDeadline->date());
     m_task.setDescription(ui->textEditDescription->toPlainText());
+
+    auto executorFullName = ui->comboBoxExecutor->currentText();
+    auto executorId = m_employeesModel->idByFullName(executorFullName);
+    m_task.setExecutorId(executorId);
 
     ui->pushButtonOk->setEnabled(false);
 
