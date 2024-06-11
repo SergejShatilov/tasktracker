@@ -5,13 +5,14 @@
 #include <QModelIndex>
 
 // =============================================================================
-DialogEditEmployee::DialogEditEmployee(std::shared_ptr<HttpClient> httpClient,
+DialogEditEmployee::DialogEditEmployee(HttpClient* httpClient,
                                        bool isEdit,
                                        QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogEditEmployee),
     m_httpClient(httpClient),
-    m_mapper(new QDataWidgetMapper(this))
+    m_mapper(new QDataWidgetMapper(this)),
+    m_employee(Employee())
 {
     ui->setupUi(this);
 
@@ -149,10 +150,15 @@ void DialogEditEmployee::createNewEmployee()
     m_employee.setPhone(ui->lineEditPhone->text());
 
     ui->pushButtonOk->setEnabled(false);
-    if (!m_httpClient->addEmployee(m_employee)) {
+
+    Employee employee = m_httpClient->addEmployee(m_employee);
+
+    if (!employee.isValid()) {
         ui->pushButtonOk->setEnabled(true);
         return;
     }
+
+    m_employee = employee;
 
     accept();
 }

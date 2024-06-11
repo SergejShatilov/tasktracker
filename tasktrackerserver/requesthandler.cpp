@@ -38,7 +38,7 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
         HttpRequest::Method::Post,
         "/dbname-{dbname}/employees/",
         [this](const HttpRequest& request) {
-            return handlerCreateNewEmployee(request);
+            return handlerCreateEmployee(request);
         }
     );
 
@@ -74,7 +74,7 @@ RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
         HttpRequest::Method::Post,
         "/dbname-{dbname}/tasks/",
         [this](const HttpRequest& request) {
-            return handlerCreateNewTask(request);
+            return handlerCreateTask(request);
         }
     );
 
@@ -144,24 +144,25 @@ HttpResponse RequestHandler::handlerCheckExistDb(const HttpRequest& request)
 }
 
 // =============================================================================
-HttpResponse
-RequestHandler::handlerCreateNewEmployee(const HttpRequest &request)
+HttpResponse RequestHandler::handlerCreateEmployee(const HttpRequest &request)
 {
     qDebug() << "Create new employee...";
 
-    // Получаем данные сотрудника
-    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
-    Employee employee = Employee::fromJsonObject(jdoc.object());
+    Employee employee = Employee::fromJson(request.data());
 
     try {
-        m_db->createNewEmployee(request.dbname(), employee);
+        employee = m_db->createEmployee(request.dbname(), employee);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,
                             ex.error().text().toLocal8Bit());
     }
 
-    return HttpResponse(HttpResponse::Status::Created);
+    return HttpResponse
+    (
+        HttpResponse::Status::Created,
+        employee.toJson()
+    );
 }
 
 // =============================================================================
@@ -235,14 +236,14 @@ HttpResponse RequestHandler::handlerChangeEmployee(const HttpRequest& request)
 
 // =============================================================================
 HttpResponse
-RequestHandler::handlerCreateNewTask(const HttpRequest &request)
+RequestHandler::handlerCreateTask(const HttpRequest &request)
 {
     qDebug() << "Create new task...";
 
     Task task = Task::fromJson(request.data());
 
     try {
-        task = m_db->createNewTask(request.dbname(), task);
+        task = m_db->createTask(request.dbname(), task);
     } catch (const DBException& ex) {
         qDebug() << ex;
         return HttpResponse(HttpResponse::Status::BadRequest,

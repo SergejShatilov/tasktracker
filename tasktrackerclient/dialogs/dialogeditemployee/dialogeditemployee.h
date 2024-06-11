@@ -15,7 +15,7 @@ class DialogEditEmployee : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogEditEmployee(std::shared_ptr<HttpClient> httpClient,
+    explicit DialogEditEmployee(HttpClient* httpClient,
                                 bool isEdit = false,
                                 QWidget *parent = nullptr);
     ~DialogEditEmployee();
@@ -38,10 +38,10 @@ private slots:
     void createNewEmployee();
 
 private:
-    Ui::DialogEditEmployee *ui;
-    std::shared_ptr<HttpClient> m_httpClient;
-    QDataWidgetMapper* m_mapper;
-    Employee m_employee;
+    Ui::DialogEditEmployee* ui;
+    HttpClient*             m_httpClient;
+    QDataWidgetMapper*      m_mapper;
+    Employee                m_employee;
 };
 
 #endif // DIALOGEDITEMPLOYEE_H

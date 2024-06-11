@@ -62,10 +62,16 @@ bool HttpClient::openDb(const QString &dbname)
 }
 
 // =============================================================================
-bool HttpClient::addEmployee(const Employee &employee)
+Employee HttpClient::addEmployee(const Employee &employee)
 {
-    return post(QString("/dbname-%1/employees/").arg(m_dataBaseName),
-                employee.toJsonObject());
+    const auto data = post2
+    (
+        QString("/dbname-%1/employees/")
+            .arg(m_dataBaseName),
+        employee.toJson()
+    );
+
+    return Employee::fromJson(data);
 }
 
 // =============================================================================
@@ -122,6 +128,17 @@ Task HttpClient::addTask(const Task& task)
 }
 
 // =============================================================================
+bool HttpClient::deleteTask(qint32 id)
+{
+    return del
+    (
+        QString("/dbname-%1/tasks/id-%2/")
+        .arg(m_dataBaseName)
+        .arg(id)
+    );
+}
+
+// =============================================================================
 bool HttpClient::getTasks(QList<Task>& list)
 {
     QJsonObject jObj;
@@ -136,17 +153,6 @@ bool HttpClient::getTasks(QList<Task>& list)
     }
 
     return true;
-}
-
-// =============================================================================
-bool HttpClient::deleteTask(qint32 id)
-{
-    return del
-    (
-        QString("/dbname-%1/tasks/id-%2/")
-        .arg(m_dataBaseName)
-        .arg(id)
-    );
 }
 
 // =============================================================================

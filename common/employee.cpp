@@ -1,5 +1,17 @@
 
 #include "employee.h"
+#include <QJsonDocument>
+
+// =============================================================================
+Employee::Employee() :
+    m_id(0)
+{
+}
+
+// =============================================================================
+bool Employee::isValid() const {
+    return (m_id != 0);
+}
 
 // =============================================================================
 void Employee::setId(qint32 val) {
@@ -65,6 +77,20 @@ const QString& Employee::phone() const {
 }
 
 // =============================================================================
+Employee Employee::fromJsonObject(const QJsonObject& jObj)
+{
+    Employee employee;
+    employee.setId(jObj["id"].toInt());
+    employee.setLastName(jObj["lastName"].toString());
+    employee.setFirstName(jObj["firstName"].toString());
+    employee.setPatronymic(jObj["patronymic"].toString());
+    employee.setPosition(jObj["position"].toString());
+    employee.setEmail(jObj["email"].toString());
+    employee.setPhone(jObj["phone"].toString());
+    return employee;
+}
+
+// =============================================================================
 QJsonObject Employee::toJsonObject() const {
     QJsonObject jObj;
     jObj.insert("id", m_id);
@@ -78,17 +104,27 @@ QJsonObject Employee::toJsonObject() const {
 }
 
 // =============================================================================
-Employee Employee::fromJsonObject(const QJsonObject& jObj)
+Employee Employee::fromJson(const QByteArray& data) {
+    return Employee::fromJsonObject(QJsonDocument::fromJson(data).object());
+}
+
+// =============================================================================
+QByteArray Employee::toJson() const {
+    return QJsonDocument(toJsonObject()).toJson(QJsonDocument::Compact);
+}
+
+// =============================================================================
+QDebug operator<<(QDebug d, const Employee& employee)
 {
-    Employee employee;
-    employee.setId(jObj["id"].toInt());
-    employee.setLastName(jObj["lastName"].toString());
-    employee.setFirstName(jObj["firstName"].toString());
-    employee.setPatronymic(jObj["patronymic"].toString());
-    employee.setPosition(jObj["position"].toString());
-    employee.setEmail(jObj["email"].toString());
-    employee.setPhone(jObj["phone"].toString());
-    return employee;
+    d << "Employee:\r\n";
+    d << "id:" << employee.id() << "\r\n";
+    d << "lastName:" << employee.lastName() << "\r\n";
+    d << "firstName:" << employee.firstName() << "\r\n";
+    d << "patronymic:" << employee.patronymic() << "\r\n";
+    d << "position:" << employee.position() << "\r\n";
+    d << "email:" << employee.email() << "\r\n";
+    d << "phone:" << employee.phone() << "\r\n";
+    return d;
 }
 
 // =============================================================================

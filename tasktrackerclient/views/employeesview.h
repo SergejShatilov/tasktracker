@@ -10,7 +10,7 @@ class EmployeesView : public QTreeView
     Q_OBJECT
 
 public:
-    explicit EmployeesView(std::shared_ptr<HttpClient> httpClient,
+    explicit EmployeesView(HttpClient* httpClient,
                            QWidget* parent = nullptr);
 
 public slots:
@@ -25,7 +25,7 @@ private slots:
     void slotContextMenu(const QPoint& pos);
 
 private:
-    std::shared_ptr<HttpClient> m_httpClient;
+    HttpClient* m_httpClient;
     EmployeesModel* m_employeesModel;
 
 };

@@ -16,12 +16,14 @@ public:
 
     virtual QString dbtype() const = 0;
 
+    // -------------------------------------------------------------------------
     virtual void createNewDB(const QString& dbname) = 0;
 
     virtual void checkExistDb(const QString& dbname) = 0;
 
-    virtual void createNewEmployee(const QString& dbname,
-                                   const Employee& employee) = 0;
+    // -------------------------------------------------------------------------
+    virtual Employee createEmployee(const QString& dbname,
+                                    const Employee& employee) = 0;
 
     virtual void deleteEmployee(const QString& dbname,
                                 qint32 id) = 0;
@@ -31,13 +33,14 @@ public:
     virtual void changeEmployee(const QString& dbname,
                                 const Employee& employee) = 0;
 
-    virtual Task createNewTask(const QString& dbname,
-                               const Task& task) = 0;
-
-    virtual QList<Task> getTasks(const QString& dbname) = 0;
+    // -------------------------------------------------------------------------
+    virtual Task createTask(const QString& dbname,
+                            const Task& task) = 0;
 
     virtual void deleteTask(const QString& dbname,
                             qint32 id) = 0;
+
+    virtual QList<Task> getTasks(const QString& dbname) = 0;
 
     virtual void changeTask(const QString& dbname,
                             const Task& task) = 0;

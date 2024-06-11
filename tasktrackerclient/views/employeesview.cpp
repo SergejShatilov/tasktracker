@@ -6,7 +6,7 @@
 #include "dialogs/dialogeditemployee/dialogeditemployee.h"
 
 // =============================================================================
-EmployeesView::EmployeesView(std::shared_ptr<HttpClient> httpClient,
+EmployeesView::EmployeesView(HttpClient* httpClient,
                              QWidget* parent) :
     QTreeView(parent),
     m_httpClient(httpClient),

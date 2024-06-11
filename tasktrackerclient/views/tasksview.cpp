@@ -67,6 +67,7 @@ void TasksView::slotCreateSub(const QModelIndex& index)
         return;
 
     m_tasksModel->addTask(dialog->task(), index);
+    expand(index);
 }
 
 // =============================================================================

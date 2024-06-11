@@ -4,7 +4,6 @@
 #include <QString>
 #include <QDate>
 #include <QJsonObject>
-#include <QJsonDocument>
 #include <QDebug>
 
 class Task

@@ -3,11 +3,14 @@
 
 #include <QString>
 #include <QJsonObject>
+#include <QDebug>
 
 class Employee
 {
 public:
-    Employee() = default;
+    Employee();
+
+    bool isValid() const;
 
     void setId(qint32 val);
     qint32 id() const;
@@ -30,8 +33,11 @@ public:
     void setPhone(const QString& val);
     const QString& phone() const;
 
-    QJsonObject toJsonObject() const;
     static Employee fromJsonObject(const QJsonObject& jObj);
+    QJsonObject toJsonObject() const;
+
+    static Employee fromJson(const QByteArray& data);
+    QByteArray toJson() const;
 
 protected:
     qint32  m_id;
@@ -42,3 +48,5 @@ protected:
     QString m_email;
     QString m_phone;
 };
+
+QDebug operator<<(QDebug d, const Employee& employee);

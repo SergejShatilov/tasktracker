@@ -171,7 +171,7 @@ void DBPostgres::checkExistDb(const QString& dbname)
 }
 
 // =============================================================================
-void DBPostgres::createNewEmployee(
+Employee DBPostgres::createEmployee(
     const QString& dbname,
     const Employee& employee)
 {
@@ -190,7 +190,8 @@ void DBPostgres::createNewEmployee(
             "position, "
             "email, "
             "phone)\r\n"
-            "VALUES ('%1', '%2', '%3', '%4', '%5', '%6');\r\n"
+            "VALUES ('%1', '%2', '%3', '%4', '%5', '%6') "
+            "RETURNING id;\r\n"
         )
         .arg(employee.lastName())
         .arg(employee.firstName())
@@ -207,6 +208,11 @@ void DBPostgres::createNewEmployee(
     if (!db.commit()) {
         throw DBException(db.lastError(), __FILE__, __LINE__);
     }
+
+    Employee employeeResult(employee);
+    employeeResult.setId(query.lastInsertId().toInt());
+
+    return employeeResult;
 }
 
 // =============================================================================
@@ -313,7 +319,7 @@ void DBPostgres::changeEmployee(
 }
 
 // =============================================================================
-Task DBPostgres::createNewTask(const QString& dbname, const Task& task)
+Task DBPostgres::createTask(const QString& dbname, const Task& task)
 {
     QSqlDatabase db = addDatabase();
 
@@ -356,6 +362,32 @@ Task DBPostgres::createNewTask(const QString& dbname, const Task& task)
 }
 
 // =============================================================================
+void DBPostgres::deleteTask(const QString& dbname, qint32 id)
+{
+    QSqlDatabase db = addDatabase();
+
+    db.setDatabaseName(dbname);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "DELETE FROM tasks\r\n"
+            "WHERE id=%1;\r\n"
+        )
+        .arg(id)
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    if (!db.commit()) {
+        throw DBException(db.lastError(), __FILE__, __LINE__);
+    }
+}
+
+// =============================================================================
 QList<Task> DBPostgres::getTasks(const QString& dbname)
 {
     QSqlDatabase db = addDatabase();
@@ -390,32 +422,6 @@ QList<Task> DBPostgres::getTasks(const QString& dbname)
     }
 
     return listTasks;
-}
-
-// =============================================================================
-void DBPostgres::deleteTask(const QString& dbname, qint32 id)
-{
-    QSqlDatabase db = addDatabase();
-
-    db.setDatabaseName(dbname);
-    DBOpener opener(&db);
-
-    QSqlQuery query(db);
-    bool result = query.exec(
-        QString(
-            "DELETE FROM tasks\r\n"
-            "WHERE id=%1;\r\n"
-        )
-        .arg(id)
-    );
-
-    if (!result) {
-        throw DBException(query.lastError(), __FILE__, __LINE__);
-    }
-
-    if (!db.commit()) {
-        throw DBException(db.lastError(), __FILE__, __LINE__);
-    }
 }
 
 // =============================================================================

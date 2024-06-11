@@ -26,14 +26,14 @@ public:
     bool createDb(const QString& dbname);
     bool openDb(const QString& dbname);
 
-    bool addEmployee(const Employee& employee);
+    Employee addEmployee(const Employee& employee);
     bool deleteEmployee(qint32 id);
     bool getEmployees(QList<Employee>& list);
     bool changeEmployee(qint32 id, const Employee& employee);
 
     Task addTask(const Task& task);
-    bool getTasks(QList<Task>& list);
     bool deleteTask(qint32 id);
+    bool getTasks(QList<Task>& list);
     bool changeTask(qint32 id, const Task& task);
 
 private:

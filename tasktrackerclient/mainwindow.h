@@ -5,7 +5,7 @@
 
 #include "httpclient/httpclient.h"
 #include "views/tasksview.h"
-//#include "views/employeesview.h"
+#include "views/employeesview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,7 +32,7 @@ private:
     Ui::MainWindow* ui;
     HttpClient*     m_httpClient;
     TasksView*      m_tasksView;
-    //EmployeesView* m_employeesView;
+    EmployeesView*  m_employeesView;
 };
 
 #endif // MAINWINDOW_H

@@ -10,12 +10,14 @@ public:
 
     QString dbtype() const override;
 
+    // -------------------------------------------------------------------------
     void createNewDB(const QString& dbname) override;
 
     void checkExistDb(const QString& dbname) override;
 
-    void createNewEmployee(const QString& dbname,
-                           const Employee& employee) override;
+    // -------------------------------------------------------------------------
+    Employee createEmployee(const QString& dbname,
+                            const Employee& employee) override;
 
     void deleteEmployee(const QString& dbname,
                         qint32 id) override;
@@ -25,13 +27,14 @@ public:
     void changeEmployee(const QString& dbname,
                         const Employee& employee) override;
 
-    Task createNewTask(const QString& dbname,
-                       const Task& task) override;
-
-    QList<Task> getTasks(const QString& dbname) override;
+    // -------------------------------------------------------------------------
+    Task createTask(const QString& dbname,
+                    const Task& task) override;
 
     void deleteTask(const QString& dbname,
                     qint32 id) override;
+
+    QList<Task> getTasks(const QString& dbname) override;
 
     void changeTask(const QString& dbname,
                     const Task& task) override;

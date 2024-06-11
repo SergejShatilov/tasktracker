@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QMap>
+#include <QJsonDocument>
 
 // =============================================================================
 Task::Task() :
@@ -10,8 +11,7 @@ Task::Task() :
     m_name(QString("Undefined")),
     m_state(State::NotStarted),
     m_executorId(0),
-    m_parentId(0),
-    m_description(QString())
+    m_parentId(0)
 {
 }
 
@@ -168,6 +168,7 @@ QByteArray Task::toJson() const {
 // =============================================================================
 QDebug operator<<(QDebug d, const Task& task)
 {
+    d << "Task:\r\n";
     d << "id:" << task.id() << "\r\n";
     d << "name:" << task.name() << "\r\n";
     d << "state:" << task.stateString() << "\r\n";
