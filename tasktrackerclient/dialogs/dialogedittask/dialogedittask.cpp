@@ -40,10 +40,9 @@ void DialogEditTask::setModel(QAbstractItemModel* model)
 {
     m_mapper->setSubmitPolicy(QDataWidgetMapper::SubmitPolicy::ManualSubmit);
     m_mapper->setModel(model);
-    m_mapper->addMapping(ui->lineEditName, 1);
-    m_mapper->addMapping(ui->textEditDescription, 7, "plainText");
-    m_mapper->addMapping(ui->dateEditStart, 4);
-    m_mapper->addMapping(ui->spinBoxDuration, 5);
+    m_mapper->addMapping(ui->lineEditName, 0);
+    m_mapper->addMapping(ui->textEditDescription, 6, "plainText");
+    m_mapper->addMapping(ui->dateEditDeadline, 4);
 }
 
 // =============================================================================
@@ -83,8 +82,7 @@ void DialogEditTask::submit()
     m_task.setName(ui->lineEditName->text());
     m_task.setState(Task::State::NotStarted);
     m_task.setExecutorId(1);
-    m_task.setStart(ui->dateEditStart->date());
-    m_task.setDuration(ui->spinBoxDuration->value());
+    m_task.setDeadline(ui->dateEditDeadline->date());
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);
@@ -103,8 +101,7 @@ void DialogEditTask::createNewTask()
     m_task.setName(ui->lineEditName->text());
     m_task.setState(Task::State::NotStarted);
     m_task.setExecutorId(1);
-    m_task.setStart(ui->dateEditStart->date());
-    m_task.setDuration(ui->spinBoxDuration->value());
+    m_task.setDeadline(ui->dateEditDeadline->date());
     m_task.setDescription(ui->textEditDescription->toPlainText());
 
     ui->pushButtonOk->setEnabled(false);

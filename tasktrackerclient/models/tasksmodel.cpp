@@ -6,8 +6,8 @@
 // =============================================================================
 TasksModel::TasksModel(QObject* parent) :
     QAbstractItemModel(parent),
-    m_columns({"id", "name", "state", "executorId",
-               "start", "duration", "parentId", "description"}),
+    m_columns({"name", "id", "state", "executorId",
+               "deadline", "parentId", "description"}),
     m_rootItem(new TaskObject(this))
 {
 }
@@ -248,14 +248,13 @@ QVariant TasksModel::headerData(int section,
 
     switch (section)
     {
-        case 0: return QString(tr("ID"));
-        case 1: return QString(tr("Name"));
+        case 0: return QString(tr("Name"));
+        case 1: return QString(tr("ID"));
         case 2: return QString(tr("State"));
         case 3: return QString(tr("Executor"));
-        case 4: return QString(tr("Start"));
-        case 5: return QString(tr("Duration"));
-        case 6: return QString(tr("Parent"));
-        case 7: return QString(tr("Description"));
+        case 4: return QString(tr("Deadline"));
+        case 5: return QString(tr("Parent"));
+        case 6: return QString(tr("Description"));
         default: return QVariant();
     }
 }

@@ -10,7 +10,6 @@ Task::Task() :
     m_name(QString("Undefined")),
     m_state(State::NotStarted),
     m_executorId(0),
-    m_duration(0),
     m_parentId(0),
     m_description(QString())
 {
@@ -52,7 +51,7 @@ Task::State Task::state() const {
 void Task::setStateString(const QString& stateString)
 {
     static QHash<QString, State> const tableStates = {
-        {"NotStarted",  State::NotStarted},
+        {"NotStarted", State::NotStarted},
         {"Work",        State::Work},
         {"Suspended",   State::Suspended},
         {"Completed",   State::Completed}
@@ -93,33 +92,21 @@ qint32 Task::executorId() const {
 }
 
 // =============================================================================
-void Task::setStart(const QDate& start) {
-    m_start = start;
+void Task::setDeadline(const QDate& deadline) {
+    m_deadline = deadline;
 }
 
-const QDate& Task::start() const {
-    return m_start;
-}
-
-// =============================================================================
-void Task::setStartString(const QString& startString)
-{
-    m_start = QDate::fromString(startString, Qt::DateFormat::ISODate);
+const QDate& Task::deadline() const {
+    return m_deadline;
 }
 
 // =============================================================================
-QString Task::startString() const
-{
-    return m_start.toString(Qt::DateFormat::ISODate);
+void Task::setDeadlineString(const QString& startString) {
+    m_deadline = QDate::fromString(startString, Qt::DateFormat::ISODate);
 }
 
-// =============================================================================
-void Task::setDuration(qint32 duration) {
-    m_duration = duration;
-}
-
-qint32 Task::duration() const {
-    return m_duration;
+QString Task::deadlineString() const {
+    return m_deadline.toString(Qt::DateFormat::ISODate);
 }
 
 // =============================================================================
@@ -148,8 +135,7 @@ Task Task::fromJsonObject(const QJsonObject& jObj)
     task.setName(jObj["name"].toString());
     task.setStateString(jObj["state"].toString());
     task.setExecutorId(jObj["executor"].toInt());
-    task.setStartString(jObj["start"].toString());
-    task.setDuration(jObj["duration"].toInt());
+    task.setDeadlineString(jObj["deadline"].toString());
     task.setParentId(jObj["parent"].toInt());
     task.setDescription(jObj["description"].toString());
 
@@ -163,8 +149,7 @@ QJsonObject Task::toJsonObject() const {
     jObj.insert("name", m_name);
     jObj.insert("state", stateString());
     jObj.insert("executor", m_executorId);
-    jObj.insert("start", startString());
-    jObj.insert("duration", m_duration);
+    jObj.insert("deadline", deadlineString());
     jObj.insert("parent", m_parentId);
     jObj.insert("description", m_description);
     return jObj;
@@ -185,7 +170,12 @@ QDebug operator<<(QDebug d, const Task& task)
 {
     d << "id:" << task.id() << "\r\n";
     d << "name:" << task.name() << "\r\n";
+    d << "state:" << task.stateString() << "\r\n";
     d << "parentId:" << task.parentId() << "\r\n";
+    d << "executorId:" << task.executorId() << "\r\n";
+    d << "deadline:" << task.deadlineString() << "\r\n";
+    d << "executorId:" << task.executorId() << "\r\n";
+    d << "description:" << task.description() << "\r\n";
 
     return d;
 }

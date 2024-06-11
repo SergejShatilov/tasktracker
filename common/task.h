@@ -38,14 +38,11 @@ public:
     void setExecutorId(qint32 executorId);
     qint32 executorId() const;
 
-    void setStart(const QDate& start);
-    const QDate& start() const;
+    void setDeadline(const QDate& deadline);
+    const QDate& deadline() const;
 
-    void setStartString(const QString& startString);
-    QString startString() const;
-
-    void setDuration(qint32 duration);
-    qint32 duration() const;
+    void setDeadlineString(const QString& deadlineString);
+    QString deadlineString() const;
 
     void setParentId(qint32 parentId);
     qint32 parentId() const;
@@ -64,8 +61,7 @@ protected:
     QString m_name;
     State   m_state;
     qint32  m_executorId;
-    QDate   m_start;
-    qint32  m_duration;
+    QDate   m_deadline;
     qint32  m_parentId;
     QString m_description;
 };

@@ -18,8 +18,7 @@ public:
     Q_PROPERTY(QString name READ name WRITE setName);
     Q_PROPERTY(QString state READ stateString WRITE setStateString);
     Q_PROPERTY(qint32 executorId READ executorId WRITE setExecutorId);
-    Q_PROPERTY(QDate start READ start WRITE setStart);
-    Q_PROPERTY(qint32 duration READ duration WRITE setDuration);
+    Q_PROPERTY(QDate deadline READ deadline WRITE setDeadline);
     Q_PROPERTY(qint32 parentId READ parentId WRITE setParentId);
     Q_PROPERTY(QString description READ description WRITE setDescription);
 

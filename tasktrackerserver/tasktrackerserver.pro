@@ -28,7 +28,6 @@ SOURCES += \
     httpserver/httprequest.cpp \
     httpserver/httpresponse.cpp \
     db/dbpostgres.cpp \
-    db/dbpostgresquery.cpp \
     $${COMMON}/employee.cpp \
     $${COMMON}/task.cpp \
 
@@ -47,7 +46,6 @@ HEADERS += \
     db/dbexception.h \
     db/dbopener.h \
     db/dbpostgres.h \
-    db/dbpostgresquery.h \
     $${COMMON}/employee.h   \
     $${COMMON}/task.h \
 
