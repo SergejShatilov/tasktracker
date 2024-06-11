@@ -21,7 +21,9 @@ void HttpSocketHandler::run()
     try
     {
         // Парсим запрос
-        HttpRequest request(socket->readAll());
+        auto buf = socket->readAll();
+        qDebug() << buf;
+        HttpRequest request(buf);
         qDebug() << request;
 
         // Обработка запроса

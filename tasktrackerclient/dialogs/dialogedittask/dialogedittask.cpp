@@ -9,7 +9,8 @@ DialogEditTask::DialogEditTask(HttpClient* httpClient,
     QDialog(parent),
     ui(new Ui::DialogEditTask),
     m_httpClient(httpClient),
-    m_mapper(new QDataWidgetMapper(this))
+    m_mapper(new QDataWidgetMapper(this)),
+    m_task(Task())
 {
     ui->setupUi(this);
 
@@ -109,8 +110,6 @@ void DialogEditTask::createNewTask()
     ui->pushButtonOk->setEnabled(false);
 
     Task task = m_httpClient->addTask(m_task);
-
-    qDebug() << task;
 
     if (!task.isValid()) {
         ui->pushButtonOk->setEnabled(true);

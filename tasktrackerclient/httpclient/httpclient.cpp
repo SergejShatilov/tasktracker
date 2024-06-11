@@ -220,7 +220,6 @@ QByteArray HttpClient::post2(const QString& uri, const QByteArray& data)
     {
         if (reply->error() == QNetworkReply::NetworkError::NoError) {
             dataResult = reply->readAll();
-            qDebug() << dataResult;
         }
         else
         {

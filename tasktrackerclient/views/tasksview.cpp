@@ -67,8 +67,6 @@ void TasksView::slotCreateSub(const QModelIndex& index)
         return;
 
     m_tasksModel->addTask(dialog->task(), index);
-
-    repaint();
 }
 
 // =============================================================================
@@ -91,12 +89,14 @@ void TasksView::slotDelete()
     if (reply != QMessageBox::Yes)
         return;
 
-    auto id = m_tasksModel->idByIndex(index);
+    setCurrentIndex(QModelIndex());
 
-    if (!m_httpClient->deleteTask(id))
-        return;
+    // Удаляем задачу и подзадачи в модели, получаем все id для удаления
+    const auto ids = m_tasksModel->removeTask(index);
 
-    m_tasksModel->removeTask(index);
+    // Удаляем все задачи с сервера
+    for (auto id : ids)
+        m_httpClient->deleteTask(id);
 }
 
 // =============================================================================

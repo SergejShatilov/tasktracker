@@ -6,9 +6,14 @@
 
 // =============================================================================
 Task::Task() :
-    m_id(0)
+    m_id(0),
+    m_name(QString("Undefined")),
+    m_state(State::NotStarted),
+    m_executorId(0),
+    m_duration(0),
+    m_parentId(0),
+    m_description(QString())
 {
-
 }
 
 // =============================================================================
@@ -57,7 +62,7 @@ void Task::setStateString(const QString& stateString)
     if (it != tableStates.end()) {
         m_state = it.value();
     } else {
-        throw std::runtime_error("state is invalid");
+        m_state = State::NotStarted;
     }
 }
 
@@ -73,7 +78,7 @@ QString Task::stateString() const
 
     const auto it = tableStates.find(m_state);
     if (it == tableStates.end())
-        throw std::runtime_error("state is invalid");
+        return QString("NotStarted");
 
     return it.value();
 }
@@ -179,7 +184,8 @@ QByteArray Task::toJson() const {
 QDebug operator<<(QDebug d, const Task& task)
 {
     d << "id:" << task.id() << "\r\n";
-    d << "Name:" << task.name() << "\r\n";
+    d << "name:" << task.name() << "\r\n";
+    d << "parentId:" << task.parentId() << "\r\n";
 
     return d;
 }

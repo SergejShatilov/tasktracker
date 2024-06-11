@@ -33,12 +33,45 @@ void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
 }
 
 // =============================================================================
-void TasksModel::removeTask(const QModelIndex& index)
+QList<qint32> TasksModel::removeTask(const QModelIndex& index)
 {
-    //beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
-    //auto obj = taskObjectByIndex(index);
-    //obj->deleteLater();
-    //endRemoveRows();
+    QList<qint32> ids;
+    beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
+
+    // Рекурсивное удаление всех дочерних задач
+    std::function<void(const QObject* obj)> funcChildrenDelete;
+    funcChildrenDelete = [this, &ids, &funcChildrenDelete](const QObject* obj)
+    {
+        const auto& children = obj->children();
+        for (const auto& child : children)
+        {
+            // Если существуют дочерние элементы, то удаляем сначала их
+            if (!child->children().isEmpty())
+                funcChildrenDelete(child);
+
+            auto taskObject = dynamic_cast<TaskObject*>(child);
+
+            // Добавляем id в список id на удаление
+            ids << taskObject->id();
+
+            // Удаляем из списка
+            m_listObjects.removeOne(taskObject);
+        }
+    };
+
+    auto obj = taskObjectByIndex(index);
+
+    // Удаляем все дочерние объекты из списка
+    funcChildrenDelete(obj);
+    ids << obj->id();
+
+    // Удаляем сам объект, его дочерние объекты сами удалятся
+    m_listObjects.removeOne(obj);
+    delete obj;
+
+    endRemoveRows();
+
+    return ids;
 }
 
 // =============================================================================
@@ -107,6 +140,16 @@ QString TasksModel::nameByIndex(const QModelIndex& index) const
 
     TaskObject* taskObject = taskObjectByIndex(index);
     return taskObject->name();
+}
+
+// =============================================================================
+TaskObject*
+TasksModel::taskObjectByIndex(const QModelIndex& index) const
+{
+    if (!index.isValid())
+        return m_rootItem;
+
+    return static_cast<TaskObject*>(index.internalPointer());
 }
 
 // =============================================================================
@@ -228,16 +271,6 @@ void TasksModel::clear()
     m_listObjects.clear();
 
     endResetModel();
-}
-
-// =============================================================================
-TaskObject*
-TasksModel::taskObjectByIndex(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return m_rootItem;
-
-    return static_cast<TaskObject*>(index.internalPointer());
 }
 
 // =============================================================================

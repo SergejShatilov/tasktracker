@@ -14,7 +14,7 @@ public:
 
     void addTask(const Task& task,
                  const QModelIndex& parentIndex = QModelIndex());
-    void removeTask(const QModelIndex& index);
+    QList<qint32> removeTask(const QModelIndex& index);
 
     void loadFromList(const QList<Task>& list);
 
@@ -22,6 +22,7 @@ public:
     QModelIndex indexOf(QObject* obj) const;
     qint32 idByIndex(const QModelIndex& index) const;
     QString nameByIndex(const QModelIndex& index) const;
+    TaskObject* taskObjectByIndex(const QModelIndex& index) const;
 
 public:
     QModelIndex index(int row, int column,
@@ -39,7 +40,6 @@ public:
 
 private:
     void clear();
-    TaskObject* taskObjectByIndex(const QModelIndex& index) const;
 
 protected:
     QStringList        m_columns;
