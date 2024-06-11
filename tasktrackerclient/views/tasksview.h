@@ -10,7 +10,7 @@ class TasksView : public QTreeView
     Q_OBJECT
 
 public:
-    explicit TasksView(std::shared_ptr<HttpClient> httpClient,
+    explicit TasksView(HttpClient* httpClient,
                        QWidget* parent = nullptr);
 
 public slots:
@@ -26,7 +26,7 @@ private slots:
     void slotContextMenu(const QPoint& pos);
 
 private:
-    std::shared_ptr<HttpClient> m_httpClient;
+    HttpClient* m_httpClient;
     TasksModel* m_tasksModel;
 
 };

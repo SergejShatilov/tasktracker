@@ -10,9 +10,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_httpClient(std::make_shared<HttpClient>(this)),
-    m_tasksView(new TasksView(m_httpClient, this)),
-    m_employeesView(new EmployeesView(m_httpClient, this))
+    m_httpClient(new HttpClient(this)),
+    m_tasksView(new TasksView(m_httpClient, this))/*,
+    m_employeesView(new EmployeesView(m_httpClient, this))*/
 {
     ui->setupUi(this);
 
@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabTasks->setLayout(ui->tasksLayout);
     ui->tabEmployees->setLayout(ui->employeesLayout);
     ui->tasksLayout->addWidget(m_tasksView);
-    ui->employeesLayout->addWidget(m_employeesView);
+    //ui->employeesLayout->addWidget(m_employeesView);
 
     uiViewDisconnected();
 }
@@ -66,10 +66,7 @@ void MainWindow::openDb()
     setWindowDbName(dialog->dbName());
 
     m_tasksView->slotUpdate();
-    m_employeesView->slotUpdate();
-
-    //updateEmployees();
-    //updateTasks();
+    //m_employeesView->slotUpdate();
 }
 
 // =============================================================================

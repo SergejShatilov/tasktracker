@@ -3,7 +3,7 @@
 #include "ui_dialogopendb.h"
 
 // =============================================================================
-DialogOpenDb::DialogOpenDb(std::shared_ptr<HttpClient> httpClient,
+DialogOpenDb::DialogOpenDb(HttpClient* httpClient,
                            bool isNewDb,
                            QWidget *parent) :
     QDialog(parent),

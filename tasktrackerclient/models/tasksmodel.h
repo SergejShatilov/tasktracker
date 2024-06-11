@@ -18,6 +18,8 @@ public:
 
     void loadFromList(const QList<Task>& list);
 
+    QObject* findById(qint32 id) const;
+    QModelIndex indexOf(QObject* obj) const;
     qint32 idByIndex(const QModelIndex& index) const;
     QString nameByIndex(const QModelIndex& index) const;
 
@@ -40,7 +42,8 @@ private:
     TaskObject* taskObjectByIndex(const QModelIndex& index) const;
 
 protected:
-    QStringList     m_columns;
-    TaskObject* m_rootItem;
+    QStringList        m_columns;
+    TaskObject*        m_rootItem;
+    QList<TaskObject*> m_listObjects;
 
 };

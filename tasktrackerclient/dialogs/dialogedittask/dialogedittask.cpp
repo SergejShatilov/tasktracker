@@ -3,7 +3,7 @@
 #include "ui_dialogedittask.h"
 
 // =============================================================================
-DialogEditTask::DialogEditTask(std::shared_ptr<HttpClient> httpClient,
+DialogEditTask::DialogEditTask(HttpClient* httpClient,
                                bool isEdit,
                                QWidget *parent) :
     QDialog(parent),

@@ -301,42 +301,6 @@ void DBPostgresQuery::changeEmployee(QSqlDatabase& db,
 }
 
 // =============================================================================
-QList<Task> DBPostgresQuery::getTasks(QSqlDatabase& db,
-                                      const QString& dbname)
-{
-    db.setDatabaseName(dbname);
-    DBOpener opener(&db);
-
-    QSqlQuery query(db);
-    bool result = query.exec(
-        QString(
-            "SELECT * FROM tasks;\r\n"
-        )
-    );
-
-    if (!result) {
-        throw DBException(query.lastError(), __FILE__, __LINE__);
-    }
-
-    QList<Task> listTasks;
-    while (query.next())
-    {
-        Task task;
-        task.setId(query.value(0).toUInt());
-        task.setName(query.value(1).toString());
-        task.setStateString(query.value(2).toString());
-        task.setExecutorId(query.value(3).toUInt());
-        task.setStartString(query.value(4).toString());
-        task.setDuration(query.value(5).toUInt());
-        task.setParentId(query.value(6).toUInt());
-        task.setDescription(query.value(7).toString());
-        listTasks << task;
-    }
-
-    return listTasks;
-}
-
-// =============================================================================
 void DBPostgresQuery::deleteTask(QSqlDatabase& db,
                                  const QString& dbname,
                                  qint32 id)

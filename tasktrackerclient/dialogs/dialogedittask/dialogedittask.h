@@ -14,7 +14,7 @@ class DialogEditTask : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogEditTask(std::shared_ptr<HttpClient> httpClient,
+    explicit DialogEditTask(HttpClient* httpClient,
                             bool isEdit = false,
                             QWidget *parent = nullptr);
     ~DialogEditTask();
@@ -32,10 +32,10 @@ private slots:
     void createNewTask();
 
 private:
-    Ui::DialogEditTask *ui;
-    std::shared_ptr<HttpClient> m_httpClient;
-    QDataWidgetMapper* m_mapper;
-    Task m_task;
+    Ui::DialogEditTask* ui;
+    HttpClient*         m_httpClient;
+    QDataWidgetMapper*  m_mapper;
+    Task                m_task;
 };
 
 #endif // DIALOGEDITTASK_H

@@ -6,7 +6,7 @@
 #include "dialogs/dialogedittask/dialogedittask.h"
 
 // =============================================================================
-TasksView::TasksView(std::shared_ptr<HttpClient> httpClient,
+TasksView::TasksView(HttpClient* httpClient,
                      QWidget* parent) :
     QTreeView(parent),
     m_httpClient(httpClient),
@@ -128,12 +128,14 @@ void TasksView::slotContextMenu(const QPoint& pos)
     QModelIndex index = indexAt(pos);
 
     QMenu menu;
-    menu.addAction(tr("Add..."), this, &TasksView::slotCreate);
 
+    // Если индекс валидный, то предлагаем создать подзадачу
     if (index.isValid()) {
         menu.addAction(tr("Add Subtask..."), this, [this, &index](){
             slotCreateSub(index);
         });
+    } else {
+        menu.addAction(tr("Add..."), this, &TasksView::slotCreate);
     }
 
     menu.addSeparator();

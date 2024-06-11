@@ -14,7 +14,7 @@ class DialogOpenDb : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogOpenDb(std::shared_ptr<HttpClient> httpClient,
+    explicit DialogOpenDb(HttpClient* httpClient,
                           bool isNewDb = true,
                           QWidget *parent = nullptr);
     ~DialogOpenDb();
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui::DialogOpenDb *ui;
-    std::shared_ptr<HttpClient> m_httpClient;
+    HttpClient* m_httpClient;
 };
 
 #endif // DIALOGOPENDB_H

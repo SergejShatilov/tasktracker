@@ -32,9 +32,6 @@ void changeEmployee(QSqlDatabase& db,
                     const QString& dbname,
                     const Employee& employee);
 
-QList<Task> getTasks(QSqlDatabase& db,
-                     const QString& dbname);
-
 void deleteTask(QSqlDatabase& db,
                 const QString& dbname,
                 qint32 id);

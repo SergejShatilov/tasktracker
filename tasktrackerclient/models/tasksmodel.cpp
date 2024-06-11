@@ -24,6 +24,7 @@ void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
 
     TaskObject* taskObject = new TaskObject(task);
+    m_listObjects << taskObject;
 
     auto parent = taskObjectByIndex(parentIndex);
     taskObject->setParent(parent);
@@ -34,10 +35,10 @@ void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
 // =============================================================================
 void TasksModel::removeTask(const QModelIndex& index)
 {
-    beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
-    auto obj = taskObjectByIndex(index);
-    obj->deleteLater();
-    endRemoveRows();
+    //beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
+    //auto obj = taskObjectByIndex(index);
+    //obj->deleteLater();
+    //endRemoveRows();
 }
 
 // =============================================================================
@@ -45,9 +46,47 @@ void TasksModel::loadFromList(const QList<Task>& list)
 {
     clear();
 
-    for (const auto& task : list) {
-        addTask(task);
+    for (const auto& task : list)
+    {
+        // Ищем объект-родитель
+        auto parentObj = findById(task.parentId());
+
+        // Ищем индекс родителя
+        auto indexParent = indexOf(parentObj);
+
+        addTask(task, indexParent);
     }
+}
+
+// =============================================================================
+QObject* TasksModel::findById(qint32 id) const
+{
+    auto it = std::find_if
+    (
+        m_listObjects.cbegin(),
+        m_listObjects.cend(),
+        [id](const TaskObject* obj) {
+            return (obj->id() == id);
+        }
+    );
+
+    if (it == m_listObjects.cend())
+        return nullptr;
+
+    return *it;
+}
+
+// =============================================================================
+QModelIndex TasksModel::indexOf(QObject* obj) const
+{
+    if (obj == nullptr)
+        return QModelIndex();
+
+    QObject* parentObj = obj->parent();
+
+    int row = parentObj->children().indexOf(obj);
+
+    return createIndex(row, 0, obj);
 }
 
 // =============================================================================
@@ -183,10 +222,10 @@ void TasksModel::clear()
 {
     beginResetModel();
 
-    const auto& objectsList = m_rootItem->children();
-    for (const auto& obj : objectsList) {
+    for (auto obj : m_listObjects)
         obj->deleteLater();
-    }
+
+    m_listObjects.clear();
 
     endResetModel();
 }
