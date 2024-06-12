@@ -24,6 +24,8 @@ public:
     void setCurrentModelIndex(const QModelIndex& index);
 
     void setEmployeesModel(EmployeesModel* model);
+    void setExecutorFullName(const QString& fullName);
+    void setTaskId(qint32 id);
 
     const Task& task() const;
 

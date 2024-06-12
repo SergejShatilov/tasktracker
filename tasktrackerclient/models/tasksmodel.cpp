@@ -8,7 +8,8 @@ TasksModel::TasksModel(QObject* parent) :
     QAbstractItemModel(parent),
     m_columns({"name", "id", "state", "executorId",
                "deadline", "parentId", "description"}),
-    m_rootItem(new TaskObject(this))
+    m_rootItem(new TaskObject(this)),
+    m_employeesModel(nullptr)
 {
 }
 
@@ -19,10 +20,15 @@ TasksModel::~TasksModel()
 }
 
 // =============================================================================
+void TasksModel::setEmployeesModel(EmployeesModel* model) {
+    m_employeesModel = model;
+}
+
+// =============================================================================
 void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
 {
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
-
+qDebug() << task;
     TaskObject* taskObject = new TaskObject(task);
     m_listObjects << taskObject;
 
@@ -201,10 +207,16 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
         {
-            return taskObjectByIndex(index)->property
-            (
-                m_columns.at(index.column()).toUtf8()
-            );
+            const auto& propertyName = m_columns.at(index.column());
+            const auto obj = taskObjectByIndex(index);
+
+            // Если колонка с исполнителем
+            if (propertyName == "executorId" && m_employeesModel != nullptr)
+            {
+                return m_employeesModel->fullNameById(obj->executorId());
+            }
+
+            return obj->property(propertyName.toUtf8());
         }
         default:
             return QVariant();
@@ -264,8 +276,10 @@ void TasksModel::clear()
 {
     beginResetModel();
 
-    for (auto obj : m_listObjects)
-        obj->deleteLater();
+    const auto& childred = m_rootItem->children();
+    for (const auto child : childred) {
+        delete child;
+    }
 
     m_listObjects.clear();
 

@@ -48,6 +48,16 @@ void DialogEditTask::setEmployeesModel(EmployeesModel* model)
 }
 
 // =============================================================================
+void DialogEditTask::setExecutorFullName(const QString& fullName) {
+    ui->comboBoxExecutor->setCurrentText(fullName);
+}
+
+// =============================================================================
+void DialogEditTask::setTaskId(qint32 id) {
+    m_task.setId(id);
+}
+
+// =============================================================================
 void DialogEditTask::setModel(QAbstractItemModel* model)
 {
     m_mapper->setSubmitPolicy(QDataWidgetMapper::SubmitPolicy::ManualSubmit);
@@ -93,9 +103,12 @@ void DialogEditTask::submit()
 {
     m_task.setName(ui->lineEditName->text());
     m_task.setState(Task::State::NotStarted);
-    m_task.setExecutorId(1);
     m_task.setDeadline(ui->dateEditDeadline->date());
     m_task.setDescription(ui->textEditDescription->toPlainText());
+
+    auto executorFullName = ui->comboBoxExecutor->currentText();
+    auto executorId = m_employeesModel->idByFullName(executorFullName);
+    m_task.setExecutorId(executorId);
 
     ui->pushButtonOk->setEnabled(false);
     if (!m_httpClient->changeTask(m_task.id(), m_task)) {
@@ -105,6 +118,8 @@ void DialogEditTask::submit()
 
     m_mapper->submit();
     accept();
+
+    qDebug() << m_task;
 }
 
 // =============================================================================

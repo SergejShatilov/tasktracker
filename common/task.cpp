@@ -175,7 +175,6 @@ QDebug operator<<(QDebug d, const Task& task)
     d << "parentId:" << task.parentId() << "\r\n";
     d << "executorId:" << task.executorId() << "\r\n";
     d << "deadline:" << task.deadlineString() << "\r\n";
-    d << "executorId:" << task.executorId() << "\r\n";
     d << "description:" << task.description() << "\r\n";
 
     return d;

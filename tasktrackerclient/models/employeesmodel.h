@@ -34,12 +34,15 @@ public:
                         Qt::Orientation orientation,
                         int role) const override;
 
-private:
-    void clear();
+    QString fullNameById(qint32 id) const;
     EmployeeObject* employeeObjectByIndex(const QModelIndex& index) const;
 
+private:
+    void clear();
+
 protected:
-    QStringList     m_columns;
-    EmployeeObject* m_rootItem;
+    QStringList            m_columns;
+    EmployeeObject*        m_rootItem;
+    QList<EmployeeObject*> m_listObjects;
 
 };

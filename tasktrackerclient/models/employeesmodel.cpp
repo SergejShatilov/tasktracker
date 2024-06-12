@@ -27,6 +27,8 @@ void EmployeesModel::addEmployee(const Employee& employee)
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
 
     EmployeeObject* employeeObject = new EmployeeObject(employee);
+    m_listObjects << employeeObject;
+
     employeeObject->setParent(m_rootItem);
 
     endInsertRows();
@@ -36,8 +38,12 @@ void EmployeesModel::addEmployee(const Employee& employee)
 void EmployeesModel::removeEmployee(const QModelIndex& index)
 {
     beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
+
     auto obj = employeeObjectByIndex(index);
-    obj->deleteLater();
+
+    m_listObjects.removeOne(obj);
+    delete obj;
+
     endRemoveRows();
 }
 
@@ -185,16 +191,24 @@ QVariant EmployeesModel::headerData(int section,
 }
 
 // =============================================================================
-void EmployeesModel::clear()
+QString EmployeesModel::fullNameById(qint32 id) const
 {
-    beginResetModel();
+    if (id == 0)
+        return QString(tr("Not assigned"));
 
-    const auto& objectsList = m_rootItem->children();
-    for (const auto& obj : objectsList) {
-        obj->deleteLater();
-    }
+    auto it = std::find_if
+    (
+        m_listObjects.cbegin(),
+        m_listObjects.cend(),
+        [id](const EmployeeObject* obj) {
+            return (obj->id() == id);
+        }
+    );
 
-    endResetModel();
+    if (it == m_listObjects.cend())
+        return QString::number(id);
+
+    return (*it)->fullName();
 }
 
 // =============================================================================
@@ -205,6 +219,21 @@ EmployeesModel::employeeObjectByIndex(const QModelIndex& index) const
         return m_rootItem;
 
     return static_cast<EmployeeObject*>(index.internalPointer());
+}
+
+// =============================================================================
+void EmployeesModel::clear()
+{
+    beginResetModel();
+
+    const auto& childred = m_rootItem->children();
+    for (const auto child : childred) {
+        delete child;
+    }
+
+    m_listObjects.clear();
+
+    endResetModel();
 }
 
 // =============================================================================

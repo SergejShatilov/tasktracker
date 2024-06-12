@@ -67,8 +67,8 @@ void MainWindow::openDb()
     m_httpClient->setDbName(dialog->dbName());
     setWindowDbName(dialog->dbName());
 
-    m_tasksView->slotUpdate();
     m_employeesView->slotUpdate();
+    m_tasksView->slotUpdate();
 }
 
 // =============================================================================

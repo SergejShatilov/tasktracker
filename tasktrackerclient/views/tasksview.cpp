@@ -19,13 +19,14 @@ TasksView::TasksView(HttpClient* httpClient,
     connect(this, &QTreeView::customContextMenuRequested,
             this, &TasksView::slotContextMenu);
 
-    /*connect(this, &QTreeView::doubleClicked,
-            this, &TasksView::slotDoubleClicked);*/
+    connect(this, &QTreeView::doubleClicked,
+            this, &TasksView::slotDoubleClicked);
 }
 
 // =============================================================================
 void TasksView::setEmployeesModel(EmployeesModel* model) {
     m_employeesModel = model;
+    m_tasksModel->setEmployeesModel(m_employeesModel);
 }
 
 // =============================================================================
@@ -104,8 +105,22 @@ void TasksView::slotEdit(const QModelIndex& index)
     dialog->setModel(m_tasksModel);
     dialog->setCurrentModelIndex(index);
 
+    auto idTaskParent = m_tasksModel->idByIndex(index.parent());
+    auto nameTaskParent = m_tasksModel->nameByIndex(index.parent());
+
+    dialog->setParentTask(idTaskParent, nameTaskParent);
+    dialog->setEmployeesModel(m_employeesModel);
+
+    auto obj = m_tasksModel->taskObjectByIndex(index);
+    const auto executorId = obj->executorId();
+    const auto& executorFullName = m_employeesModel->fullNameById(executorId);
+    dialog->setExecutorFullName(executorFullName);
+    dialog->setTaskId(obj->id());
+
     if (dialog->exec() != QDialog::Accepted)
         return;
+
+    obj->setExecutorId(dialog->task().executorId());
 }
 
 // =============================================================================

@@ -3,6 +3,7 @@
 
 #include <QAbstractItemModel>
 #include "taskobject.h"
+#include "employeesmodel.h"
 
 class TasksModel : public QAbstractItemModel
 {
@@ -11,6 +12,8 @@ class TasksModel : public QAbstractItemModel
 public:
     explicit TasksModel(QObject* parent = nullptr);
     ~TasksModel();
+
+    void setEmployeesModel(EmployeesModel* model);
 
     void addTask(const Task& task,
                  const QModelIndex& parentIndex = QModelIndex());
@@ -45,5 +48,5 @@ protected:
     QStringList        m_columns;
     TaskObject*        m_rootItem;
     QList<TaskObject*> m_listObjects;
-
+    EmployeesModel*    m_employeesModel;
 };
