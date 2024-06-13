@@ -29,6 +29,7 @@ SOURCES += \
     models/taskobject.cpp \
     views/employeesview.cpp \
     views/tasksview.cpp \
+    views/taskstatedelegate.cpp \
     dialogs/dialogeditemployee/dialogeditemployee.cpp \
     dialogs/dialogopendb/dialogopendb.cpp \
     httpclient/httpclient.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
     models/tasksmodel.h \
     models/taskobject.h \
     views/tasksview.h \
+    views/taskstatedelegate.h \
     views/employeesview.h \
     dialogs/dialogeditemployee/dialogeditemployee.h \
     dialogs/dialogopendb/dialogopendb.h \

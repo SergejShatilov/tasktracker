@@ -28,7 +28,7 @@ void TasksModel::setEmployeesModel(EmployeesModel* model) {
 void TasksModel::addTask(const Task& task, const QModelIndex& parentIndex)
 {
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
-qDebug() << task;
+
     TaskObject* taskObject = new TaskObject(task);
     m_listObjects << taskObject;
 
@@ -216,6 +216,25 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
                 return m_employeesModel->fullNameById(obj->executorId());
             }
 
+            // Если колонка с состоянием
+            if (propertyName == "state")
+            {
+                const QString state = obj->stateString();
+
+                static QHash<QString, QString> const tableStates = {
+                    {"NotStarted", tr("Not Started")},
+                    {"Work",       tr("Work")},
+                    {"Suspended",  tr("Suspended")},
+                    {"Completed",  tr("Completed")}
+                };
+
+                auto it = tableStates.find(state);
+                if (it == tableStates.end())
+                    return obj->property(propertyName.toUtf8());
+
+                return *it;
+            }
+
             return obj->property(propertyName.toUtf8());
         }
         default:
@@ -228,6 +247,8 @@ bool TasksModel::setData(const QModelIndex &index,
                              const QVariant &value,
                              int role)
 {
+    qDebug() << index << value << role;
+
     if (!index.isValid())
         return false;
 
@@ -236,6 +257,16 @@ bool TasksModel::setData(const QModelIndex &index,
         case Qt::DisplayRole:
         case Qt::EditRole:
         {
+            // Если изменение состояния
+            if (index.column() == 2)
+            {
+
+
+                return true;
+            }
+
+
+
             return taskObjectByIndex(index)->setProperty
             (
                 m_columns.at(index.column()).toUtf8(),
@@ -269,6 +300,21 @@ QVariant TasksModel::headerData(int section,
         case 6: return QString(tr("Description"));
         default: return QVariant();
     }
+}
+
+// =============================================================================
+Qt::ItemFlags TasksModel::flags(const QModelIndex& index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+    // Для колонки состояния, делает так чтобы ее можно было редактировать
+    if (index.column() == 2)
+        flags |= Qt::ItemIsEditable;
+
+    return flags;
 }
 
 // =============================================================================

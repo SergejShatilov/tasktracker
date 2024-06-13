@@ -28,6 +28,8 @@ DialogEditTask::DialogEditTask(HttpClient* httpClient,
         connect(ui->pushButtonOk, &QPushButton::clicked,
                 this, &DialogEditTask::createNewTask);
     }
+
+    ui->dateEditDeadline->setDate(QDate::currentDate());
 }
 
 // =============================================================================
@@ -118,8 +120,6 @@ void DialogEditTask::submit()
 
     m_mapper->submit();
     accept();
-
-    qDebug() << m_task;
 }
 
 // =============================================================================

@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include "dialogs/dialogedittask/dialogedittask.h"
+#include "views/taskstatedelegate.h"
 
 // =============================================================================
 TasksView::TasksView(HttpClient* httpClient,
@@ -21,6 +22,11 @@ TasksView::TasksView(HttpClient* httpClient,
 
     connect(this, &QTreeView::doubleClicked,
             this, &TasksView::slotDoubleClicked);
+
+    setColumnHidden(5, true);
+
+    TaskStateDelegate* delegate = new TaskStateDelegate(this);
+    setItemDelegateForColumn(2, delegate);
 }
 
 // =============================================================================
@@ -126,6 +132,10 @@ void TasksView::slotEdit(const QModelIndex& index)
 // =============================================================================
 void TasksView::slotDoubleClicked(const QModelIndex& index)
 {
+    // Для столбца с состоянием игнориуем, т.к. для него отдельный делегат
+    if (index.column() == 2)
+        return;
+
     slotEdit(index);
 }
 

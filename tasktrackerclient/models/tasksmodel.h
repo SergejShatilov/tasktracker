@@ -40,6 +40,7 @@ public:
     QVariant headerData(int section,
                         Qt::Orientation orientation,
                         int role) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
 private:
     void clear();
@@ -49,4 +50,5 @@ protected:
     TaskObject*        m_rootItem;
     QList<TaskObject*> m_listObjects;
     EmployeesModel*    m_employeesModel;
+
 };
