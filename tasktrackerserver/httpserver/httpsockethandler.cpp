@@ -15,17 +15,34 @@ void HttpSocketHandler::run()
     QTcpSocket* socket = new QTcpSocket();
     socket->setSocketDescriptor(m_handle);
 
-    // Принимаем запрос
-    socket->waitForReadyRead();
+    // Принимаем данные, учитывая, что могут быть отправлены по частям
+    QByteArray buf;
+    HttpRequest request;
+    while (!request.isValid() && buf.size() < 10000)
+    {
+        socket->waitForReadyRead();
+
+        buf.append(socket->readAll());
+        //qDebug() << buf;
+
+        // Пробуем распарсить запрос
+        try {
+            request.parse(buf);
+        } catch (const std::runtime_error& ex) {
+            qDebug() << ex.what();
+            buf.clear();
+            continue;
+        }
+
+        // Если запрос валидный, то переходим для его обработки
+        if (request.isValid())
+            break;
+    }
+
+    qDebug() << request;
 
     try
     {
-        // Парсим запрос
-        auto buf = socket->readAll();
-        qDebug() << buf;
-        HttpRequest request(buf);
-        qDebug() << request;
-
         // Обработка запроса
         auto response = requestProcess(request);
 
@@ -40,6 +57,7 @@ void HttpSocketHandler::run()
     socket->disconnectFromHost();
     socket->close();
     socket->deleteLater();
+    qDebug() << "complete! Socket closed!";
 }
 
 // =============================================================================

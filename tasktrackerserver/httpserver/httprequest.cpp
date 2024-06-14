@@ -2,9 +2,20 @@
 #include "httprequest.h"
 
 // =============================================================================
-HttpRequest::HttpRequest(const QByteArray& request)
+HttpRequest::HttpRequest() :
+    m_isValid(false)
 {
-    const QString requestString(request);
+}
+
+// =============================================================================
+bool HttpRequest::isValid() const {
+    return m_isValid;
+}
+
+// =============================================================================
+bool HttpRequest::parse(const QByteArray& buf)
+{
+    const QString requestString(buf);
 
     if (requestString.isEmpty())
         throw std::runtime_error("the request is empty");
@@ -24,6 +35,10 @@ HttpRequest::HttpRequest(const QByteArray& request)
 
     startLineParse(startLine);
     headersParse(headers);
+
+    m_isValid = checkContent();
+
+    return m_isValid;
 }
 
 // =============================================================================
@@ -130,6 +145,21 @@ void HttpRequest::headersParse(const QStringList& headers)
         m_userName = authorization.first();
         m_password = authorization.last().simplified();
     }
+}
+
+// =============================================================================
+bool HttpRequest::checkContent() const
+{
+    // Для GET-запроса контент не проверяем
+    if (m_method == Method::Get)
+        return true;
+
+    auto it = m_headers.find("Content-Length");
+    if (it != m_headers.end()) {
+        return m_data.length() == it.value().toInt();
+    }
+
+    return false;
 }
 
 // =============================================================================

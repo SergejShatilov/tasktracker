@@ -19,7 +19,10 @@ public:
     };
 
 public:
-    explicit HttpRequest(const QByteArray& request);
+    explicit HttpRequest();
+
+    bool isValid() const;
+    bool parse(const QByteArray& buf);
 
     Method method() const;
     const QString& methodString() const;
@@ -41,8 +44,10 @@ public:
 private:
     void startLineParse(const QString& startLine);
     void headersParse(const QStringList& headers);
+    bool checkContent() const;
 
 private:
+    bool    m_isValid;
     Method  m_method;
     QString m_methodString;
     QString m_uri;
