@@ -1,6 +1,7 @@
 
 #include "tasksmodel.h"
 
+#include <QBrush>
 #include <QDebug>
 
 // =============================================================================
@@ -223,10 +224,10 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
                 const QString state = obj->stateString();
 
                 static QHash<QString, QString> const tableStates = {
-                    {"NotStarted", tr("Not Started")},
-                    {"Work",       tr("Work")},
-                    {"Suspended",  tr("Suspended")},
-                    {"Completed",  tr("Completed")}
+                    {"NotStarted",  tr("Not Started")},
+                    {"Work",        tr("Work")},
+                    {"Suspended",   tr("Suspended")},
+                    {"Completed",   tr("Completed")}
                 };
 
                 auto it = tableStates.find(state);
@@ -237,6 +238,36 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
             }
 
             return obj->property(propertyName.toUtf8());
+        }
+        case Qt::BackgroundRole:
+        {
+            const auto& propertyName = m_columns.at(index.column());
+            const auto obj = taskObjectByIndex(index);
+
+            // Если колонка с состоянием
+            if (propertyName == "state")
+            {
+                // Если задача выполнена, то отображаем ее зеленой,
+                // независимо от дедлайна
+                if (obj->state() == Task::State::Completed)
+                    return QBrush(Qt::green);
+
+                // Если задача просрочена, то отображаем поле
+                // состояние красным
+                if (obj->deadline() < QDate::currentDate())
+                    return QBrush(Qt::red);
+
+                switch (obj->state())
+                {
+                    case Task::State::NotStarted:
+                    case Task::State::Suspended:
+                        return QBrush(Qt::lightGray);
+                    default:
+                        return QVariant();
+                }
+            }
+
+            return QVariant();
         }
         default:
             return QVariant();
@@ -259,19 +290,8 @@ bool TasksModel::setData(const QModelIndex &index,
             // Если изменение состояния
             if (index.column() == 2)
             {
-                static QHash<QString, QString> const tableStates = {
-                    {tr("Not Started"), "NotStarted"},
-                    {tr("Work"),        "Work"},
-                    {tr("Suspended"),   "Suspended"},
-                    {tr("Completed"),   "Completed"}
-                };
-
-                auto it = tableStates.find(value.toString());
-                if (it == tableStates.end())
-                    return false;
-
                 auto taskObject = taskObjectByIndex(index);
-                taskObject->setStateString(*it);
+                taskObject->setStateString(value.toString());
 
                 Task task;
                 task.setId(taskObject->id());
