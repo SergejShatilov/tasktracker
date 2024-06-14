@@ -4,8 +4,9 @@
 #include <QDebug>
 
 // =============================================================================
-TasksModel::TasksModel(QObject* parent) :
+TasksModel::TasksModel(HttpClient* httpClient, QObject* parent) :
     QAbstractItemModel(parent),
+    m_httpClient(httpClient),
     m_columns({"name", "id", "state", "executorId",
                "deadline", "parentId", "description"}),
     m_rootItem(new TaskObject(this)),
@@ -247,8 +248,6 @@ bool TasksModel::setData(const QModelIndex &index,
                              const QVariant &value,
                              int role)
 {
-    qDebug() << index << value << role;
-
     if (!index.isValid())
         return false;
 
@@ -260,12 +259,33 @@ bool TasksModel::setData(const QModelIndex &index,
             // Если изменение состояния
             if (index.column() == 2)
             {
+                static QHash<QString, QString> const tableStates = {
+                    {tr("Not Started"), "NotStarted"},
+                    {tr("Work"),        "Work"},
+                    {tr("Suspended"),   "Suspended"},
+                    {tr("Completed"),   "Completed"}
+                };
 
+                auto it = tableStates.find(value.toString());
+                if (it == tableStates.end())
+                    return false;
+
+                auto taskObject = taskObjectByIndex(index);
+                taskObject->setStateString(*it);
+
+                Task task;
+                task.setId(taskObject->id());
+                task.setName(taskObject->name());
+                task.setState(taskObject->state());
+                task.setDeadline(taskObject->deadline());
+                task.setParentId(taskObject->parentId());
+                task.setExecutorId(taskObject->executorId());
+                task.setDescription(taskObject->description());
+
+                m_httpClient->changeTask(task.id(), task);
 
                 return true;
             }
-
-
 
             return taskObjectByIndex(index)->setProperty
             (

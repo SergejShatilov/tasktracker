@@ -4,13 +4,15 @@
 #include <QAbstractItemModel>
 #include "taskobject.h"
 #include "employeesmodel.h"
+#include "httpclient/httpclient.h"
 
 class TasksModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    explicit TasksModel(QObject* parent = nullptr);
+    explicit TasksModel(HttpClient* httpClient,
+                        QObject* parent = nullptr);
     ~TasksModel();
 
     void setEmployeesModel(EmployeesModel* model);
@@ -46,6 +48,7 @@ private:
     void clear();
 
 protected:
+    HttpClient*        m_httpClient;
     QStringList        m_columns;
     TaskObject*        m_rootItem;
     QList<TaskObject*> m_listObjects;

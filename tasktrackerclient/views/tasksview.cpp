@@ -11,7 +11,7 @@ TasksView::TasksView(HttpClient* httpClient,
                      QWidget* parent) :
     QTreeView(parent),
     m_httpClient(httpClient),
-    m_tasksModel(new TasksModel(this)),
+    m_tasksModel(new TasksModel(httpClient, this)),
     m_employeesModel(nullptr)
 {
     setModel(m_tasksModel);
