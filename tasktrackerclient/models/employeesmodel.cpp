@@ -3,13 +3,16 @@
 
 #include "employeeobject.h"
 #include <QDebug>
+#include "tasksmodel.h"
+#include <QBrush>
 
 // =============================================================================
 EmployeesModel::EmployeesModel(QObject* parent) :
     QAbstractItemModel(parent),
     m_columns({"id", "lastName", "firstName", "patronymic",
-               "fullName", "position", "email", "phone"}),
-    m_rootItem(new EmployeeObject(this))
+               "fullName", "position", "email", "phone", "tasks"}),
+    m_rootItem(new EmployeeObject(this)),
+    m_tasksModel(nullptr)
 {
 }
 
@@ -17,6 +20,11 @@ EmployeesModel::EmployeesModel(QObject* parent) :
 EmployeesModel::~EmployeesModel()
 {
 
+}
+
+// =============================================================================
+void EmployeesModel::setTasksModel(QAbstractItemModel* model) {
+    m_tasksModel = model;
 }
 
 // =============================================================================
@@ -135,10 +143,46 @@ QVariant EmployeesModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
         {
-            return employeeObjectByIndex(index)->property
-            (
-                m_columns.at(index.column()).toUtf8()
-            );
+            const auto& propertyName = m_columns.at(index.column());
+            const auto obj = employeeObjectByIndex(index);
+
+            // Если колонка с задачами
+            if (propertyName == "tasks" && m_tasksModel != nullptr)
+            {
+                auto executorId = obj->id();
+                const auto listTasks = static_cast<TasksModel*>(m_tasksModel)->findByExecutorId(executorId);
+
+                int count = 0;
+
+                for (const auto taskObject : listTasks)
+                {
+                    if (taskObject->state() == Task::State::Completed)
+                        continue;
+
+                    if (taskObject->deadline() >= QDate::currentDate())
+                        continue;
+
+                    count++;
+                }
+
+                return QVariant(count);
+            }
+
+            return obj->property(propertyName.toUtf8());
+        }
+        case Qt::BackgroundRole :
+        {
+            const auto& propertyName = m_columns.at(index.column());
+
+            // Если колонка с задачами
+            if (propertyName == "tasks" && m_tasksModel != nullptr)
+            {
+                auto count = data(index, Qt::DisplayRole);
+                if (count > 0)
+                    return QBrush(Qt::red);
+            }
+
+            return QVariant();
         }
         default:
             return QVariant();
@@ -186,8 +230,23 @@ QVariant EmployeesModel::headerData(int section,
         case 5: return QString(tr("Position"));
         case 6: return QString(tr("Email"));
         case 7: return QString(tr("Phone"));
+        case 8: return QString(tr("Deadline Tasks"));
         default: return QVariant();
     }
+}
+
+// =============================================================================
+Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+    if (index.column() == 8)
+        flags |= Qt::ItemIsEditable;
+
+    return flags;
 }
 
 // =============================================================================

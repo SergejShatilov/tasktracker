@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include "httpclient/httpclient.h"
 #include "models/employeesmodel.h"
+#include "models/tasksmodel.h"
 
 class EmployeesView : public QTreeView
 {
@@ -14,6 +15,8 @@ public:
                            QWidget* parent = nullptr);
 
     EmployeesModel* employeesModel() const;
+
+    void setTasksModel(TasksModel* model);
 
 public slots:
     void slotUpdate();
@@ -29,5 +32,6 @@ private slots:
 private:
     HttpClient* m_httpClient;
     EmployeesModel* m_employeesModel;
+    TasksModel* m_tasksModel;
 
 };

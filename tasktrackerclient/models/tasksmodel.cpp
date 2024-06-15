@@ -161,6 +161,20 @@ TasksModel::taskObjectByIndex(const QModelIndex& index) const
 }
 
 // =============================================================================
+QList<TaskObject*> TasksModel::findByExecutorId(qint32 executorId) const
+{
+    QList<TaskObject*> list;
+
+    for (auto taskObject : m_listObjects) {
+        if (taskObject->executorId() == executorId) {
+            list << taskObject;
+        }
+    }
+
+    return list;
+}
+
+// =============================================================================
 QModelIndex TasksModel::index(int row, int column,
                               const QModelIndex &parent) const
 {
@@ -265,6 +279,31 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
                     default:
                         return QVariant();
                 }
+            }
+
+            return QVariant();
+        }
+        case Qt::ToolTipRole:
+        {
+            const auto& propertyName = m_columns.at(index.column());
+            const auto obj = taskObjectByIndex(index);
+
+            // Если колонка с исполнителем
+            if (propertyName == "executorId" && m_employeesModel != nullptr)
+            {
+                return obj->executorId();
+            }
+
+            // Если колонка с состоянием
+            else if (propertyName == "state" && m_employeesModel != nullptr)
+            {
+                return obj->stateString();
+            }
+
+            // Если колонка с датой
+            else if (propertyName == "deadline" && m_employeesModel != nullptr)
+            {
+                return obj->deadline();
             }
 
             return QVariant();

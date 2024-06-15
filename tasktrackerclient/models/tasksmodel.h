@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef TASKS_MODEL_H
+#define TASKS_MODEL_H
 
 #include <QAbstractItemModel>
 #include "taskobject.h"
@@ -29,6 +30,8 @@ public:
     QString nameByIndex(const QModelIndex& index) const;
     TaskObject* taskObjectByIndex(const QModelIndex& index) const;
 
+    QList<TaskObject*> findByExecutorId(qint32 executorId) const;
+
 public:
     QModelIndex index(int row, int column,
                       const QModelIndex &parent) const override;
@@ -55,3 +58,5 @@ protected:
     EmployeesModel*    m_employeesModel;
 
 };
+
+#endif

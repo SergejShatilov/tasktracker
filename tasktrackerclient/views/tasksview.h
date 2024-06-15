@@ -14,6 +14,8 @@ public:
     explicit TasksView(HttpClient* httpClient,
                        QWidget* parent = nullptr);
 
+    TasksModel* tasksModel() const;
+
     void setEmployeesModel(EmployeesModel* model);
 
 public slots:

@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabEmployees->setLayout(ui->employeesLayout);
     ui->employeesLayout->addWidget(m_employeesView);
+    m_employeesView->setTasksModel(m_tasksView->tasksModel());
 
     uiViewDisconnected();
 }

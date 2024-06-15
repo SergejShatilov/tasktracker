@@ -4,13 +4,15 @@
 #include <QMenu>
 #include <QMessageBox>
 #include "dialogs/dialogeditemployee/dialogeditemployee.h"
+#include "views/tasksdelegate.h"
 
 // =============================================================================
 EmployeesView::EmployeesView(HttpClient* httpClient,
                              QWidget* parent) :
     QTreeView(parent),
     m_httpClient(httpClient),
-    m_employeesModel(new EmployeesModel(this))
+    m_employeesModel(new EmployeesModel(this)),
+    m_tasksModel(nullptr)
 {
     setModel(m_employeesModel);
     setColumnHidden(0, true);
@@ -29,6 +31,15 @@ EmployeesView::EmployeesView(HttpClient* httpClient,
 // =============================================================================
 EmployeesModel* EmployeesView::employeesModel() const {
     return m_employeesModel;
+}
+
+// =============================================================================
+void EmployeesView::setTasksModel(TasksModel* model) {
+    m_tasksModel = model;
+    m_employeesModel->setTasksModel(model);
+
+    TasksDelegate* delegate = new TasksDelegate(model, this);
+    setItemDelegateForColumn(8, delegate);
 }
 
 // =============================================================================
@@ -106,6 +117,9 @@ void EmployeesView::slotEdit(const QModelIndex& index)
 // =============================================================================
 void EmployeesView::slotDoubleClicked(const QModelIndex& index)
 {
+    if (index.column() == 8)
+        return;
+
     slotEdit(index);
 }
 

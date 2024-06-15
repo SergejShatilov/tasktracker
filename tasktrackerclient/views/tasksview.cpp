@@ -30,6 +30,11 @@ TasksView::TasksView(HttpClient* httpClient,
 }
 
 // =============================================================================
+TasksModel* TasksView::tasksModel() const {
+    return m_tasksModel;
+}
+
+// =============================================================================
 void TasksView::setEmployeesModel(EmployeesModel* model) {
     m_employeesModel = model;
     m_tasksModel->setEmployeesModel(m_employeesModel);

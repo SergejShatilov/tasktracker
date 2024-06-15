@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef EMPLOYEES_MODEL_H__
+#define EMPLOYEES_MODEL_H__
 
 #include <QAbstractItemModel>
 #include "employeeobject.h"
@@ -11,6 +12,8 @@ class EmployeesModel : public QAbstractItemModel
 public:
     explicit EmployeesModel(QObject* parent = nullptr);
     ~EmployeesModel();
+
+    void setTasksModel(QAbstractItemModel* model);
 
     void addEmployee(const Employee& employee);
     void removeEmployee(const QModelIndex& index);
@@ -33,9 +36,11 @@ public:
     QVariant headerData(int section,
                         Qt::Orientation orientation,
                         int role) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     QString fullNameById(qint32 id) const;
     EmployeeObject* employeeObjectByIndex(const QModelIndex& index) const;
+
 
 private:
     void clear();
@@ -44,5 +49,12 @@ protected:
     QStringList            m_columns;
     EmployeeObject*        m_rootItem;
     QList<EmployeeObject*> m_listObjects;
+    QAbstractItemModel*    m_tasksModel;
+
+
+    // QAbstractItemModel interface
+public:
 
 };
+
+#endif

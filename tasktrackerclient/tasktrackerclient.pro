@@ -25,11 +25,13 @@ SOURCES += \
     dialogs/dialogedittask/dialogedittask.cpp \
     models/employeesmodel.cpp \
     models/tasksmodel.cpp \
+    models/taskexecutorfiltermodel.cpp \
     models/employeeobject.cpp \
     models/taskobject.cpp \
     views/employeesview.cpp \
     views/tasksview.cpp \
     views/taskstatedelegate.cpp \
+    views/tasksdelegate.cpp \
     dialogs/dialogeditemployee/dialogeditemployee.cpp \
     dialogs/dialogopendb/dialogopendb.cpp \
     httpclient/httpclient.cpp \
@@ -42,10 +44,12 @@ HEADERS += \
     dialogs/dialogedittask/dialogedittask.h \
     models/employeesmodel.h \
     models/employeeobject.h \
+    models/taskexecutorfiltermodel.h \
     models/tasksmodel.h \
     models/taskobject.h \
     views/tasksview.h \
     views/taskstatedelegate.h \
+    views/tasksdelegate.h \
     views/employeesview.h \
     dialogs/dialogeditemployee/dialogeditemployee.h \
     dialogs/dialogopendb/dialogopendb.h \
