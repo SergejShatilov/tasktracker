@@ -6,11 +6,11 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QEventLoop>
+#include <QTimer>
 
 // =============================================================================
 HttpClient::HttpClient(QObject *parent) :
     QObject(parent),
-    m_lastErrorString(""),
     m_hostName("127.0.0.1"),
     m_port(80),
     m_dataBaseName("undefined")
@@ -37,8 +37,8 @@ int HttpClient::port() const {
 }
 
 // =============================================================================
-void HttpClient::setDbName(const QString& name) {
-    m_dataBaseName = name;
+void HttpClient::setDbName(const QString& dbName) {
+    m_dataBaseName = dbName;
 }
 
 const QString& HttpClient::dbName() const {
@@ -46,58 +46,82 @@ const QString& HttpClient::dbName() const {
 }
 
 // =============================================================================
-bool HttpClient::createDb(const QString &dbname)
+bool HttpClient::createDb(const QString &dbName)
 {
-    QJsonObject jobj;
-    jobj["dbname"] = dbname;
+    QJsonObject jObj;
+    jObj["dbName"] = dbName;
 
-    return post("/", jobj);
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Post,
+        "/",
+        jObj,
+        &result
+    );
+
+    return result;
 }
 
 // =============================================================================
-bool HttpClient::openDb(const QString &dbname)
+bool HttpClient::openDb(const QString &dbName)
 {
-    QJsonObject jObj;
-    return get(QString("/dbname-%1/").arg(dbname), jObj);
+    bool result = false;
+    makeRequest(
+        Method::Get,
+        QString("/%1").arg(dbName),
+        QByteArray(),
+        &result
+    );
+
+    return result;
 }
 
 // =============================================================================
 Employee HttpClient::addEmployee(const Employee &employee)
 {
-    const auto data = post2
-    (
-        QString("/dbname-%1/employees/")
-            .arg(m_dataBaseName),
-        employee.toJson()
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Post,
+        QString("/%1/employees").arg(m_dataBaseName),
+        employee.toJson(),
+        &result
     );
 
-    return Employee::fromJson(data);
+    if (!result)
+        return Employee();
+
+    return Employee::fromJson(recvBuf);
 }
 
 // =============================================================================
 bool HttpClient::deleteEmployee(qint32 id)
 {
-    return del
-    (
-        QString("/dbname-%1/employees/id-%2/")
-        .arg(m_dataBaseName)
-        .arg(id)
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Delete,
+        QString("/%1/employees/%2").arg(m_dataBaseName).arg(id),
+        QByteArray(),
+        &result
     );
+
+    return result;
 }
 
 // =============================================================================
 bool HttpClient::getEmployees(QList<Employee>& list)
 {
-    QJsonObject jObj;
-    if (!get(QString("/dbname-%1/employees/").arg(m_dataBaseName), jObj))
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Get,
+        QString("/%1/employees").arg(m_dataBaseName),
+        QByteArray(),
+        &result
+    );
+
+    if (!result)
         return false;
 
-    list.clear();
-
-    QJsonArray jarray = jObj["employees"].toArray();
-    for (const auto& jemployee : jarray) {
-        list.append(Employee::fromJsonObject(jemployee.toObject()));
-    }
+    list = Employee::listFromJson(recvBuf);
 
     return true;
 }
@@ -105,52 +129,63 @@ bool HttpClient::getEmployees(QList<Employee>& list)
 // =============================================================================
 bool HttpClient::changeEmployee(qint32 id, const Employee& employee)
 {
-    return put
-    (
-        QString("/dbname-%1/employees/id-%2/")
-            .arg(m_dataBaseName)
-            .arg(id),
-        employee.toJsonObject()
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Put,
+        QString("/%1/employees/%2").arg(m_dataBaseName).arg(id),
+        employee.toJson(),
+        &result
     );
+
+    return result;
 }
 
 // =============================================================================
 Task HttpClient::addTask(const Task& task)
 {
-    const auto data = post2
-    (
-        QString("/dbname-%1/tasks/")
-            .arg(m_dataBaseName),
-        task.toJson()
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Post,
+        QString("/%1/tasks").arg(m_dataBaseName),
+        task.toJson(),
+        &result
     );
 
-    return Task::fromJson(data);
+    if (!result)
+        return Task();
+
+    return Task::fromJson(recvBuf);
 }
 
 // =============================================================================
 bool HttpClient::deleteTask(qint32 id)
 {
-    return del
-    (
-        QString("/dbname-%1/tasks/id-%2/")
-        .arg(m_dataBaseName)
-        .arg(id)
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Delete,
+        QString("/%1/tasks/%2").arg(m_dataBaseName).arg(id),
+        QByteArray(),
+        &result
     );
+
+    return result;
 }
 
 // =============================================================================
 bool HttpClient::getTasks(QList<Task>& list)
 {
-    QJsonObject jObj;
-    if (!get(QString("/dbname-%1/tasks/").arg(m_dataBaseName), jObj))
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Get,
+        QString("/%1/tasks").arg(m_dataBaseName),
+        QByteArray(),
+        &result
+    );
+
+    if (!result)
         return false;
 
-    list.clear();
-
-    QJsonArray jarray = jObj["tasks"].toArray();
-    for (const auto& jtask : jarray) {
-        list.append(Task::fromJsonObject(jtask.toObject()));
-    }
+    list = Task::listFromJson(recvBuf);
 
     return true;
 }
@@ -158,214 +193,120 @@ bool HttpClient::getTasks(QList<Task>& list)
 // =============================================================================
 bool HttpClient::changeTask(qint32 id, const Task& task)
 {
-    return put
-    (
-        QString("/dbname-%1/tasks/id-%2/")
-            .arg(m_dataBaseName)
-            .arg(id),
-        task.toJsonObject()
+    bool result = false;
+    QByteArray recvBuf = makeRequest(
+        Method::Put,
+        QString("/%1/tasks/%2").arg(m_dataBaseName).arg(id),
+        task.toJson(),
+        &result
     );
-}
-
-// =============================================================================
-void HttpClient::showError()
-{
-    QMessageBox message(QMessageBox::Critical,
-                        QObject::tr("Error"),
-                        m_lastErrorString,
-                        QMessageBox::Ok);
-    message.exec();
-}
-
-// =============================================================================
-bool HttpClient::post(const QString& endPoint, const QJsonObject& jObj)
-{
-    bool result = false;
-
-    QNetworkAccessManager manager(this);
-    connect(&manager, &QNetworkAccessManager::finished,
-            this, [this, &result](QNetworkReply* reply)
-    {
-        if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            result = true;
-        }
-        else
-        {
-            m_lastErrorString = QString("%1\r\n%2")
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll()));
-            showError();
-        }
-
-        emit finished();
-    });
-
-    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
-    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
-
-    manager.post(request, QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact));
-
-    // Ждем ответ
-    QEventLoop eventLoop;
-    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec();
 
     return result;
 }
 
 // =============================================================================
-QByteArray HttpClient::post2(const QString& uri, const QByteArray& data)
+QByteArray HttpClient::makeRequest(Method method,
+                                   const QString& uri,
+                                   const QByteArray& content,
+                                   bool* result)
 {
-    QByteArray dataResult;
+    QTimer timer;
+    timer.setInterval(5000);
+    timer.setSingleShot(true);
 
+    QEventLoop eventLoop;
     QNetworkAccessManager manager(this);
-    connect(&manager, &QNetworkAccessManager::finished,
-            this, [this, &dataResult](QNetworkReply* reply)
-    {
-        if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            dataResult = reply->readAll();
-        }
-        else
-        {
-            m_lastErrorString = QString("%1\r\n%2")
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll()));
-            showError();
-        }
 
-        emit finished();
-    });
+    // Формируем запрос
+    const QUrl url = QUrl(
+        QString("http://%1:%2%3")
+        .arg(m_hostName)
+        .arg(m_port)
+        .arg(uri)
+    );
 
-    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(uri));
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
-    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
+    request.setHeader(QNetworkRequest::UserAgentHeader,
+                      QString("HttpClient"));
 
-    manager.post(request, data);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      QString("application/json"));
+
+    // Делаем запрос
+    QNetworkReply* reply = nullptr;
+    switch (method)
+    {
+        case Method::Get:
+            reply = manager.get(request);
+            break;
+        case Method::Post:
+            reply = manager.post(request, content);
+            break;
+        case Method::Put:
+            reply = manager.put(request, content);
+            break;
+        case Method::Delete:
+            reply = manager.deleteResource(request);
+            break;
+        default:
+        {
+            if (result != nullptr)
+                (*result) = false;
+
+            return QByteArray("Error: [HttpClent] request method invalid");
+        }
+    }
+
+    connect(reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit);
+    connect(&timer, &QTimer::timeout, reply, &QNetworkReply::abort);
 
     // Ждем ответ
-    QEventLoop eventLoop;
-    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
+    timer.start();
     eventLoop.exec();
 
-    return dataResult;
+    // Обрабатываем ответ
+    bool res = false;
+    QByteArray recvBuf;
+    if (reply->isFinished() && reply->error() == QNetworkReply::NoError)
+    {
+        recvBuf = reply->readAll();
+        res = true;
+    }
+    else
+    {
+        QString error = QString("%1\r\n%2")
+                        .arg(reply->errorString())
+                        .arg(QString(reply->readAll()));
+
+        QMessageBox message(QMessageBox::Critical,
+                            tr("Error"),
+                            error,
+                            QMessageBox::Ok);
+        message.exec();
+    }
+
+    reply->deleteLater();
+
+    if (result != nullptr)
+        (*result) = res;
+
+    return recvBuf;
 }
 
 // =============================================================================
-bool HttpClient::get(const QString& endPoint, QJsonObject& jObj)
+QByteArray HttpClient::makeRequest(Method method,
+                                   const QString& uri,
+                                   const QJsonObject& jObj,
+                                   bool* result)
 {
-    bool result = false;
+    QJsonDocument jDoc(jObj);
 
-    QNetworkAccessManager manager(this);
-    connect(&manager, &QNetworkAccessManager::finished,
-            this, [this, &result, &jObj](QNetworkReply* reply)
-    {
-        if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            jObj = QJsonDocument::fromJson(reply->readAll()).object();
-            result = true;
-        }
-        else
-        {
-            m_lastErrorString = QString("%1\r\n%2")
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll()));
-            showError();
-        }
-
-        emit finished();
-    });
-
-    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
-    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
-
-    manager.get(request);
-
-    // Ждем ответ
-    QEventLoop eventLoop;
-    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec();
-
-    return result;
-}
-
-// =============================================================================
-bool HttpClient::put(const QString& endPoint, const QJsonObject& jObj)
-{
-    bool result = false;
-
-    QNetworkAccessManager manager(this);
-    connect(&manager, &QNetworkAccessManager::finished,
-            this, [this, &result](QNetworkReply* reply)
-    {
-        if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            result = true;
-        }
-        else
-        {
-            m_lastErrorString = QString("%1\r\n%2")
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll()));
-            showError();
-        }
-
-        emit finished();
-    });
-
-    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
-    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
-
-    manager.put(request, QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact));
-
-    // Ждем ответ
-    QEventLoop eventLoop;
-    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec();
-
-    return result;
-}
-
-// =============================================================================
-bool HttpClient::del(const QString& endPoint)
-{
-    bool result = false;
-
-    QNetworkAccessManager manager(this);
-    connect(&manager, &QNetworkAccessManager::finished,
-            this, [this, &result](QNetworkReply* reply)
-    {
-        if (reply->error() == QNetworkReply::NetworkError::NoError) {
-            result = true;
-        }
-        else
-        {
-            m_lastErrorString = QString("%1\r\n%2")
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll()));
-            showError();
-        }
-
-        emit finished();
-    });
-
-    const QUrl url = QUrl(QString("http://%1:%2%3").arg(m_hostName).arg(m_port).arg(endPoint));
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, QString("TaskTrackerClient"));
-    request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QString("application/json"));
-
-    manager.deleteResource(request);
-
-    // Ждем ответ
-    QEventLoop eventLoop;
-    connect(this, &HttpClient::finished, &eventLoop, &QEventLoop::quit);
-    eventLoop.exec();
-
-    return result;
+    return makeRequest(
+        method,
+        uri,
+        jDoc.toJson(QJsonDocument::Compact),
+        result
+    );
 }
 
 // =============================================================================

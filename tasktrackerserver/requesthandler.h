@@ -11,19 +11,35 @@ public:
                             DBManager* db = nullptr);
 
 private:
-    HttpResponse handlerCreateNewDB(const HttpRequest& request);
-    HttpResponse handlerCheckExistDb(const HttpRequest& request);
-
-    HttpResponse handlerCreateEmployee(const HttpRequest& request);
-    HttpResponse handlerDeleteEmployee(const HttpRequest& request);
-    HttpResponse handlerGetEmployees(const HttpRequest& request);
-    HttpResponse handlerChangeEmployee(const HttpRequest& request);
-
-    HttpResponse handlerCreateTask(const HttpRequest& request);
-    HttpResponse handlerGetTasks(const HttpRequest& request);
-    HttpResponse handlerDeleteTask(const HttpRequest& request);
-    HttpResponse handlerChangeTask(const HttpRequest& request);
+    void registerHandlersForDb();
+    void registerHandlersForEmployees();
+    void registerHandlersForTasks();
 
 private:
-    DBManager* m_db;
+    HttpResponse handlerCreateDb(const QByteArray& content,
+                                 const RoutingArgs& args);
+    HttpResponse handlerCheckExistDb(const QByteArray& content,
+                                     const RoutingArgs& args);
+
+    HttpResponse handlerCreateEmployee(const QByteArray& content,
+                                       const RoutingArgs& args);
+    HttpResponse handlerDeleteEmployee(const QByteArray& content,
+                                       const RoutingArgs& args);
+    HttpResponse handlerChangeEmployee(const QByteArray& content,
+                                       const RoutingArgs& args);
+    HttpResponse handlerGetEmployees(const QByteArray& content,
+                                     const RoutingArgs& args);
+
+    HttpResponse handlerCreateTask(const QByteArray& content,
+                                   const RoutingArgs& args);
+    HttpResponse handlerDeleteTask(const QByteArray& content,
+                                   const RoutingArgs& args);
+    HttpResponse handlerChangeTask(const QByteArray& content,
+                                   const RoutingArgs& args);
+    HttpResponse handlerGetTasks(const QByteArray& content,
+                                 const RoutingArgs& args);
+
+private:
+    HttpServer& m_httpServer;
+    DBManager*  m_db;
 };

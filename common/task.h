@@ -55,6 +55,9 @@ public:
     static Task fromJson(const QByteArray& data);
     QByteArray toJson() const;
 
+    static QList<Task> listFromJson(const QByteArray& data);
+    static QByteArray listToJson(const QList<Task>& listTasks);
+
 protected:
     qint32  m_id;
     QString m_name;

@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <QObject>
 #include <QNetworkReply>
 #include <QJsonObject>
 
@@ -13,6 +12,15 @@ class HttpClient : public QObject
     Q_OBJECT
 
 public:
+    enum class Method
+    {
+        Get,
+        Post,
+        Put,
+        Delete
+    };
+
+public:
     explicit HttpClient(QObject* parent = nullptr);
 
     void setHostName(const QString& hostName);
@@ -20,11 +28,11 @@ public:
     void setPort(int port);
     int port() const;
 
-    void setDbName(const QString& name);
+    void setDbName(const QString& dbName);
     const QString& dbName() const;
 
-    bool createDb(const QString& dbname);
-    bool openDb(const QString& dbname);
+    bool createDb(const QString& dbName);
+    bool openDb(const QString& dbName);
 
     Employee addEmployee(const Employee& employee);
     bool deleteEmployee(qint32 id);
@@ -36,19 +44,17 @@ public:
     bool getTasks(QList<Task>& list);
     bool changeTask(qint32 id, const Task& task);
 
-private:
-    void showError();
-    bool post(const QString& endPoint, const QJsonObject& jObj);
-    QByteArray post2(const QString& uri, const QByteArray& data);
-    bool get(const QString& endPoint, QJsonObject& jObj);
-    bool put(const QString& endPoint, const QJsonObject& jObj);
-    bool del(const QString& endPoint);
+    QByteArray makeRequest(Method method,
+                           const QString& uri,
+                           const QByteArray& content,
+                           bool* result = nullptr);
 
-signals:
-    void finished();
+    QByteArray makeRequest(Method method,
+                           const QString& uri,
+                           const QJsonObject& jObj,
+                           bool* result = nullptr);
 
 private:
-    QString m_lastErrorString;
     QString m_hostName;
     int     m_port;
     QString m_dataBaseName;

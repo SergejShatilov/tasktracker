@@ -39,6 +39,9 @@ public:
     static Employee fromJson(const QByteArray& data);
     QByteArray toJson() const;
 
+    static QList<Employee> listFromJson(const QByteArray& data);
+    static QByteArray listToJson(const QList<Employee>& listEmployees);
+
 protected:
     qint32  m_id;
     QString m_lastName;

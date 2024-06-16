@@ -17,15 +17,15 @@ public:
 
 public:
     explicit HttpResponse(const Status status);
-    explicit HttpResponse(const Status status, const QByteArray& data);
+    explicit HttpResponse(const Status status, const QByteArray& content);
 
-    void setData(const QByteArray& data);
+    void setContent(const QByteArray& content);
     void addHeader(const QString& key, const QString& value);
 
     QByteArray toByteArray() const;
 
 private:
-    QString m_status;
-    QByteArray m_data;
+    QString                 m_status;
+    QByteArray              m_content;
     QHash<QString, QString> m_headers;
 };

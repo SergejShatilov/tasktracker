@@ -3,40 +3,29 @@
 
 #include <QString>
 #include <QHash>
-#include <QDebug>
 
 class HttpRequest
 {
 public:
     enum class Method
     {
-        Invalid,
         Get,
         Post,
         Put,
-        Delete,
-        Patch
+        Delete
     };
 
 public:
-    explicit HttpRequest();
-
-    bool isValid() const;
-    bool parse(const QByteArray& buf);
+    explicit HttpRequest(const QByteArray& data);
 
     Method method() const;
     const QString& methodString() const;
     const QString& uri() const;
     const QString& httpVersion() const;
-
     const QHash<QString, QString>& headers() const;
+    const QByteArray& content() const;
 
-    const QString& userName() const;
-    const QString& password() const;
-    QString dbname() const;
-    qint32 id() const;
-
-    const QByteArray& data() const;
+    void debug() const;
 
     static QString uriToEndPoint(const QString& uri);
     static QString findValueInUri(const QString& uri, const QString& key);
@@ -44,34 +33,13 @@ public:
 private:
     void startLineParse(const QString& startLine);
     void headersParse(const QStringList& headers);
-    bool checkContent() const;
+    void checkContent();
 
 private:
-    bool    m_isValid;
-    Method  m_method;
-    QString m_methodString;
-    QString m_uri;
-    QString m_httpVersion;
-    QString m_userName;
-    QString m_password;
-
+    Method                  m_method;
+    QString                 m_methodString;
+    QString                 m_uri;
+    QString                 m_httpVersion;
     QHash<QString, QString> m_headers;
-
-    QByteArray m_data;
+    QByteArray              m_content;
 };
-
-inline QDebug operator<<(QDebug d, const HttpRequest& ex)
-{
-    d << "Request:\r\n";
-    d << "\tMethod:" << ex.methodString() << "\r\n";
-    d << "\tUri:" << ex.uri() << "\r\n";
-    d << "\tHttp Version:" << ex.httpVersion() << "\r\n";
-    d << "\tHeaders:" << "\r\n";
-    const auto& headers = ex.headers();
-    for (auto it = headers.cbegin(); it != headers.cend(); ++it) {
-        d << "\t" << it.key() << ":" << it.value() << "\r\n";
-    }
-    d << "\tData:" << ex.data() << "\r\n";
-
-    return d;
-}

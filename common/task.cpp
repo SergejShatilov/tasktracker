@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QMap>
 #include <QJsonDocument>
+#include <QJsonArray>
 
 // =============================================================================
 Task::Task() :
@@ -163,6 +164,35 @@ Task Task::fromJson(const QByteArray& data) {
 // =============================================================================
 QByteArray Task::toJson() const {
     return QJsonDocument(toJsonObject()).toJson(QJsonDocument::Compact);
+}
+
+// =============================================================================
+QList<Task> Task::listFromJson(const QByteArray& data)
+{
+    QList<Task> list;
+
+    QJsonObject jObj = QJsonDocument::fromJson(data).object();
+
+    QJsonArray jArray = jObj["tasks"].toArray();
+    for (const auto& jTask : jArray) {
+        list.append(Task::fromJsonObject(jTask.toObject()));
+    }
+
+    return list;
+}
+
+// =============================================================================
+QByteArray Task::listToJson(const QList<Task>& listTasks)
+{
+    QJsonArray jArray;
+    for (const auto& employee : listTasks) {
+        jArray.append(employee.toJsonObject());
+    }
+
+    QJsonObject jObj;
+    jObj.insert("tasks", QJsonValue(jArray));
+
+    return QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact);
 }
 
 // =============================================================================

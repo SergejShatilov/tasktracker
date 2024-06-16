@@ -1,6 +1,8 @@
 
 #include "employee.h"
+
 #include <QJsonDocument>
+#include <QJsonArray>
 
 // =============================================================================
 Employee::Employee() :
@@ -111,6 +113,35 @@ Employee Employee::fromJson(const QByteArray& data) {
 // =============================================================================
 QByteArray Employee::toJson() const {
     return QJsonDocument(toJsonObject()).toJson(QJsonDocument::Compact);
+}
+
+// =============================================================================
+QList<Employee> Employee::listFromJson(const QByteArray& data)
+{
+    QList<Employee> list;
+
+    QJsonObject jObj = QJsonDocument::fromJson(data).object();
+
+    QJsonArray jArray = jObj["employees"].toArray();
+    for (const auto& jEmployee : jArray) {
+        list.append(Employee::fromJsonObject(jEmployee.toObject()));
+    }
+
+    return list;
+}
+
+// =============================================================================
+QByteArray Employee::listToJson(const QList<Employee>& listEmployees)
+{
+    QJsonArray jArray;
+    for (const auto& employee : listEmployees) {
+        jArray.append(employee.toJsonObject());
+    }
+
+    QJsonObject jObj;
+    jObj.insert("employees", QJsonValue(jArray));
+
+    return QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact);
 }
 
 // =============================================================================

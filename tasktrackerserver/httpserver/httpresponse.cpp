@@ -15,21 +15,21 @@ HttpResponse::HttpResponse(const Status status)
 
     const auto it = tableStatuses.find(status);
     if (it == tableStatuses.end())
-        throw std::runtime_error("internal error, responce status is invalid");
+        throw std::runtime_error("Responce status is invalid");
 
     m_status = it.value();
 }
 
 // =============================================================================
-HttpResponse::HttpResponse(const Status status, const QByteArray& data) :
+HttpResponse::HttpResponse(const Status status, const QByteArray& content) :
     HttpResponse(status)
 {
-    m_data = data;
+    m_content = content;
 }
 
 // =============================================================================
-void HttpResponse::setData(const QByteArray& data) {
-    m_data = data;
+void HttpResponse::setContent(const QByteArray& content) {
+    m_content = content;
 }
 
 // =============================================================================
@@ -45,7 +45,7 @@ QByteArray HttpResponse::toByteArray() const
         response += (it.key() + ": " + it.value() + "\r\n");
     }
     response += "\r\n";
-    response += m_data;
+    response += m_content;
 
     return response.toLocal8Bit();
 }

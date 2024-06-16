@@ -13,317 +13,364 @@
 
 // =============================================================================
 RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
+    m_httpServer(httpServer),
     m_db(db)
 {
-    // Регистрируем обработчик создания базы данных сотрудников и задач
-    httpServer.route(
+    // Регистрируем все группы обработчиков запросов
+    registerHandlersForDb();
+    registerHandlersForEmployees();
+    registerHandlersForTasks();
+}
+
+// =============================================================================
+void RequestHandler::registerHandlersForDb()
+{
+    m_httpServer.route(
         HttpRequest::Method::Post,
         "/",
-        [this](const HttpRequest& request) {
-            return handlerCreateNewDB(request);
+        [this](const auto& content, const auto& args) {
+            return handlerCreateDb(content, args);
         }
     );
 
-    // Регистрируем обработчик проверки существования БД
-    httpServer.route(
+    m_httpServer.route(
         HttpRequest::Method::Get,
-        "/dbname-{dbname}/",
-        [this](const HttpRequest& request) {
-            return handlerCheckExistDb(request);
-        }
-    );
-
-    // Регистрируем обработчик создания нового сотрудника
-    httpServer.route(
-        HttpRequest::Method::Post,
-        "/dbname-{dbname}/employees/",
-        [this](const HttpRequest& request) {
-            return handlerCreateEmployee(request);
-        }
-    );
-
-    // Регистрируем обработчик удаления сотрудника
-    httpServer.route(
-        HttpRequest::Method::Delete,
-        "/dbname-{dbname}/employees/id-{id}/",
-        [this](const HttpRequest& request) {
-            return handlerDeleteEmployee(request);
-        }
-    );
-
-    // Регистрируем обработчик запроса сотрудников
-    httpServer.route(
-        HttpRequest::Method::Get,
-        "/dbname-{dbname}/employees/",
-        [this](const HttpRequest& request) {
-            return handlerGetEmployees(request);
-        }
-    );
-
-    // Регистрируем обработчик изменения данных о сотруднике
-    httpServer.route(
-        HttpRequest::Method::Put,
-        "/dbname-{dbname}/employees/id-{id}/",
-        [this](const HttpRequest& request) {
-            return handlerChangeEmployee(request);
-        }
-    );
-
-    // Регистрируем обработчик создания новой задачи
-    httpServer.route(
-        HttpRequest::Method::Post,
-        "/dbname-{dbname}/tasks/",
-        [this](const HttpRequest& request) {
-            return handlerCreateTask(request);
-        }
-    );
-
-    // Регистрируем обработчик запроса задач
-    httpServer.route(
-        HttpRequest::Method::Get,
-        "/dbname-{dbname}/tasks/",
-        [this](const HttpRequest& request) {
-            return handlerGetTasks(request);
-        }
-    );
-
-    // Регистрируем обработчик удаления задачи
-    httpServer.route(
-        HttpRequest::Method::Delete,
-        "/dbname-{dbname}/tasks/id-{id}/",
-        [this](const HttpRequest& request) {
-            return handlerDeleteTask(request);
-        }
-    );
-
-    // Регистрируем обработчик изменения данных о задаче
-    httpServer.route(
-        HttpRequest::Method::Put,
-        "/dbname-{dbname}/tasks/id-{id}/",
-        [this](const HttpRequest& request) {
-            return handlerChangeTask(request);
+        "/{dbname}",
+        [this](const auto& content, const auto& args) {
+            return handlerCheckExistDb(content, args);
         }
     );
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerCreateNewDB(const HttpRequest &request)
+void RequestHandler::registerHandlersForEmployees()
 {
-    qDebug() << "Create new db...";
+    m_httpServer.route(
+        HttpRequest::Method::Post,
+        "/{dbname}/employees",
+        [this](const auto& content, const auto& args) {
+            return handlerCreateEmployee(content, args);
+        }
+    );
 
-    // Получаем имя создаваемой базы данных
-    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
+    m_httpServer.route(
+        HttpRequest::Method::Delete,
+        "/{dbname}/employees/{id}",
+        [this](const auto& content, const auto& args) {
+            return handlerDeleteEmployee(content, args);
+        }
+    );
+
+    m_httpServer.route(
+        HttpRequest::Method::Put,
+        "/{dbname}/employees/{id}",
+        [this](const auto& content, const auto& args) {
+            return handlerChangeEmployee(content, args);
+        }
+    );
+
+    m_httpServer.route(
+        HttpRequest::Method::Get,
+        "/{dbname}/employees",
+        [this](const auto& content, const auto& args) {
+            return handlerGetEmployees(content, args);
+        }
+    );
+}
+
+// =============================================================================
+void RequestHandler::registerHandlersForTasks()
+{
+    m_httpServer.route(
+        HttpRequest::Method::Post,
+        "/{dbname}/tasks",
+        [this](const auto& content, const auto& args) {
+            return handlerCreateTask(content, args);
+        }
+    );
+
+    m_httpServer.route(
+        HttpRequest::Method::Delete,
+        "/{dbname}/tasks/{id}",
+        [this](const auto& content, const auto& args) {
+            return handlerDeleteTask(content, args);
+        }
+    );
+
+    m_httpServer.route(
+        HttpRequest::Method::Put,
+        "/{dbname}/tasks/{id}",
+        [this](const auto& content, const auto& args) {
+            return handlerChangeTask(content, args);
+        }
+    );
+
+    m_httpServer.route(
+        HttpRequest::Method::Get,
+        "/{dbname}/tasks",
+        [this](const auto& content, const auto& args) {
+            return handlerGetTasks(content, args);
+        }
+    );
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerCreateDb(
+    const QByteArray& content,
+    const RoutingArgs& args)
+{
+    Q_UNUSED(args);
+
+    QJsonDocument jdoc(QJsonDocument::fromJson(content));
     QJsonObject jobj = jdoc.object();
-    const QString dbname = jobj["dbname"].toString();
+    const QString dbName = jobj["dbName"].toString();
 
     try {
-        m_db->createNewDB(dbname);
-    } catch (const DBException& ex) {
+        m_db->createNewDB(dbName);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
     return HttpResponse(HttpResponse::Status::Created);
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerCheckExistDb(const HttpRequest& request)
+HttpResponse RequestHandler::handlerCheckExistDb(
+    const QByteArray& content,
+    const RoutingArgs& args)
 {
-    qDebug() << "Check exist db...";
+    Q_UNUSED(content);
+
+    const QString dbName = args["{dbname}"].toString();
 
     try {
-        m_db->checkExistDb(request.dbname());
-    } catch (const DBException& ex) {
+        m_db->checkExistDb(dbName);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
     return HttpResponse(HttpResponse::Status::OK);
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerCreateEmployee(const HttpRequest &request)
+HttpResponse RequestHandler::handlerCreateEmployee(
+    const QByteArray& content,
+    const RoutingArgs& args)
 {
-    qDebug() << "Create new employee...";
+    Employee employee = Employee::fromJson(content);
 
-    Employee employee = Employee::fromJson(request.data());
+    const QString dbName = args["{dbname}"].toString();
 
     try {
-        employee = m_db->createEmployee(request.dbname(), employee);
-    } catch (const DBException& ex) {
+        employee = m_db->createEmployee(dbName, employee);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
-    return HttpResponse
-    (
+    return HttpResponse(
         HttpResponse::Status::Created,
         employee.toJson()
     );
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerDeleteEmployee(const HttpRequest& request)
+HttpResponse RequestHandler::handlerDeleteEmployee(
+    const QByteArray& content, const RoutingArgs& args)
 {
-    qDebug() << "Delete employees...";
+    Q_UNUSED(content);
+
+    const QString dbName = args["{dbname}"].toString();
+    const qint32  id     = args["{id}"].toInt();
 
     try {
-        m_db->deleteEmployee(request.dbname(), request.id());
-    } catch (const DBException& ex) {
+        m_db->deleteEmployee(dbName, id);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
     return HttpResponse(HttpResponse::Status::OK);
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerGetEmployees(const HttpRequest &request)
+HttpResponse RequestHandler::handlerChangeEmployee(
+    const QByteArray& content,
+    const RoutingArgs& args)
 {
-    qDebug() << "Get employees...";
+    const Employee employee = Employee::fromJson(content);
+
+    const QString dbName = args["{dbname}"].toString();
+
+    try {
+        m_db->changeEmployee(dbName, employee);
+    }
+    catch (const DBException& ex)
+    {
+        qDebug() << ex;
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerGetEmployees(
+    const QByteArray& content,
+    const RoutingArgs& args)
+{
+    Q_UNUSED(content);
+
+    const QString dbName = args["{dbname}"].toString();
 
     QList<Employee> listEmployees;
 
     try {
-        listEmployees = m_db->getEmployees(request.dbname());
-    } catch (const DBException& ex) {
+        listEmployees = m_db->getEmployees(dbName);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
-    QJsonArray jarray;
-    for (const auto& employee : listEmployees) {
-        jarray.append(employee.toJsonObject());
-    }
-
-    QJsonObject jobj;
-    jobj.insert("employees", QJsonValue(jarray));
-
-    QJsonDocument jdoc;
-    jdoc.setObject(jobj);
-
-    return HttpResponse
-    (
+    return HttpResponse (
         HttpResponse::Status::OK,
-        QJsonDocument(jobj).toJson(QJsonDocument::JsonFormat::Compact)
+        Employee::listToJson(listEmployees)
     );
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerChangeEmployee(const HttpRequest& request)
+HttpResponse RequestHandler::handlerCreateTask(
+    const QByteArray& content,
+    const RoutingArgs& args)
 {
-    qDebug() << "Change employee...";
+    const QString dbName = args["{dbname}"].toString();
 
-    // Получаем данные сотрудника
-    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
-    Employee employee = Employee::fromJsonObject(jdoc.object());
+    Task task = Task::fromJson(content);
 
     try {
-        m_db->changeEmployee(request.dbname(), employee);
-    } catch (const DBException& ex) {
+        task = m_db->createTask(dbName, task);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
-    return HttpResponse(HttpResponse::Status::OK);
-}
-
-// =============================================================================
-HttpResponse
-RequestHandler::handlerCreateTask(const HttpRequest &request)
-{
-    qDebug() << "Create new task...";
-
-    Task task = Task::fromJson(request.data());
-
-    try {
-        task = m_db->createTask(request.dbname(), task);
-    } catch (const DBException& ex) {
-        qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
-    }
-
-    return HttpResponse
-    (
+    return HttpResponse(
         HttpResponse::Status::Created,
         task.toJson()
     );
 }
 
 // =============================================================================
-HttpResponse RequestHandler::handlerGetTasks(const HttpRequest &request)
+HttpResponse RequestHandler::handlerDeleteTask(
+    const QByteArray& content,
+    const RoutingArgs& args)
 {
-    qDebug() << "Get tasks...";
+    Q_UNUSED(content);
+
+    const QString dbName = args["{dbname}"].toString();
+    const qint32  id     = args["{id}"].toInt();
+
+    try {
+        m_db->deleteTask(dbName, id);
+    }
+    catch (const DBException& ex)
+    {
+        qDebug() << ex;
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerChangeTask(
+    const QByteArray& content,
+    const RoutingArgs& args)
+{
+    const Task task = Task::fromJson(content);
+
+    const QString dbName = args["{dbname}"].toString();
+
+    try {
+        m_db->changeTask(dbName, task);
+    }
+    catch (const DBException& ex)
+    {
+        qDebug() << ex;
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
+    }
+
+    return HttpResponse(HttpResponse::Status::OK);
+}
+
+// =============================================================================
+HttpResponse RequestHandler::handlerGetTasks(
+    const QByteArray& content,
+    const RoutingArgs& args)
+{
+    Q_UNUSED(content);
+
+    const QString dbName = args["{dbname}"].toString();
 
     QList<Task> listTasks;
 
     try {
-        listTasks = m_db->getTasks(request.dbname());
-    } catch (const DBException& ex) {
+        listTasks = m_db->getTasks(dbName);
+    }
+    catch (const DBException& ex)
+    {
         qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
+        return HttpResponse(
+            HttpResponse::Status::BadRequest,
+            ex.error().text().toLocal8Bit()
+        );
     }
 
-    QJsonArray jarray;
-    for (const auto& employee : listTasks) {
-        jarray.append(employee.toJsonObject());
-    }
-
-    QJsonObject jobj;
-    jobj.insert("tasks", QJsonValue(jarray));
-
-    QJsonDocument jdoc;
-    jdoc.setObject(jobj);
-
-    return HttpResponse
-    (
+    return HttpResponse (
         HttpResponse::Status::OK,
-        QJsonDocument(jobj).toJson(QJsonDocument::JsonFormat::Compact)
+        Task::listToJson(listTasks)
     );
-}
-
-// =============================================================================
-HttpResponse RequestHandler::handlerDeleteTask(const HttpRequest& request)
-{
-    qDebug() << "Delete task...";
-
-    try {
-        m_db->deleteTask(request.dbname(), request.id());
-    } catch (const DBException& ex) {
-        qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
-    }
-
-    return HttpResponse(HttpResponse::Status::OK);
-}
-
-// =============================================================================
-HttpResponse RequestHandler::handlerChangeTask(const HttpRequest& request)
-{
-    qDebug() << "Change task...";
-
-    // Получаем данные сотрудника
-    QJsonDocument jdoc(QJsonDocument::fromJson(request.data()));
-    Task task = Task::fromJsonObject(jdoc.object());
-
-    try {
-        m_db->changeTask(request.dbname(), task);
-    } catch (const DBException& ex) {
-        qDebug() << ex;
-        return HttpResponse(HttpResponse::Status::BadRequest,
-                            ex.error().text().toLocal8Bit());
-    }
-
-    return HttpResponse(HttpResponse::Status::OK);
 }
 
 // =============================================================================

@@ -3,13 +3,18 @@
 
 #include <QRunnable>
 #include <QTcpSocket>
-#include <QDebug>
 #include <QTime>
+#include <QHash>
 
 #include "httprequest.h"
 #include "httpresponse.h"
 
-using RouteHandler = std::function<HttpResponse(const HttpRequest&)>;
+using RoutingArgs = QHash<QString, QVariant>;
+
+using RouteHandler = std::function<HttpResponse(
+    const QByteArray& content,
+    const RoutingArgs& args)>;
+
 using RoutingMap = QMap<QPair<HttpRequest::Method, QString>, RouteHandler>;
 
 class HttpSocketHandler : public QRunnable

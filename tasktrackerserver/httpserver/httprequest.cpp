@@ -1,32 +1,24 @@
 
 #include "httprequest.h"
 
+#include <QDebug>
+
 // =============================================================================
-HttpRequest::HttpRequest() :
-    m_isValid(false)
+HttpRequest::HttpRequest(const QByteArray& data)
 {
-}
+    if (data.isEmpty())
+        throw std::runtime_error("Request is empty");
 
-// =============================================================================
-bool HttpRequest::isValid() const {
-    return m_isValid;
-}
-
-// =============================================================================
-bool HttpRequest::parse(const QByteArray& buf)
-{
-    const QString requestString(buf);
-
-    if (requestString.isEmpty())
-        throw std::runtime_error("the request is empty");
+    const QString requestString(data);
 
     // Разделяем заголовок и тело запроса, должно быть минимум
     // одна пустая строка, иначе непредвиденный конец запроса
     const QStringList requestParts = requestString.split("\r\n\r\n");
     if (requestParts.size() < 2)
-        throw std::runtime_error("unexpected end of the request");
+        throw std::runtime_error("Unexpected end of the request");
 
-    m_data = requestParts.last().toLocal8Bit();
+    // Получаем контент
+    m_content = requestParts.last().toLocal8Bit();
 
     // Получаем стартовую строку и заголовки
     QStringList headers = requestParts.first().split("\r\n");
@@ -36,9 +28,7 @@ bool HttpRequest::parse(const QByteArray& buf)
     startLineParse(startLine);
     headersParse(headers);
 
-    m_isValid = checkContent();
-
-    return m_isValid;
+    checkContent();
 }
 
 // =============================================================================
@@ -62,26 +52,29 @@ const QHash<QString, QString>& HttpRequest::headers() const {
     return m_headers;
 }
 
-// =============================================================================
-const QString& HttpRequest::userName() const {
-    return m_userName;
-}
-
-const QString& HttpRequest::password() const {
-    return m_password;
+const QByteArray& HttpRequest::content() const {
+    return m_content;
 }
 
 // =============================================================================
-QString HttpRequest::dbname() const {
-    return findValueInUri(m_uri, "dbname");
-}
+void HttpRequest::debug() const
+{
+    qDebug() << QString("Request(%1 %2 %3):")
+         .arg(m_methodString)
+         .arg(m_uri)
+         .arg(m_httpVersion)
+         .toStdString().c_str();
 
-qint32 HttpRequest::id() const {
-    return findValueInUri(m_uri, "id").toInt();
-}
+    for (auto it = m_headers.cbegin(); it != m_headers.cend(); ++it) {
+        qDebug() << QString("    %1 : %2")
+                    .arg(it.key())
+                    .arg(it.value())
+                    .toStdString().c_str();;
+    }
 
-const QByteArray &HttpRequest::data() const {
-    return m_data;
+    if (!m_content.isEmpty()) {
+        qDebug() << m_content;
+    }
 }
 
 // =============================================================================
@@ -91,7 +84,7 @@ void HttpRequest::startLineParse(const QString& startLine)
     // Метода, URI и версии HTTP
     const QStringList startLineParts = startLine.split(' ');
     if (startLineParts.size() != 3)
-        throw std::runtime_error("starting line is invalid");
+        throw std::runtime_error("Starting line is invalid");
 
     m_methodString = startLineParts.at(0);
     m_uri          = startLineParts.at(1);
@@ -102,24 +95,23 @@ void HttpRequest::startLineParse(const QString& startLine)
         {"GET",    Method::Get},
         {"POST",   Method::Post},
         {"PUT",    Method::Put},
-        {"DELETE", Method::Delete},
-        {"PATCH",  Method::Patch}
+        {"DELETE", Method::Delete}
     };
 
     auto it = tableMethods.find(m_methodString);
     if (it != tableMethods.end()) {
         m_method = it.value();
     } else {
-        throw std::runtime_error("method is invalid");
+        throw std::runtime_error("Method is invalid");
     }
 
     // Проверяем URI, должен быть не пустой и иметь вначале /
     if (m_uri.isEmpty() || (m_uri[0] != '/'))
-        throw std::runtime_error("uri is invalid");
+        throw std::runtime_error("Uri is invalid");
 
     // Проверяем версию HTTP, поддерживаем пока что HTTP/1.1
     if (m_httpVersion != "HTTP/1.1")
-        throw std::runtime_error("unsupported http version");
+        throw std::runtime_error("Unsupported http version");
 }
 
 // =============================================================================
@@ -128,38 +120,33 @@ void HttpRequest::headersParse(const QStringList& headers)
     for (const auto& header : headers)
     {
         // В заголовке должно быть хотябы одно двоеточие
-        if (header.count(':') < 1)
-            throw std::runtime_error("header is invalid");
+        if (!header.contains(':'))
+            throw std::runtime_error("Header is invalid");
 
         int index = header.indexOf(':');
         const QString& key = header.left(index);
         const QString& value = header.mid(index + 2);
         m_headers.insert(key, value);
     }
-
-    // Ищем информацию для авторизации пользователя
-    auto it = m_headers.find("Authorization");
-    if (it != m_headers.end())
-    {
-        QStringList authorization = it.value().split(',');
-        m_userName = authorization.first();
-        m_password = authorization.last().simplified();
-    }
 }
 
 // =============================================================================
-bool HttpRequest::checkContent() const
+void HttpRequest::checkContent()
 {
-    // Для GET-запроса контент не проверяем
-    if (m_method == Method::Get)
-        return true;
+    // Для GET- и DELETE- запросов контент не проверяем
+    if (m_method == Method::Get || m_method == Method::Delete)
+        return;
 
+    // Проверяем размер контента
     auto it = m_headers.find("Content-Length");
     if (it != m_headers.end()) {
-        return m_data.length() == it.value().toInt();
+        if (m_content.length() != it.value().toInt()) {
+            throw std::runtime_error("Size of the content does not match");
+        }
+        return;
     }
 
-    return false;
+    throw std::runtime_error("Header 'Content-Length' not found");
 }
 
 // =============================================================================
