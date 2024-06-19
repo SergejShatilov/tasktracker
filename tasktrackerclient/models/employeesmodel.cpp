@@ -1,29 +1,35 @@
 
 #include "employeesmodel.h"
 
-#include "employeeobject.h"
-#include <QDebug>
-#include "tasksmodel.h"
-#include <QBrush>
+//#include "tasksmodel.h"
+//#include <QBrush>
 
 // =============================================================================
-EmployeesModel::EmployeesModel(QObject* parent) :
-    QAbstractItemModel(parent),
-    m_columns({"id", "lastName", "firstName", "patronymic",
-               "fullName", "position", "email", "phone", "tasks"}),
-    m_rootItem(new EmployeeObject(this)),
-    m_tasksModel(nullptr)
+EmployeesModel::EmployeesModel(DbRemoteManager* dbManager, QObject* parent) :
+    ObjectsModel(dbManager, parent)
 {
+    addField("id",           tr("ID"),            false);
+    addField("lastName",     tr("Last Name"),     false);
+    addField("firstName",    tr("First Name"),    false);
+    addField("patronymic",   tr("Patronymic"),    false);
+    addField("fullName",     tr("Full Name"),     true);
+    addField("position",     tr("Position"),      true);
+    addField("email",        tr("Email"),         true);
+    addField("phone",        tr("Phone"),         true);
+    addField("expiredTasks", tr("Expired Tasks"), true);
+
+    connect(dbManager, &DbRemoteManager::addedEmployee,
+            this, &EmployeesModel::addEmployee, Qt::DirectConnection);
+
+    connect(dbManager, &DbRemoteManager::removedEmployee,
+            this, &EmployeesModel::removeEmployee, Qt::DirectConnection);
+
+    connect(dbManager, &DbRemoteManager::updateEmployees,
+            this, &EmployeesModel::updateEmployees, Qt::DirectConnection);
 }
 
 // =============================================================================
-EmployeesModel::~EmployeesModel()
-{
-
-}
-
-// =============================================================================
-void EmployeesModel::setTasksModel(QAbstractItemModel* model) {
+/*void EmployeesModel::setTasksModel(QAbstractItemModel* model) {
     m_tasksModel = model;
 }
 
@@ -93,50 +99,35 @@ qint32 EmployeesModel::idByFullName(const QString& fullName) const
 
     return (*it)->property("id").toInt();
 }
-
-// =============================================================================
-QModelIndex EmployeesModel::index(int row, int column,
-                                  const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    QObject* parentObj = employeeObjectByIndex(parent);
-    return createIndex(row, column, parentObj->children().at(row));
-}
-
-// =============================================================================
-QModelIndex EmployeesModel::parent(const QModelIndex &child) const
-{
-    QObject* childObj = employeeObjectByIndex(child);
-    QObject* parentObj = childObj->parent();
-
-    if (parentObj == m_rootItem)
-        return QModelIndex();
-
-    QObject* grandParentObj = parentObj->parent();
-
-    int row = grandParentObj->children().indexOf(parentObj);
-
-    return createIndex(row, 0, parentObj);
-}
-
-// =============================================================================
-int EmployeesModel::rowCount(const QModelIndex &parent) const {
-    return employeeObjectByIndex(parent)->children().count();
-}
-
-// =============================================================================
-int EmployeesModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent);
-    return m_columns.size();
-}
+*/
 
 // =============================================================================
 QVariant EmployeesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+        {
+            const auto& field = fieldByColumn(index.column());
+            auto employee = static_cast<Employee*>(objectByIndex(index));
+
+            // Если поле с задачами с истекшим временем выполнения
+            if (field == "expiredTasks")
+            {
+                return 0;
+            }
+
+            return employee->property(field.toLocal8Bit());
+        }
+        default:
+            return QVariant();
+    }
+
+
+    /*
 
     switch (role)
     {
@@ -186,59 +177,14 @@ QVariant EmployeesModel::data(const QModelIndex &index, int role) const
         }
         default:
             return QVariant();
-    }
-}
-
-// =============================================================================
-bool EmployeesModel::setData(const QModelIndex &index,
-                             const QVariant &value,
-                             int role)
-{
-    if (!index.isValid())
-        return false;
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-        {
-            return employeeObjectByIndex(index)->setProperty
-            (
-                m_columns.at(index.column()).toUtf8(),
-                value
-            );
-        }
-        default:
-            return false;
-    }
-}
-
-// =============================================================================
-QVariant EmployeesModel::headerData(int section,
-                                    Qt::Orientation orientation,
-                                    int role) const
-{
-    if ((orientation != Qt::Orientation::Horizontal) ||
-        (role != Qt::DisplayRole))
-    {
-        return QVariant();
-    }
-
-    switch (section)
-    {
-        case 4: return QString(tr("Full Name"));
-        case 5: return QString(tr("Position"));
-        case 6: return QString(tr("Email"));
-        case 7: return QString(tr("Phone"));
-        case 8: return QString(tr("Deadline Tasks"));
-        default: return QVariant();
-    }
+    }*/
+    return QVariant();
 }
 
 // =============================================================================
 Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    /*if (!index.isValid())
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -246,9 +192,55 @@ Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
     if (index.column() == 8)
         flags |= Qt::ItemIsEditable;
 
-    return flags;
+    return flags;*/
+    return ObjectsModel::flags(index);
 }
 
+// =============================================================================
+void EmployeesModel::addEmployee(Employee* employee)
+{
+    const QModelIndex parentIndex = QModelIndex();
+
+    beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
+
+    employee->setParent(m_rootObject);
+
+    endInsertRows();
+}
+
+// =============================================================================
+void EmployeesModel::removeEmployee(Employee* employee)
+{
+    const QModelIndex index = indexOf(employee);
+
+    if (!index.isValid())
+        return;
+
+    beginRemoveRows(QModelIndex(), index.row(), index.row());
+
+    delete employee;
+
+    endRemoveRows();
+}
+
+// =============================================================================
+void EmployeesModel::updateEmployees(const QList<Employee*>& listEmployees)
+{
+    // Удаляем все объекты
+    reset();
+
+    // Добавляем объекты в модель
+    const QModelIndex parentIndex = QModelIndex();
+    beginInsertRows(parentIndex, rowCount(parentIndex),
+                    rowCount(parentIndex) + listEmployees.size());
+
+    for (auto employee : listEmployees)
+        employee->setParent(m_rootObject);
+
+    endInsertRows();
+}
+
+/*
 // =============================================================================
 QString EmployeesModel::fullNameById(qint32 id) const
 {
@@ -268,31 +260,5 @@ QString EmployeesModel::fullNameById(qint32 id) const
         return QString::number(id);
 
     return (*it)->fullName();
-}
-
-// =============================================================================
-EmployeeObject*
-EmployeesModel::employeeObjectByIndex(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return m_rootItem;
-
-    return static_cast<EmployeeObject*>(index.internalPointer());
-}
-
-// =============================================================================
-void EmployeesModel::clear()
-{
-    beginResetModel();
-
-    const auto& childred = m_rootItem->children();
-    for (const auto child : childred) {
-        delete child;
-    }
-
-    m_listObjects.clear();
-
-    endResetModel();
-}
-
+}*/
 // =============================================================================

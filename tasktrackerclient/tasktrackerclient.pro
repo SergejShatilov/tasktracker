@@ -17,52 +17,61 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
+# ------------------------------------------------------------------------------
 INCLUDEPATH += \
     $${COMMON}/ \
 
+# ------------------------------------------------------------------------------
 SOURCES += \
-    dialogs/dialogedittask/dialogedittask.cpp \
-    models/employeesmodel.cpp \
     models/tasksmodel.cpp \
-    models/taskexecutorfiltermodel.cpp \
-    models/employeeobject.cpp \
-    models/taskobject.cpp \
-    views/employeesview.cpp \
-    views/tasksview.cpp \
-    views/taskstatedelegate.cpp \
-    views/tasksdelegate.cpp \
-    dialogs/dialogeditemployee/dialogeditemployee.cpp \
-    dialogs/dialogopendb/dialogopendb.cpp \
-    httpclient/httpclient.cpp \
-    $${COMMON}/employee.cpp \
-    $${COMMON}/task.cpp \
-    main.cpp \
-    mainwindow.cpp \
+    models/objectsmodel.cpp \
+    models/employeesmodel.cpp \
+    #models/taskexecutorfiltermodel.cpp \
+    #views/taskstatedelegate.cpp \
+    #views/tasksdelegate.cpp \
+    models/viewerproxymodel.cpp     \
+    widgets/tasksviewer.cpp         \
+    widgets/employeesviewer.cpp     \
+    dialogs/taskdialog.cpp          \
+    dialogs/employeedialog.cpp      \
+    dialogs/connectdialog.cpp       \
+    db/dbremotemanager.cpp          \
+    httpclient/httpclient.cpp       \
+    $${COMMON}/employee.cpp         \
+    $${COMMON}/task.cpp             \
+    main.cpp                        \
+    mainwindow.cpp                  \
+    widgets/viewer.cpp              \
 
+# ------------------------------------------------------------------------------
 HEADERS += \
-    dialogs/dialogedittask/dialogedittask.h \
-    models/employeesmodel.h \
-    models/employeeobject.h \
-    models/taskexecutorfiltermodel.h \
     models/tasksmodel.h \
-    models/taskobject.h \
-    views/tasksview.h \
-    views/taskstatedelegate.h \
-    views/tasksdelegate.h \
-    views/employeesview.h \
-    dialogs/dialogeditemployee/dialogeditemployee.h \
-    dialogs/dialogopendb/dialogopendb.h \
-    $${COMMON}/employee.h \
-    $${COMMON}/task.h \
-    httpclient/httpclient.h \
-    mainwindow.h
+    models/objectsmodel.h \
+    models/employeesmodel.h \
+    #models/taskexecutorfiltermodel.h \
+    #views/taskstatedelegate.h \
+    #views/tasksdelegate.h \
+    models/viewerproxymodel.h       \
+    widgets/tasksviewer.h           \
+    widgets/employeesviewer.h       \
+    dialogs/taskdialog.h            \
+    dialogs/employeedialog.h        \
+    dialogs/connectdialog.h         \
+    db/dbremotemanager.h            \
+    httpclient/httpclient.h         \
+    $${COMMON}/employee.h           \
+    $${COMMON}/task.h               \
+    mainwindow.h                    \
+    widgets/viewer.h                \
 
-FORMS += \
-    dialogs/dialogeditemployee/dialogeditemployee.ui \
-    dialogs/dialogedittask/dialogedittask.ui \
-    dialogs/dialogopendb/dialogopendb.ui \
-    mainwindow.ui
+# ------------------------------------------------------------------------------
+FORMS +=                            \
+    dialogs/taskdialog.ui           \
+    dialogs/employeedialog.ui       \
+    dialogs/connectdialog.ui        \
+    widgets/viewer.ui               \
+    mainwindow.ui                   \
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

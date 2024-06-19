@@ -3,9 +3,11 @@
 
 #include <QMainWindow>
 
-#include "httpclient/httpclient.h"
-#include "views/tasksview.h"
-#include "views/employeesview.h"
+#include "db/dbremotemanager.h"
+#include "widgets/tasksviewer.h"
+#include "widgets/employeesviewer.h"
+#include "models/tasksmodel.h"
+#include "models/employeesmodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,17 +24,19 @@ public:
 private slots:
     void newDb();
     void openDb();
+    void closeDb();
 
 private:
-    void setWindowDbName(const QString& name);
-    void uiViewDisconnected();
-    void uiViewConnected();
+    void setViewDisconnected();
+    void setViewConnected();
 
 private:
-    Ui::MainWindow* ui;
-    HttpClient*     m_httpClient;
-    TasksView*      m_tasksView;
-    EmployeesView*  m_employeesView;
+    Ui::MainWindow*     ui;
+    DbRemoteManager*    m_dbManager;
+    TasksViewer*        m_tasksViewer;
+    EmployeesViewer*    m_employeesViewer;
+    TasksModel*         m_tasksModel;
+    EmployeesModel*     m_employeesModel;
 };
 
 #endif // MAINWINDOW_H

@@ -1,11 +1,12 @@
 
 #pragma once
 
-#include <QNetworkReply>
+#include <QObject>
 #include <QJsonObject>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
-#include "employee.h"
-#include "task.h"
+#define HTTPCLENT_DEFAULT_TIMEOUT_MS    (30000)
 
 class HttpClient : public QObject
 {
@@ -28,34 +29,30 @@ public:
     void setPort(int port);
     int port() const;
 
-    void setDbName(const QString& dbName);
-    const QString& dbName() const;
+    bool makeRequest(Method method,
+                     const QString& uri,
+                     const QByteArray& contentSend,
+                     QByteArray* contentRecv = nullptr,
+                     int timeout = HTTPCLENT_DEFAULT_TIMEOUT_MS);
 
-    bool createDb(const QString& dbName);
-    bool openDb(const QString& dbName);
+    bool makeRequest(Method method,
+                     const QString& uri,
+                     const QJsonObject& jObjSend,
+                     QJsonObject* jObjRecv = nullptr,
+                     int timeout = HTTPCLENT_DEFAULT_TIMEOUT_MS);
 
-    Employee addEmployee(const Employee& employee);
-    bool deleteEmployee(qint32 id);
-    bool getEmployees(QList<Employee>& list);
-    bool changeEmployee(qint32 id, const Employee& employee);
+signals:
+    void messageError(const QString& error);
 
-    Task addTask(const Task& task);
-    bool deleteTask(qint32 id);
-    bool getTasks(QList<Task>& list);
-    bool changeTask(qint32 id, const Task& task);
-
-    QByteArray makeRequest(Method method,
-                           const QString& uri,
-                           const QByteArray& content,
-                           bool* result = nullptr);
-
-    QByteArray makeRequest(Method method,
-                           const QString& uri,
-                           const QJsonObject& jObj,
-                           bool* result = nullptr);
+private:
+    QNetworkRequest buildRequest(const QString& uri) const;
+    QNetworkReply* execMethod(Method method,
+                              QNetworkAccessManager& manager,
+                              const QNetworkRequest& request,
+                              const QByteArray& content) const;
 
 private:
     QString m_hostName;
     int     m_port;
-    QString m_dataBaseName;
+
 };

@@ -3,41 +3,37 @@
 
 #include "dbmanager.h"
 
-class DBPostgres : public DBManager
+class DbPostgres : public DbManager
 {
 public:
-    explicit DBPostgres(const QString& hostName, int port);
+    explicit DbPostgres(const QString& hostName, int port);
 
-    QString dbtype() const override;
+    QString dbType() const override;
 
-    // -------------------------------------------------------------------------
-    void createNewDB(const QString& dbname) override;
+    void createDb(const QString& dbName) override;
 
-    void checkExistDb(const QString& dbname) override;
+    void checkExistDb(const QString& dbName) override;
 
-    // -------------------------------------------------------------------------
-    Employee createEmployee(const QString& dbname,
-                            const Employee& employee) override;
+    void createEmployee(const QString& dbName,
+                        QSharedPointer<Employee> employee) override;
 
-    void deleteEmployee(const QString& dbname,
+    void deleteEmployee(const QString& dbName,
                         qint32 id) override;
 
-    QList<Employee> getEmployees(const QString& dbname) override;
+    void changeEmployee(const QString& dbName,
+                        const QSharedPointer<Employee> employee) override;
 
-    void changeEmployee(const QString& dbname,
-                        const Employee& employee) override;
+    QList<QSharedPointer<Employee>> getEmployees(
+        const QString& dbName
+    ) override;
 
-    // -------------------------------------------------------------------------
-    Task createTask(const QString& dbname,
-                    const Task& task) override;
-
-    void deleteTask(const QString& dbname,
+    void createTask(const QString& dbName,
+                    QSharedPointer<Task> task) override;
+    void deleteTask(const QString& dbName,
                     qint32 id) override;
-
-    QList<Task> getTasks(const QString& dbname) override;
-
-    void changeTask(const QString& dbname,
-                    const Task& task) override;
+    void changeTask(const QString& dbName,
+                    const QSharedPointer<Task> task) override;
+    QList<QSharedPointer<Task>> getTasks(const QString& dbName) override;
 
 private:
     QSqlDatabase addDatabase() const;

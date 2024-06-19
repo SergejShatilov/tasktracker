@@ -12,7 +12,10 @@
 #include "employee.h"
 
 // =============================================================================
-RequestHandler::RequestHandler(HttpServer& httpServer, DBManager* db) :
+RequestHandler::RequestHandler(HttpServer& httpServer,
+                               DbManager* db,
+                               QObject* parent) :
+    QObject(parent),
     m_httpServer(httpServer),
     m_db(db)
 {
@@ -126,7 +129,7 @@ HttpResponse RequestHandler::handlerCreateDb(
     const QString dbName = jobj["dbName"].toString();
 
     try {
-        m_db->createNewDB(dbName);
+        m_db->createDb(dbName);
     }
     catch (const DBException& ex)
     {
@@ -169,12 +172,14 @@ HttpResponse RequestHandler::handlerCreateEmployee(
     const QByteArray& content,
     const RoutingArgs& args)
 {
-    Employee employee = Employee::fromJson(content);
-
     const QString dbName = args["{dbname}"].toString();
 
+    auto employee = QSharedPointer<Employee>(
+        Employee::createFromJson(content, this)
+    );
+
     try {
-        employee = m_db->createEmployee(dbName, employee);
+        m_db->createEmployee(dbName, employee);
     }
     catch (const DBException& ex)
     {
@@ -187,7 +192,7 @@ HttpResponse RequestHandler::handlerCreateEmployee(
 
     return HttpResponse(
         HttpResponse::Status::Created,
-        employee.toJson()
+        employee->toJson()
     );
 }
 
@@ -220,9 +225,11 @@ HttpResponse RequestHandler::handlerChangeEmployee(
     const QByteArray& content,
     const RoutingArgs& args)
 {
-    const Employee employee = Employee::fromJson(content);
-
     const QString dbName = args["{dbname}"].toString();
+
+    const auto employee = QSharedPointer<Employee>(
+        Employee::createFromJson(content, this)
+    );
 
     try {
         m_db->changeEmployee(dbName, employee);
@@ -248,7 +255,7 @@ HttpResponse RequestHandler::handlerGetEmployees(
 
     const QString dbName = args["{dbname}"].toString();
 
-    QList<Employee> listEmployees;
+    QList<QSharedPointer<Employee>> listEmployees;
 
     try {
         listEmployees = m_db->getEmployees(dbName);
@@ -275,10 +282,10 @@ HttpResponse RequestHandler::handlerCreateTask(
 {
     const QString dbName = args["{dbname}"].toString();
 
-    Task task = Task::fromJson(content);
+    auto task = QSharedPointer<Task>(Task::createFromJson(content, this));
 
     try {
-        task = m_db->createTask(dbName, task);
+        m_db->createTask(dbName, task);
     }
     catch (const DBException& ex)
     {
@@ -291,7 +298,7 @@ HttpResponse RequestHandler::handlerCreateTask(
 
     return HttpResponse(
         HttpResponse::Status::Created,
-        task.toJson()
+        task->toJson()
     );
 }
 
@@ -325,9 +332,11 @@ HttpResponse RequestHandler::handlerChangeTask(
     const QByteArray& content,
     const RoutingArgs& args)
 {
-    const Task task = Task::fromJson(content);
-
     const QString dbName = args["{dbname}"].toString();
+
+    const auto task = QSharedPointer<Task>(
+        Task::createFromJson(content, this)
+    );
 
     try {
         m_db->changeTask(dbName, task);
@@ -353,7 +362,7 @@ HttpResponse RequestHandler::handlerGetTasks(
 
     const QString dbName = args["{dbname}"].toString();
 
-    QList<Task> listTasks;
+    QList<QSharedPointer<Task>> listTasks;
 
     try {
         listTasks = m_db->getTasks(dbName);

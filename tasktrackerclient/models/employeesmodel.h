@@ -1,60 +1,25 @@
 
-#ifndef EMPLOYEES_MODEL_H__
-#define EMPLOYEES_MODEL_H__
+#pragma once
 
-#include <QAbstractItemModel>
-#include "employeeobject.h"
+#include "objectsmodel.h"
+#include "db/dbremotemanager.h"
 
-class EmployeesModel : public QAbstractItemModel
+class EmployeesModel : public ObjectsModel
 {
     Q_OBJECT
 
 public:
-    explicit EmployeesModel(QObject* parent = nullptr);
-    ~EmployeesModel();
-
-    void setTasksModel(QAbstractItemModel* model);
-
-    void addEmployee(const Employee& employee);
-    void removeEmployee(const QModelIndex& index);
-
-    void loadFromList(const QList<Employee>& list);
-
-    qint32 idByIndex(const QModelIndex& index) const;
-    qint32 idByFullName(const QString& fullName) const;
+    explicit EmployeesModel(DbRemoteManager* dbManager,
+                            QObject* parent = nullptr);
 
 public:
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent) const override;
-    QModelIndex parent(const QModelIndex &child) const override;
-    int rowCount(const QModelIndex &parent) const override;
-    int columnCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role) const override;
-    bool setData(const QModelIndex &index,
-                 const QVariant &value,
-                 int role) override;
-    QVariant headerData(int section,
-                        Qt::Orientation orientation,
-                        int role) const override;
+
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    QString fullNameById(qint32 id) const;
-    EmployeeObject* employeeObjectByIndex(const QModelIndex& index) const;
-
-
-private:
-    void clear();
-
-protected:
-    QStringList            m_columns;
-    EmployeeObject*        m_rootItem;
-    QList<EmployeeObject*> m_listObjects;
-    QAbstractItemModel*    m_tasksModel;
-
-
-    // QAbstractItemModel interface
-public:
+private slots:
+    void addEmployee(Employee* employee);
+    void removeEmployee(Employee* employee);
+    void updateEmployees(const QList<Employee*>& listEmployees);
 
 };
-
-#endif

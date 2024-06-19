@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 
     HttpServer httpServer;
 
-    DBPostgres db("127.0.0.1", 5432);
+    DbPostgres db("127.0.0.1", 5432);
 
-    RequestHandler(httpServer, &db);
+    RequestHandler requestHandler(httpServer, &db);
 
     if (httpServer.listen(QHostAddress::Any, 80)) {
         qDebug() << "Listering...";

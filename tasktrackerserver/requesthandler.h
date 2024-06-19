@@ -4,11 +4,14 @@
 #include "httpserver/httpserver.h"
 #include "db/dbmanager.h"
 
-class RequestHandler
+class RequestHandler : public QObject
 {
+    Q_OBJECT
+
 public:
     explicit RequestHandler(HttpServer& httpServer,
-                            DBManager* db = nullptr);
+                            DbManager* db = nullptr,
+                            QObject* parent = nullptr);
 
 private:
     void registerHandlersForDb();
@@ -41,5 +44,5 @@ private:
 
 private:
     HttpServer& m_httpServer;
-    DBManager*  m_db;
+    DbManager*  m_db;
 };

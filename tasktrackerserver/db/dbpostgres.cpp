@@ -85,12 +85,12 @@ namespace
 
     // =========================================================================
     // Инициализация БД (создание таблиц)
-    static void initDataBase_(QSqlDatabase& db, const QString& dbname)
+    static void initDataBase_(QSqlDatabase& db, const QString& dbName)
     {
         qDebug() << "Init db...";
 
         // Подключаемся к базе данных
-        db.setDatabaseName(dbname);
+        db.setDatabaseName(dbName);
         DBOpener opener(&db);
 
         // Создаем таблицу сотрудников
@@ -109,7 +109,7 @@ namespace
 }
 
 // =============================================================================
-DBPostgres::DBPostgres(const QString& hostName, int port) :
+DbPostgres::DbPostgres(const QString& hostName, int port) :
     m_hostName(hostName),
     m_port(port)
 {
@@ -117,12 +117,12 @@ DBPostgres::DBPostgres(const QString& hostName, int port) :
 }
 
 // =============================================================================
-QString DBPostgres::dbtype() const {
+QString DbPostgres::dbType() const {
     return QString("QPSQL");
 }
 
 // =============================================================================
-void DBPostgres::createNewDB(const QString& dbname)
+void DbPostgres::createDb(const QString& dbName)
 {
     QSqlDatabase db = addDatabase();
 
@@ -142,7 +142,7 @@ void DBPostgres::createNewDB(const QString& dbname)
             "\tCONNECTION LIMIT = -1\r\n"
             "\tIS_TEMPLATE = False;"
         )
-        .arg(dbname)
+        .arg(dbName)
     );
 
     if (!result) {
@@ -156,28 +156,28 @@ void DBPostgres::createNewDB(const QString& dbname)
     db.close();
 
     // Инициализация этой БД
-    initDataBase_(db, dbname);
+    initDataBase_(db, dbName);
 }
 
 // =============================================================================
-void DBPostgres::checkExistDb(const QString& dbname)
+void DbPostgres::checkExistDb(const QString& dbName)
 {
     QSqlDatabase db = addDatabase();
 
     // Пробуем подключиться к БД,
     // если не получится, будет вызвано исключение
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 }
 
 // =============================================================================
-Employee DBPostgres::createEmployee(
-    const QString& dbname,
-    const Employee& employee)
+void DbPostgres::createEmployee(
+    const QString& dbName,
+    QSharedPointer<Employee> employee)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -193,12 +193,12 @@ Employee DBPostgres::createEmployee(
             "VALUES ('%1', '%2', '%3', '%4', '%5', '%6') "
             "RETURNING id;\r\n"
         )
-        .arg(employee.lastName())
-        .arg(employee.firstName())
-        .arg(employee.patronymic())
-        .arg(employee.position())
-        .arg(employee.email())
-        .arg(employee.phone())
+        .arg(employee->lastName())
+        .arg(employee->firstName())
+        .arg(employee->patronymic())
+        .arg(employee->position())
+        .arg(employee->email())
+        .arg(employee->phone())
     );
 
     if (!result) {
@@ -209,18 +209,15 @@ Employee DBPostgres::createEmployee(
         throw DBException(db.lastError(), __FILE__, __LINE__);
     }
 
-    Employee employeeResult(employee);
-    employeeResult.setId(query.lastInsertId().toInt());
-
-    return employeeResult;
+    employee->setId(query.lastInsertId().toInt());
 }
 
 // =============================================================================
-void DBPostgres::deleteEmployee(const QString& dbname, qint32 id)
+void DbPostgres::deleteEmployee(const QString& dbName, qint32 id)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -242,50 +239,13 @@ void DBPostgres::deleteEmployee(const QString& dbname, qint32 id)
 }
 
 // =============================================================================
-QList<Employee> DBPostgres::getEmployees(const QString& dbname)
+void DbPostgres::changeEmployee(
+    const QString& dbName,
+    const QSharedPointer<Employee> employee)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
-    DBOpener opener(&db);
-
-    QSqlQuery query(db);
-    bool result = query.exec(
-        QString(
-            "SELECT * FROM employees;\r\n"
-        )
-    );
-
-    if (!result) {
-        throw DBException(query.lastError(), __FILE__, __LINE__);
-    }
-
-    QList<Employee> listEmployees;
-    while (query.next())
-    {
-        Employee employee;
-        employee.setId(query.value(0).toUInt());
-        employee.setLastName(query.value(1).toString());
-        employee.setFirstName(query.value(2).toString());
-        employee.setPatronymic(query.value(3).toString());
-        employee.setPosition(query.value(4).toString());
-        employee.setEmail(query.value(5).toString());
-        employee.setPhone(query.value(6).toString());
-
-        listEmployees << employee;
-    }
-
-    return listEmployees;
-}
-
-// =============================================================================
-void DBPostgres::changeEmployee(
-    const QString& dbname,
-    const Employee& employee)
-{
-    QSqlDatabase db = addDatabase();
-
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -300,13 +260,13 @@ void DBPostgres::changeEmployee(
             "    phone = '%6'\r\n"
             "WHERE id = %7;\r\n"
         )
-        .arg(employee.lastName())
-        .arg(employee.firstName())
-        .arg(employee.patronymic())
-        .arg(employee.position())
-        .arg(employee.email())
-        .arg(employee.phone())
-        .arg(employee.id())
+        .arg(employee->lastName())
+        .arg(employee->firstName())
+        .arg(employee->patronymic())
+        .arg(employee->position())
+        .arg(employee->email())
+        .arg(employee->phone())
+        .arg(employee->id())
     );
 
     if (!result) {
@@ -319,11 +279,49 @@ void DBPostgres::changeEmployee(
 }
 
 // =============================================================================
-Task DBPostgres::createTask(const QString& dbname, const Task& task)
+QList<QSharedPointer<Employee>> DbPostgres::getEmployees(const QString& dbName)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "SELECT * FROM employees;\r\n"
+        )
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    QList<QSharedPointer<Employee>> listEmployees;
+    while (query.next())
+    {
+        auto employee = QSharedPointer<Employee>(new Employee());
+
+        employee->setId(query.value(0).toUInt());
+        employee->setLastName(query.value(1).toString());
+        employee->setFirstName(query.value(2).toString());
+        employee->setPatronymic(query.value(3).toString());
+        employee->setPosition(query.value(4).toString());
+        employee->setEmail(query.value(5).toString());
+        employee->setPhone(query.value(6).toString());
+
+        listEmployees << employee;
+    }
+
+    return listEmployees;
+}
+
+// =============================================================================
+void DbPostgres::createTask(const QString& dbName, QSharedPointer<Task> task)
+{
+    QSqlDatabase db = addDatabase();
+
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -339,12 +337,12 @@ Task DBPostgres::createTask(const QString& dbname, const Task& task)
             "VALUES ('%1', '%2', %3, '%4', %5, '%6') "
             "RETURNING id;\r\n"
         )
-        .arg(task.name())
-        .arg(task.stateString())
-        .arg(task.executorId())
-        .arg(task.deadlineString())
-        .arg(task.parentId())
-        .arg(task.description())
+        .arg(task->name())
+        .arg(task->stateString())
+        .arg(task->executorId())
+        .arg(task->deadlineString())
+        .arg(task->parentId())
+        .arg(task->description())
     );
 
     if (!result) {
@@ -355,18 +353,15 @@ Task DBPostgres::createTask(const QString& dbname, const Task& task)
         throw DBException(db.lastError(), __FILE__, __LINE__);
     }
 
-    Task taskResult(task);
-    taskResult.setId(query.lastInsertId().toInt());
-
-    return taskResult;
+    task->setId(query.lastInsertId().toInt());
 }
 
 // =============================================================================
-void DBPostgres::deleteTask(const QString& dbname, qint32 id)
+void DbPostgres::deleteTask(const QString& dbName, qint32 id)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -388,48 +383,12 @@ void DBPostgres::deleteTask(const QString& dbname, qint32 id)
 }
 
 // =============================================================================
-QList<Task> DBPostgres::getTasks(const QString& dbname)
+void DbPostgres::changeTask(const QString& dbName,
+                            const QSharedPointer<Task> task)
 {
     QSqlDatabase db = addDatabase();
 
-    db.setDatabaseName(dbname);
-    DBOpener opener(&db);
-
-    QSqlQuery query(db);
-    bool result = query.exec(
-        QString(
-            "SELECT * FROM tasks\r\n"
-            "ORDER BY parent;\r\n"
-        )
-    );
-
-    if (!result) {
-        throw DBException(query.lastError(), __FILE__, __LINE__);
-    }
-
-    QList<Task> listTasks;
-    while (query.next())
-    {
-        Task task;
-        task.setId(query.value(0).toUInt());
-        task.setName(query.value(1).toString());
-        task.setStateString(query.value(2).toString());
-        task.setExecutorId(query.value(3).toUInt());
-        task.setDeadlineString(query.value(4).toString());
-        task.setParentId(query.value(5).toUInt());
-        task.setDescription(query.value(6).toString());
-        listTasks << task;
-    }
-
-    return listTasks;
-}
-
-// =============================================================================
-void DBPostgres::changeTask(const QString& dbname, const Task& task)
-{
-    QSqlDatabase db = addDatabase();
-
-    db.setDatabaseName(dbname);
+    db.setDatabaseName(dbName);
     DBOpener opener(&db);
 
     QSqlQuery query(db);
@@ -444,13 +403,13 @@ void DBPostgres::changeTask(const QString& dbname, const Task& task)
             "    description = '%6'\r\n"
             "WHERE id = %7;\r\n"
         )
-        .arg(task.name())
-        .arg(task.stateString())
-        .arg(task.executorId())
-        .arg(task.deadlineString())
-        .arg(task.parentId())
-        .arg(task.description())
-        .arg(task.id())
+        .arg(task->name())
+        .arg(task->stateString())
+        .arg(task->executorId())
+        .arg(task->deadlineString())
+        .arg(task->parentId())
+        .arg(task->description())
+        .arg(task->id())
     );
 
     if (!result) {
@@ -463,10 +422,48 @@ void DBPostgres::changeTask(const QString& dbname, const Task& task)
 }
 
 // =============================================================================
-QSqlDatabase
-DBPostgres::addDatabase() const
+QList<QSharedPointer<Task>> DbPostgres::getTasks(const QString& dbName)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase(dbtype());
+    QSqlDatabase db = addDatabase();
+
+    db.setDatabaseName(dbName);
+    DBOpener opener(&db);
+
+    QSqlQuery query(db);
+    bool result = query.exec(
+        QString(
+            "SELECT * FROM tasks\r\n"
+            "ORDER BY parent;\r\n"
+        )
+    );
+
+    if (!result) {
+        throw DBException(query.lastError(), __FILE__, __LINE__);
+    }
+
+    QList<QSharedPointer<Task>> listTasks;
+    while (query.next())
+    {
+        auto task = QSharedPointer<Task>(new Task());
+
+        task->setId(query.value(0).toUInt());
+        task->setName(query.value(1).toString());
+        task->setStateString(query.value(2).toString());
+        task->setExecutorId(query.value(3).toUInt());
+        task->setDeadlineString(query.value(4).toString());
+        task->setParentId(query.value(5).toUInt());
+        task->setDescription(query.value(6).toString());
+        listTasks << task;
+    }
+
+    return listTasks;
+}
+
+// =============================================================================
+QSqlDatabase
+DbPostgres::addDatabase() const
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase(dbType());
     db.setHostName(m_hostName);
     db.setPort(m_port);
     db.setUserName("postgres");

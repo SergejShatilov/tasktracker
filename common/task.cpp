@@ -7,12 +7,14 @@
 #include <QJsonArray>
 
 // =============================================================================
-Task::Task() :
+Task::Task(QObject* parent) :
+    QObject(parent),
     m_id(0),
     m_name(QString("Undefined")),
     m_state(State::NotStarted),
     m_executorId(0),
-    m_parentId(0)
+    m_parentId(0),
+    m_executor(nullptr)
 {
 }
 
@@ -129,18 +131,12 @@ const QString& Task::description() const {
 }
 
 // =============================================================================
-Task Task::fromJsonObject(const QJsonObject& jObj)
-{
-    Task task;
-    task.setId(jObj["id"].toInt());
-    task.setName(jObj["name"].toString());
-    task.setStateString(jObj["state"].toString());
-    task.setExecutorId(jObj["executor"].toInt());
-    task.setDeadlineString(jObj["deadline"].toString());
-    task.setParentId(jObj["parent"].toInt());
-    task.setDescription(jObj["description"].toString());
+void Task::setExecutor(QObject* executor) {
+    m_executor = executor;
+}
 
-    return task;
+QObject* Task::executor() const {
+    return m_executor;
 }
 
 // =============================================================================
@@ -157,8 +153,16 @@ QJsonObject Task::toJsonObject() const {
 }
 
 // =============================================================================
-Task Task::fromJson(const QByteArray& data) {
-    return Task::fromJsonObject(QJsonDocument::fromJson(data).object());
+void Task::fromJson(const QByteArray& data)
+{
+    QJsonObject jObj = QJsonDocument::fromJson(data).object();
+    setId(jObj["id"].toInt());
+    setName(jObj["name"].toString());
+    setStateString(jObj["state"].toString());
+    setExecutorId(jObj["executor"].toInt());
+    setDeadlineString(jObj["deadline"].toString());
+    setParentId(jObj["parent"].toInt());
+    setDescription(jObj["description"].toString());
 }
 
 // =============================================================================
@@ -167,45 +171,70 @@ QByteArray Task::toJson() const {
 }
 
 // =============================================================================
-QList<Task> Task::listFromJson(const QByteArray& data)
+Task* Task::createFromJsonObject(const QJsonObject& jObj, QObject* parent)
 {
-    QList<Task> list;
+    auto task = new Task(parent);
+
+    task->setId(jObj["id"].toInt());
+    task->setName(jObj["name"].toString());
+    task->setStateString(jObj["state"].toString());
+    task->setExecutorId(jObj["executor"].toInt());
+    task->setDeadlineString(jObj["deadline"].toString());
+    task->setParentId(jObj["parent"].toInt());
+    task->setDescription(jObj["description"].toString());
+
+    return task;
+}
+
+// =============================================================================
+Task* Task::createFromJson(const QByteArray& data, QObject* parent)
+{
+    return Task::createFromJsonObject(
+        QJsonDocument::fromJson(data).object(),
+        parent
+    );
+}
+
+// =============================================================================
+QList<Task*> Task::createListFromJson(const QByteArray& data, QObject* parent)
+{
+    QList<Task*> list;
 
     QJsonObject jObj = QJsonDocument::fromJson(data).object();
 
     QJsonArray jArray = jObj["tasks"].toArray();
     for (const auto& jTask : jArray) {
-        list.append(Task::fromJsonObject(jTask.toObject()));
+        list.append(Task::createFromJsonObject(jTask.toObject(), parent));
     }
 
     return list;
 }
 
 // =============================================================================
-QByteArray Task::listToJson(const QList<Task>& listTasks)
+QByteArray Task::listToJson(const QList<QSharedPointer<Task>>& listTasks)
 {
     QJsonArray jArray;
     for (const auto& employee : listTasks) {
-        jArray.append(employee.toJsonObject());
+        jArray.append(employee->toJsonObject());
     }
 
     QJsonObject jObj;
     jObj.insert("tasks", QJsonValue(jArray));
 
-    return QJsonDocument(jObj).toJson(QJsonDocument::JsonFormat::Compact);
+    return QJsonDocument(jObj).toJson(QJsonDocument::Compact);
 }
 
 // =============================================================================
-QDebug operator<<(QDebug d, const Task& task)
+QDebug operator<<(QDebug d, const Task* task)
 {
     d << "Task:\r\n";
-    d << "id:" << task.id() << "\r\n";
-    d << "name:" << task.name() << "\r\n";
-    d << "state:" << task.stateString() << "\r\n";
-    d << "parentId:" << task.parentId() << "\r\n";
-    d << "executorId:" << task.executorId() << "\r\n";
-    d << "deadline:" << task.deadlineString() << "\r\n";
-    d << "description:" << task.description() << "\r\n";
+    d << "id:" << task->id() << "\r\n";
+    d << "name:" << task->name() << "\r\n";
+    d << "state:" << task->stateString() << "\r\n";
+    d << "parentId:" << task->parentId() << "\r\n";
+    d << "executorId:" << task->executorId() << "\r\n";
+    d << "deadline:" << task->deadlineString() << "\r\n";
+    d << "description:" << task->description() << "\r\n";
 
     return d;
 }

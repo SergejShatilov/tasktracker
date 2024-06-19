@@ -18,43 +18,11 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="tabPosition">
-       <enum>QTabWidget::South</enum>
+       <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>-1</number>
       </property>
-      <widget class="QWidget" name="tabTasks">
-       <attribute name="title">
-        <string>Tasks</string>
-       </attribute>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>80</y>
-          <width>311</width>
-          <height>191</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="tasksLayout"/>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tabEmployees">
-       <attribute name="title">
-        <string>Employees</string>
-       </attribute>
-       <widget class="QWidget" name="verticalLayoutWidget_2">
-        <property name="geometry">
-         <rect>
-          <x>150</x>
-          <y>110</y>
-          <width>321</width>
-          <height>141</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="employeesLayout"/>
-       </widget>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -68,14 +36,48 @@
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
     <addaction name="actionNewDb"/>
     <addaction name="actionConnectToDb"/>
+    <addaction name="separator"/>
+    <addaction name="actionCloseDb"/>
    </widget>
-   <addaction name="menu_File"/>
+   <widget class="QMenu" name="menuEmployees">
+    <property name="title">
+     <string>Employees</string>
+    </property>
+    <addaction name="actionEmployeeAdd"/>
+    <addaction name="separator"/>
+    <addaction name="actionEmployeeEdit"/>
+    <addaction name="actionEmployeeDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionEmployeesUpdate"/>
+   </widget>
+   <widget class="QMenu" name="menuTasks">
+    <property name="title">
+     <string>Tasks</string>
+    </property>
+    <addaction name="actionTaskAdd"/>
+    <addaction name="actionTaskAddSub"/>
+    <addaction name="separator"/>
+    <addaction name="actionTaskEdit"/>
+    <addaction name="actionTaskDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionTasksUpdate"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSettings"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTasks"/>
+   <addaction name="menuEmployees"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNewDb">
@@ -101,6 +103,69 @@
   <action name="actionCreateTask">
    <property name="text">
     <string>Create Task ...</string>
+   </property>
+  </action>
+  <action name="actionCloseDb">
+   <property name="text">
+    <string>Close DB</string>
+   </property>
+  </action>
+  <action name="actionEmployeeAdd">
+   <property name="text">
+    <string>Add...</string>
+   </property>
+  </action>
+  <action name="actionEmployeeEdit">
+   <property name="text">
+    <string>Edit...</string>
+   </property>
+  </action>
+  <action name="actionEmployeeDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionEmployeesUpdate">
+   <property name="text">
+    <string>Update</string>
+   </property>
+  </action>
+  <action name="actionTaskAdd">
+   <property name="text">
+    <string>Add...</string>
+   </property>
+  </action>
+  <action name="actionTaskAddSub">
+   <property name="text">
+    <string>Add Subtask...</string>
+   </property>
+  </action>
+  <action name="actionTaskEdit">
+   <property name="text">
+    <string>Edit...</string>
+   </property>
+  </action>
+  <action name="actionTaskDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionTasksUpdate">
+   <property name="text">
+    <string>Update</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+  </action>
+  <action name="actionFilters">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Filters</string>
    </property>
   </action>
  </widget>

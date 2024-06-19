@@ -2,35 +2,66 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <memory>
-
-#include "dialogs/dialogopendb/dialogopendb.h"
+#include "dialogs/connectdialog.h"
 
 // =============================================================================
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_httpClient(new HttpClient(this)),
-    m_tasksView(new TasksView(m_httpClient, this)),
-    m_employeesView(new EmployeesView(m_httpClient, this))
+    m_dbManager(new DbRemoteManager(this)),
+    m_tasksViewer(new TasksViewer(m_dbManager, this)),
+    m_employeesViewer(new EmployeesViewer(m_dbManager, this)),
+    m_tasksModel(new TasksModel(m_dbManager, this)),
+    m_employeesModel(new EmployeesModel(m_dbManager, this))
 {
     ui->setupUi(this);
 
+    // File
     connect(ui->actionNewDb, &QAction::triggered,
             this, &MainWindow::newDb);
 
     connect(ui->actionConnectToDb, &QAction::triggered,
             this, &MainWindow::openDb);
 
-    ui->tabTasks->setLayout(ui->tasksLayout);
-    ui->tasksLayout->addWidget(m_tasksView);
-    m_tasksView->setEmployeesModel(m_employeesView->employeesModel());
+    connect(ui->actionCloseDb, &QAction::triggered,
+            this, &MainWindow::closeDb);
 
-    ui->tabEmployees->setLayout(ui->employeesLayout);
-    ui->employeesLayout->addWidget(m_employeesView);
-    m_employeesView->setTasksModel(m_tasksView->tasksModel());
+    // Tasks
+    connect(ui->actionTaskAdd, &QAction::triggered,
+            m_tasksViewer, &TasksViewer::create);
 
-    uiViewDisconnected();
+    connect(ui->actionTaskAddSub, &QAction::triggered,
+            m_tasksViewer, &TasksViewer::createSub);
+
+    connect(ui->actionTaskEdit, &QAction::triggered,
+            m_tasksViewer, &TasksViewer::edit);
+
+    connect(ui->actionTaskDelete, &QAction::triggered,
+            m_tasksViewer, &TasksViewer::remove);
+
+    connect(ui->actionTasksUpdate, &QAction::triggered,
+            m_tasksViewer, &TasksViewer::update);
+
+    ui->tabWidget->addTab(m_tasksViewer, tr("Tasks"));
+    m_tasksViewer->setModel(m_tasksModel);
+
+    // Employees
+    connect(ui->actionEmployeeAdd, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::create);
+
+    connect(ui->actionEmployeeEdit, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::edit);
+
+    connect(ui->actionEmployeeDelete, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::remove);
+
+    connect(ui->actionEmployeesUpdate, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::update);
+
+    ui->tabWidget->addTab(m_employeesViewer, tr("Employees"));
+    m_employeesViewer->setModel(m_employeesModel);
+
+    setViewDisconnected();
 }
 
 // =============================================================================
@@ -42,55 +73,86 @@ MainWindow::~MainWindow()
 // =============================================================================
 void MainWindow::newDb()
 {
-    auto dialog = std::make_unique<DialogOpenDb>(m_httpClient, true, this);
-    dialog->setWindowTitle(tr("Create new db..."));
-    dialog->show();
+    auto dialog = QScopedPointer(new ConnectDialog(
+        m_dbManager,
+        this,
+        true
+    ));
 
     if (dialog->exec() != QDialog::Accepted)
         return;
 
-    uiViewConnected();
-    m_httpClient->setDbName(dialog->dbName());
-    setWindowDbName(dialog->dbName());
+    setViewConnected();
 }
 
 // =============================================================================
 void MainWindow::openDb()
 {
-    auto dialog = std::make_unique<DialogOpenDb>(m_httpClient, false, this);
-    dialog->setWindowTitle(tr("Connect to db..."));
-    dialog->show();
+    auto dialog = QScopedPointer(new ConnectDialog(
+        m_dbManager,
+        this
+    ));
 
     if (dialog->exec() != QDialog::Accepted)
         return;
 
-    uiViewConnected();
-    m_httpClient->setDbName(dialog->dbName());
-    setWindowDbName(dialog->dbName());
+    m_tasksViewer->update();
 
-    m_employeesView->slotUpdate();
-    m_tasksView->slotUpdate();
+    setViewConnected();
 }
 
 // =============================================================================
-void MainWindow::setWindowDbName(const QString &name)
+void MainWindow::closeDb()
 {
-    setWindowTitle(QString("%1 @ %2").arg(qApp->applicationName()).arg(name));
+    m_dbManager->setDbName("");
+    setViewDisconnected();
 }
 
 // =============================================================================
-void MainWindow::uiViewDisconnected()
+void MainWindow::setViewDisconnected()
 {
+    setWindowTitle(qApp->applicationName());
+
     ui->tabWidget->setCurrentIndex(0);
     ui->tabWidget->setVisible(false);
 
-    setWindowTitle(qApp->applicationName());
+    m_tasksViewer->reset();
+    m_employeesViewer->reset();
+
+    // File
+    ui->actionCloseDb->setVisible(false);
+
+    // Tasks
+    ui->menuTasks->menuAction()->setVisible(false);
+    ui->actionTaskAddSub->setVisible(false);
+    ui->actionTaskEdit->setVisible(false);
+    ui->actionTaskDelete->setVisible(false);
+
+    // Employees
+    ui->menuEmployees->menuAction()->setVisible(false);
+    ui->actionEmployeeEdit->setVisible(false);
+    ui->actionEmployeeDelete->setVisible(false);
+
 }
 
 // =============================================================================
-void MainWindow::uiViewConnected()
+void MainWindow::setViewConnected()
 {
+    setWindowTitle(QString("%1 @ %2")
+                   .arg(qApp->applicationName())
+                   .arg(m_dbManager->dbName())
+    );
+
     ui->tabWidget->setVisible(true);
+
+    // File
+    ui->actionCloseDb->setVisible(true);
+
+    // Tasks
+    ui->menuTasks->menuAction()->setVisible(true);
+
+    // Employees
+    ui->menuEmployees->menuAction()->setVisible(true);
 }
 
 // =============================================================================

@@ -4,10 +4,13 @@
 #include <QString>
 #include <QDate>
 #include <QJsonObject>
+#include <QSharedPointer>
 #include <QDebug>
 
-class Task
+class Task : public QObject
 {
+    Q_OBJECT
+
 public:
     enum class State
     {
@@ -18,7 +21,7 @@ public:
     };
 
 public:
-    Task();
+    explicit Task(QObject* parent = nullptr);
 
     bool isValid() const;
 
@@ -49,23 +52,52 @@ public:
     void setDescription(const QString& description);
     const QString& description() const;
 
-    static Task fromJsonObject(const QJsonObject& jObj);
+    void setExecutor(QObject* executor);
+    QObject* executor() const;
+
+    // ----------------------------------------
     QJsonObject toJsonObject() const;
 
-    static Task fromJson(const QByteArray& data);
+    void fromJson(const QByteArray& data);
     QByteArray toJson() const;
 
-    static QList<Task> listFromJson(const QByteArray& data);
-    static QByteArray listToJson(const QList<Task>& listTasks);
+    static Task* createFromJsonObject(
+        const QJsonObject& jObj,
+        QObject* parent = nullptr
+    );
+
+    static Task* createFromJson(
+        const QByteArray& data,
+        QObject* parent = nullptr
+    );
+
+    static QList<Task*> createListFromJson(
+        const QByteArray& data,
+        QObject* parent = nullptr
+    );
+
+    static QByteArray listToJson(
+        const QList<QSharedPointer<Task>>& listTasks
+    );
+
+public:
+    Q_PROPERTY(qint32 id READ id WRITE setId);
+    Q_PROPERTY(QString name READ name WRITE setName);
+    Q_PROPERTY(QString state READ stateString WRITE setStateString);
+    Q_PROPERTY(qint32 executorId READ executorId WRITE setExecutorId);
+    Q_PROPERTY(QDate deadline READ deadline WRITE setDeadline);
+    Q_PROPERTY(qint32 parentId READ parentId WRITE setParentId);
+    Q_PROPERTY(QString description READ description WRITE setDescription);
 
 protected:
-    qint32  m_id;
-    QString m_name;
-    State   m_state;
-    qint32  m_executorId;
-    QDate   m_deadline;
-    qint32  m_parentId;
-    QString m_description;
+    qint32   m_id;
+    QString  m_name;
+    State    m_state;
+    qint32   m_executorId;
+    QDate    m_deadline;
+    qint32   m_parentId;
+    QString  m_description;
+    QObject* m_executor;
 };
 
-QDebug operator<<(QDebug d, const Task& task);
+QDebug operator<<(QDebug d, const Task* task);

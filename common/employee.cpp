@@ -5,7 +5,8 @@
 #include <QJsonArray>
 
 // =============================================================================
-Employee::Employee() :
+Employee::Employee(QObject* parent) :
+    QObject(parent),
     m_id(0)
 {
 }
@@ -40,6 +41,15 @@ void Employee::setFirstName(const QString& val) {
 
 const QString& Employee::firstName() const {
     return m_firstName;
+}
+
+// =============================================================================
+QString Employee::fullName() const
+{
+    return QString("%1 %2 %3")
+        .arg(m_lastName)
+        .arg(m_firstName)
+        .arg(m_patronymic);
 }
 
 // =============================================================================
@@ -79,17 +89,18 @@ const QString& Employee::phone() const {
 }
 
 // =============================================================================
-Employee Employee::fromJsonObject(const QJsonObject& jObj)
-{
-    Employee employee;
-    employee.setId(jObj["id"].toInt());
-    employee.setLastName(jObj["lastName"].toString());
-    employee.setFirstName(jObj["firstName"].toString());
-    employee.setPatronymic(jObj["patronymic"].toString());
-    employee.setPosition(jObj["position"].toString());
-    employee.setEmail(jObj["email"].toString());
-    employee.setPhone(jObj["phone"].toString());
-    return employee;
+void Employee::addTask(QObject* task) {
+    m_tasks.append(task);
+}
+
+// =============================================================================
+void Employee::removeTask(QObject* task) {
+    m_tasks.removeOne(task);
+}
+
+// =============================================================================
+const QList<QObject*>& Employee::tasks() const {
+    return m_tasks;
 }
 
 // =============================================================================
@@ -106,8 +117,16 @@ QJsonObject Employee::toJsonObject() const {
 }
 
 // =============================================================================
-Employee Employee::fromJson(const QByteArray& data) {
-    return Employee::fromJsonObject(QJsonDocument::fromJson(data).object());
+void Employee::fromJson(const QByteArray& data)
+{
+    QJsonObject jObj = QJsonDocument::fromJson(data).object();
+    setId(jObj["id"].toInt());
+    setLastName(jObj["lastName"].toString());
+    setFirstName(jObj["firstName"].toString());
+    setPatronymic(jObj["patronymic"].toString());
+    setPosition(jObj["position"].toString());
+    setEmail(jObj["email"].toString());
+    setPhone(jObj["phone"].toString());
 }
 
 // =============================================================================
@@ -116,26 +135,58 @@ QByteArray Employee::toJson() const {
 }
 
 // =============================================================================
-QList<Employee> Employee::listFromJson(const QByteArray& data)
+Employee* Employee::createFromJsonObject(
+    const QJsonObject& jObj,
+    QObject* parent)
 {
-    QList<Employee> list;
+    auto employee = new Employee(parent);
+
+    employee->setId(jObj["id"].toInt());
+    employee->setLastName(jObj["lastName"].toString());
+    employee->setFirstName(jObj["firstName"].toString());
+    employee->setPatronymic(jObj["patronymic"].toString());
+    employee->setPosition(jObj["position"].toString());
+    employee->setEmail(jObj["email"].toString());
+    employee->setPhone(jObj["phone"].toString());
+
+    return employee;
+}
+
+// =============================================================================
+Employee* Employee::createFromJson(
+    const QByteArray& data,
+    QObject* parent)
+{
+    return Employee::createFromJsonObject(
+        QJsonDocument::fromJson(data).object(),
+        parent
+    );
+}
+
+// =============================================================================
+QList<Employee*> Employee::createListFromJson(
+    const QByteArray& data,
+    QObject* parent)
+{
+    QList<Employee*> list;
 
     QJsonObject jObj = QJsonDocument::fromJson(data).object();
 
     QJsonArray jArray = jObj["employees"].toArray();
     for (const auto& jEmployee : jArray) {
-        list.append(Employee::fromJsonObject(jEmployee.toObject()));
+        list.append(Employee::createFromJsonObject(jEmployee.toObject(), parent));
     }
 
     return list;
 }
 
 // =============================================================================
-QByteArray Employee::listToJson(const QList<Employee>& listEmployees)
+QByteArray Employee::listToJson(
+    const QList<QSharedPointer<Employee>>& listEmployees)
 {
     QJsonArray jArray;
     for (const auto& employee : listEmployees) {
-        jArray.append(employee.toJsonObject());
+        jArray.append(employee->toJsonObject());
     }
 
     QJsonObject jObj;
@@ -145,16 +196,16 @@ QByteArray Employee::listToJson(const QList<Employee>& listEmployees)
 }
 
 // =============================================================================
-QDebug operator<<(QDebug d, const Employee& employee)
+QDebug operator<<(QDebug d, const Employee* employee)
 {
     d << "Employee:\r\n";
-    d << "id:" << employee.id() << "\r\n";
-    d << "lastName:" << employee.lastName() << "\r\n";
-    d << "firstName:" << employee.firstName() << "\r\n";
-    d << "patronymic:" << employee.patronymic() << "\r\n";
-    d << "position:" << employee.position() << "\r\n";
-    d << "email:" << employee.email() << "\r\n";
-    d << "phone:" << employee.phone() << "\r\n";
+    d << "id:" << employee->id() << "\r\n";
+    d << "lastName:" << employee->lastName() << "\r\n";
+    d << "firstName:" << employee->firstName() << "\r\n";
+    d << "patronymic:" << employee->patronymic() << "\r\n";
+    d << "position:" << employee->position() << "\r\n";
+    d << "email:" << employee->email() << "\r\n";
+    d << "phone:" << employee->phone() << "\r\n";
     return d;
 }
 
