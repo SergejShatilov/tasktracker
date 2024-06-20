@@ -102,6 +102,7 @@ bool DbRemoteManager::removeEmployee(Employee* employee)
     {
         auto task = static_cast<Task*>(obj);
         task->setExecutorId(0);
+        task->setExecutor(nullptr);
         if (!changeTask(task))
             return false;
     }

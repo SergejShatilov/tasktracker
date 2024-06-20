@@ -2,6 +2,8 @@
 #pragma once
 
 #include <QStyledItemDelegate>
+#include <QTreeView>
+
 #include "models/tasksmodel.h"
 #include "models/expiredtasksproxymodel.h"
 
@@ -23,6 +25,10 @@ public:
     void updateEditorGeometry(QWidget* editor,
                               const QStyleOptionViewItem& option,
                               const QModelIndex& index) const override;
+
+private:
+    void hideAllColumnExcept(QTreeView* treeView,
+                             const QStringList& listFields) const;
 
 private:
     TasksModel*             m_tasksModel;

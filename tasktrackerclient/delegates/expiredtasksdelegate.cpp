@@ -1,7 +1,9 @@
 
 #include "expiredtasksdelegate.h"
 
-#include <QTreeView>
+#include <QHeaderView>
+
+#include "models/tasksmodel.h"
 
 // =============================================================================
 ExpiredTasksDelegate::ExpiredTasksDelegate(TasksModel* tasksModel,
@@ -25,6 +27,16 @@ QWidget* ExpiredTasksDelegate::createEditor(
     QTreeView* treeView = new QTreeView(parent);
     treeView->setAutoFillBackground(true);
     treeView->setModel(m_proxyModel);
+
+    // Скрываем все колонки, кроме ...
+    hideAllColumnExcept(
+        treeView,
+        QStringList({
+            "name",
+            "id",
+            "deadline"
+        })
+    );
 
     return treeView;
 }
@@ -50,6 +62,21 @@ void ExpiredTasksDelegate::updateEditorGeometry(
 
     editor->setGeometry(option.rect.x(), option.rect.y(),
                         option.rect.width(), 200);
+}
+
+// =============================================================================
+void ExpiredTasksDelegate::hideAllColumnExcept(
+    QTreeView* treeView,
+    const QStringList& listFields) const
+{
+    auto tasksModel = static_cast<TasksModel*>(m_proxyModel->sourceModel());
+
+    for (int i = 0; i < tasksModel->columnCount(QModelIndex()); ++i)
+    {
+        auto field = tasksModel->fieldByColumn(i);
+        if (!listFields.contains(field))
+            treeView->setColumnHidden(i, true);
+    }
 }
 
 // =============================================================================
