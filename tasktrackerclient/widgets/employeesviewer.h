@@ -12,6 +12,8 @@ public:
     explicit EmployeesViewer(DbRemoteManager* dbManager,
                              QWidget *parent = nullptr);
 
+    void setExpiredTasksDelegate(QAbstractItemDelegate* delegate);
+
 private:
     void createByIndex(const QModelIndex& index) override;
     void editByIndex(const QModelIndex& index) override;

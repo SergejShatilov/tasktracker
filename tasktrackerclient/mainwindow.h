@@ -8,6 +8,7 @@
 #include "widgets/employeesviewer.h"
 #include "models/tasksmodel.h"
 #include "models/employeesmodel.h"
+#include "delegates/expiredtasksdelegate.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,12 +32,13 @@ private:
     void setViewConnected();
 
 private:
-    Ui::MainWindow*     ui;
-    DbRemoteManager*    m_dbManager;
-    TasksViewer*        m_tasksViewer;
-    EmployeesViewer*    m_employeesViewer;
-    TasksModel*         m_tasksModel;
-    EmployeesModel*     m_employeesModel;
+    Ui::MainWindow*         ui;
+    DbRemoteManager*        m_dbManager;
+    TasksViewer*            m_tasksViewer;
+    EmployeesViewer*        m_employeesViewer;
+    TasksModel*             m_tasksModel;
+    EmployeesModel*         m_employeesModel;
+    ExpiredTasksDelegate*   m_expiredTasksDelegate;
 };
 
 #endif // MAINWINDOW_H

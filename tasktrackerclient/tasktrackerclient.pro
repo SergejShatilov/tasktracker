@@ -22,55 +22,55 @@ INCLUDEPATH += \
     $${COMMON}/ \
 
 # ------------------------------------------------------------------------------
-SOURCES += \
-    models/tasksmodel.cpp \
-    models/objectsmodel.cpp \
-    models/employeesmodel.cpp \
-    #models/taskexecutorfiltermodel.cpp \
-    #views/tasksdelegate.cpp \
-    delegates/statedelegate.cpp     \
-    models/viewerproxymodel.cpp     \
-    widgets/tasksviewer.cpp         \
-    widgets/employeesviewer.cpp     \
-    dialogs/taskdialog.cpp          \
-    dialogs/employeedialog.cpp      \
-    dialogs/connectdialog.cpp       \
-    db/dbremotemanager.cpp          \
-    httpclient/httpclient.cpp       \
-    $${COMMON}/employee.cpp         \
-    $${COMMON}/task.cpp             \
-    main.cpp                        \
-    mainwindow.cpp                  \
-    widgets/viewer.cpp              \
+SOURCES +=                              \
+    models/tasksmodel.cpp               \
+    models/objectsmodel.cpp             \
+    models/employeesmodel.cpp           \
+    models/expiredtasksproxymodel.cpp   \
+    delegates/expiredtasksdelegate.cpp  \
+    delegates/statedelegate.cpp         \
+    models/viewerproxymodel.cpp         \
+    widgets/tasksviewer.cpp             \
+    widgets/employeesviewer.cpp         \
+    dialogs/taskdialog.cpp              \
+    dialogs/employeedialog.cpp          \
+    dialogs/connectdialog.cpp           \
+    db/dbremotemanager.cpp              \
+    httpclient/httpclient.cpp           \
+    $${COMMON}/employee.cpp             \
+    $${COMMON}/task.cpp                 \
+    main.cpp                            \
+    mainwindow.cpp                      \
+    widgets/viewer.cpp                  \
 
 # ------------------------------------------------------------------------------
-HEADERS += \
-    models/tasksmodel.h \
-    models/objectsmodel.h \
-    models/employeesmodel.h \
-    #models/taskexecutorfiltermodel.h \
-    #views/tasksdelegate.h \
-    delegates/statedelegate.h       \
-    models/viewerproxymodel.h       \
-    widgets/tasksviewer.h           \
-    widgets/employeesviewer.h       \
-    dialogs/taskdialog.h            \
-    dialogs/employeedialog.h        \
-    dialogs/connectdialog.h         \
-    db/dbremotemanager.h            \
-    httpclient/httpclient.h         \
-    $${COMMON}/employee.h           \
-    $${COMMON}/task.h               \
-    mainwindow.h                    \
-    widgets/viewer.h                \
+HEADERS +=                              \
+    models/tasksmodel.h                 \
+    models/objectsmodel.h               \
+    models/employeesmodel.h             \
+    models/expiredtasksproxymodel.h     \
+    delegates/expiredtasksdelegate.h    \
+    delegates/statedelegate.h           \
+    models/viewerproxymodel.h           \
+    widgets/tasksviewer.h               \
+    widgets/employeesviewer.h           \
+    dialogs/taskdialog.h                \
+    dialogs/employeedialog.h            \
+    dialogs/connectdialog.h             \
+    db/dbremotemanager.h                \
+    httpclient/httpclient.h             \
+    $${COMMON}/employee.h               \
+    $${COMMON}/task.h                   \
+    mainwindow.h                        \
+    widgets/viewer.h                    \
 
 # ------------------------------------------------------------------------------
-FORMS +=                            \
-    dialogs/taskdialog.ui           \
-    dialogs/employeedialog.ui       \
-    dialogs/connectdialog.ui        \
-    widgets/viewer.ui               \
-    mainwindow.ui                   \
+FORMS +=                                \
+    dialogs/taskdialog.ui               \
+    dialogs/employeedialog.ui           \
+    dialogs/connectdialog.ui            \
+    widgets/viewer.ui                   \
+    mainwindow.ui                       \
 
 
 # Default rules for deployment.

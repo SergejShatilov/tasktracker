@@ -4,11 +4,22 @@
 #include <QMessageBox>
 
 #include "dialogs/employeedialog.h"
+#include "models/employeesmodel.h"
 
 // =============================================================================
 EmployeesViewer::EmployeesViewer(DbRemoteManager* dbManager, QWidget *parent) :
     Viewer(dbManager, parent)
 {
+}
+
+// =============================================================================
+void EmployeesViewer::setExpiredTasksDelegate(QAbstractItemDelegate* delegate)
+{
+    auto proxyModel = static_cast<QAbstractProxyModel*>(treeView()->model());
+    auto model = static_cast<EmployeesModel*>(proxyModel->sourceModel());
+    treeView()->setItemDelegateForColumn(
+        model->columnByField("expiredTasks"), delegate
+    );
 }
 
 // =============================================================================
@@ -92,6 +103,17 @@ void EmployeesViewer::customContextMenu(QMenu* menu, const QModelIndex& index)
 // =============================================================================
 void EmployeesViewer::itemDoubleClicked(const QModelIndex& index)
 {
+    if (!index.isValid())
+        return;
+
+    auto field = index.model()->headerData(
+        index.column(), Qt::Horizontal, (Qt::UserRole + 1)
+    );
+
+    // Колонку с задачами с истекщим сроком не обрабатываем двойным щелчком
+    if (field == "expiredTasks")
+        return;
+
     editByIndex(index);
 }
 

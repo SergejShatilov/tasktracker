@@ -3,12 +3,12 @@
 
 #include <QSortFilterProxyModel>
 
-class TaskExecutorFilterModel : public QSortFilterProxyModel
+class ExpiredTasksProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 
 public:
-    explicit TaskExecutorFilterModel(QObject* parent = nullptr);
+    explicit ExpiredTasksProxyModel(QObject* parent = nullptr);
 
     void setExecutorId(qint32 executorId);
 
@@ -18,9 +18,5 @@ protected:
 
 private:
     qint32 m_executorId;
-
-
-
-
 
 };

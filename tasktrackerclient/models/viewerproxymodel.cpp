@@ -37,7 +37,7 @@ bool ViewerProxyModel::filterAcceptsRow(
     if (m_filterValue.isEmpty())
         return true;
 
-    QVariant value = sourceModel()->data(index, Qt::DisplayRole);
+    QVariant value = sourceModel()->data(index);
     if (value.isValid())
     {
         const QString str = value.toString();

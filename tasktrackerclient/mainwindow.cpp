@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_tasksViewer(new TasksViewer(m_dbManager, this)),
     m_employeesViewer(new EmployeesViewer(m_dbManager, this)),
     m_tasksModel(new TasksModel(m_dbManager, this)),
-    m_employeesModel(new EmployeesModel(m_dbManager, this))
+    m_employeesModel(new EmployeesModel(m_dbManager, this)),
+    m_expiredTasksDelegate(new ExpiredTasksDelegate(m_tasksModel, this))
 {
     ui->setupUi(this);
 
@@ -60,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(m_employeesViewer, tr("Employees"));
     m_employeesViewer->setModel(m_employeesModel);
+    m_employeesViewer->setExpiredTasksDelegate(m_expiredTasksDelegate);
 
     setViewDisconnected();
 }

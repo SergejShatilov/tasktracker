@@ -24,9 +24,9 @@ TaskDialog::TaskDialog(DbRemoteManager* dbManager,
             this, &TaskDialog::changed);
 
     // Загружаем список сотрудников
-    ui->comboBoxExecutor->addItem(tr("<Not Selected>"));
+    ui->comboBoxExecutor->addItem(tr("<Not Selected>"), 0);
     for (auto employee : dbManager->employees())
-        ui->comboBoxExecutor->addItem(employee->fullName());
+        ui->comboBoxExecutor->addItem(employee->fullName(), employee->id());
 
     // Если объект не существует, значит создаем новую задачу,
     // Иначе редактируем уже существующую
@@ -46,13 +46,19 @@ TaskDialog::TaskDialog(DbRemoteManager* dbManager,
         ui->textEditDescription->setText(m_task->description());
         ui->dateEditDeadline->setDate(m_task->deadline());
 
+        int currentIndex = 0;
+
         if (m_task->executor() != nullptr)
         {
             auto executor = static_cast<Employee*>(m_task->executor());
-            ui->comboBoxExecutor->setCurrentText(executor->fullName());
-        } else {
-            ui->comboBoxExecutor->setCurrentIndex(0);
+            for (int i = 0; i < dbManager->employees().size(); ++i)
+            {
+                if (dbManager->employees().at(i) == executor)
+                    currentIndex = (i + 1);
+            }
         }
+
+        ui->comboBoxExecutor->setCurrentIndex(currentIndex);
 
         m_funcHandler = [this](Task* task) {
             return m_dbManager->changeTask(task);
@@ -93,7 +99,7 @@ void TaskDialog::clickedOk()
     m_task->setDescription(ui->textEditDescription->toPlainText());
 
     // Если исполнитель не выбран
-    if (ui->comboBoxExecutor->currentIndex() == 0)
+    if (ui->comboBoxExecutor->currentData().toInt() == 0)
     {
         // Если у задачи был исполнитель,
         // то у этого исполнителя удаляем эту задачу
@@ -111,6 +117,14 @@ void TaskDialog::clickedOk()
         auto executor = m_dbManager->employees().at(
             ui->comboBoxExecutor->currentIndex() - 1
         );
+
+        // Если у задачи до этого был исполнитель,
+        // то у него удаляем эту задачу
+        if (m_task->executor() != nullptr)
+        {
+            auto executor = static_cast<Employee*>(m_task->executor());
+            executor->removeTask(m_task);
+        }
 
         m_task->setExecutorId(executor->id());
         m_task->setExecutor(executor);

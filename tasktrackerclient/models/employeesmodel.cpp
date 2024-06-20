@@ -29,98 +29,46 @@ EmployeesModel::EmployeesModel(DbRemoteManager* dbManager, QObject* parent) :
 }
 
 // =============================================================================
-/*void EmployeesModel::setTasksModel(QAbstractItemModel* model) {
-    m_tasksModel = model;
-}
-
-// =============================================================================
-void EmployeesModel::addEmployee(const Employee& employee)
-{
-    auto parentIndex = QModelIndex();
-
-    beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
-
-    EmployeeObject* employeeObject = new EmployeeObject(employee);
-    m_listObjects << employeeObject;
-
-    employeeObject->setParent(m_rootItem);
-
-    endInsertRows();
-}
-
-// =============================================================================
-void EmployeesModel::removeEmployee(const QModelIndex& index)
-{
-    beginRemoveRows(QModelIndex(), index.row(), index.row() + 1);
-
-    auto obj = employeeObjectByIndex(index);
-
-    m_listObjects.removeOne(obj);
-    delete obj;
-
-    endRemoveRows();
-}
-
-// =============================================================================
-void EmployeesModel::loadFromList(const QList<Employee>& list)
-{
-    clear();
-
-    for (const auto& employee : list) {
-        addEmployee(employee);
-    }
-}
-
-// =============================================================================
-qint32 EmployeesModel::idByIndex(const QModelIndex& index) const
-{
-    if (!index.isValid())
-        return -1;
-
-    EmployeeObject* employeeObject = employeeObjectByIndex(index);
-    return employeeObject->id();
-}
-
-// =============================================================================
-qint32 EmployeesModel::idByFullName(const QString& fullName) const
-{
-    const auto& children = m_rootItem->children();
-    auto it = std::find_if
-    (
-        children.cbegin(),
-        children.cend(),
-        [&fullName](const QObject* obj) {
-            return (obj->property("fullName").toString() == fullName);
-        }
-    );
-
-    if (it == children.cend())
-        return 0;
-
-    return (*it)->property("id").toInt();
-}
-*/
-
-// =============================================================================
 QVariant EmployeesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
 
+    const auto& field = fieldByColumn(index.column());
+    auto employee = static_cast<Employee*>(objectByIndex(index));
+
     switch (role)
     {
         case Qt::DisplayRole:
         {
-            const auto& field = fieldByColumn(index.column());
-            auto employee = static_cast<Employee*>(objectByIndex(index));
-
             // Если поле с задачами с истекшим временем выполнения
             if (field == "expiredTasks")
             {
-                return 0;
+                // Отображаем кол-во задач с истекшим временем исполнения
+                int expiredTasksCount = 0;
+
+                for (auto obj : employee->tasks())
+                {
+                    auto task = static_cast<Task*>(obj);
+                    if ((task->state() != Task::State::Completed) &&
+                        (task->deadline() < QDate::currentDate()))
+                    {
+                         ++(expiredTasksCount);
+                    }
+                }
+
+                return expiredTasksCount;
             }
 
             return employee->property(field.toLocal8Bit());
+        }
+        case Qt::EditRole:
+        {
+            // Для просроченных задач выдаем id исполнителя
+            if (field == "expiredTasks")
+                return employee->id();
+
+            return QVariant();
         }
         default:
             return QVariant();
@@ -184,16 +132,22 @@ QVariant EmployeesModel::data(const QModelIndex &index, int role) const
 // =============================================================================
 Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
 {
-    /*if (!index.isValid())
-        return Qt::NoItemFlags;
+    auto flags = ObjectsModel::flags(index);
 
-    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    if (!index.isValid())
+        return flags;
 
-    if (index.column() == 8)
-        flags |= Qt::ItemIsEditable;
+    // Колонку с просрочеными задачами делаем редактируемой,
+    // чтобы была возможность вызвать делегат
+    const auto& field = fieldByColumn(index.column());
+    if (field == "expiredTasks")
+    {
+        // Если просроченных задач нет, то делегат запрещаем вызывать делегат
+        if (index.data().toInt() != 0)
+            flags |= Qt::ItemIsEditable;
+    }
 
-    return flags;*/
-    return ObjectsModel::flags(index);
+    return flags;
 }
 
 // =============================================================================
@@ -240,25 +194,4 @@ void EmployeesModel::updateEmployees(const QList<Employee*>& listEmployees)
     endInsertRows();
 }
 
-/*
-// =============================================================================
-QString EmployeesModel::fullNameById(qint32 id) const
-{
-    if (id == 0)
-        return QString(tr("Not assigned"));
-
-    auto it = std::find_if
-    (
-        m_listObjects.cbegin(),
-        m_listObjects.cend(),
-        [id](const EmployeeObject* obj) {
-            return (obj->id() == id);
-        }
-    );
-
-    if (it == m_listObjects.cend())
-        return QString::number(id);
-
-    return (*it)->fullName();
-}*/
 // =============================================================================
