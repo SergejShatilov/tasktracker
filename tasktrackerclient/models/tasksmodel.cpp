@@ -8,15 +8,16 @@
 TasksModel::TasksModel(DbRemoteManager* dbManager, QObject* parent) :
     ObjectsModel(dbManager, parent)
 {
-    addField("name",            tr("Name"),        true);
-    addField("id",              tr("ID"),          true);
-    addField("state",           tr("State_"),      true);
-    addField("stateDisplay",    tr("State"),       true);
-    addField("executorId",      tr("Executor ID"), false);
-    addField("executor",        tr("Executor"),    true);
-    addField("deadline",        tr("Deadline"),    true);
-    addField("parentId",        tr("Parent ID"),   true);
-    addField("description",     tr("Description"), true);
+    addField("name",            tr("Name"),         true);
+    addField("id",              tr("ID"),           true);
+    addField("stateIndex",      tr("State Index"),  false);
+    addField("stateString",     tr("State String"), false);
+    addField("stateDisplay",    tr("State"),        true);
+    addField("executorId",      tr("Executor ID"),  false);
+    addField("executor",        tr("Executor"),     true);
+    addField("deadline",        tr("Deadline"),     true);
+    addField("parentId",        tr("Parent ID"),    false);
+    addField("description",     tr("Description"),  true);
 
     connect(dbManager, &DbRemoteManager::addedTask,
             this, &TasksModel::addTask, Qt::DirectConnection);
@@ -45,7 +46,19 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
             // Если отображаемое состояние задачи
             if (field == "stateDisplay")
             {
-                return -1;
+                switch(task->state())
+                {
+                    case Task::State::NotStarted:
+                        return QString(tr("Not Started"));
+                    case Task::State::Work:
+                        return QString(tr("Work"));
+                    case Task::State::Suspended:
+                        return QString(tr("Suspended"));
+                    case Task::State::Completed:
+                        return QString(tr("Completed"));
+                    default:
+                        return QString(tr("<Unknown>"));
+                }
             }
 
             // Если отображаемые ФИО исполнителя
@@ -59,6 +72,14 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
             }
 
             return task->property(field.toLocal8Bit());
+        }
+        case Qt::EditRole:
+        {
+            // Для отображаемого состояния возвращаем индекс этого состояния
+            if (field == "stateDisplay")
+                return task->stateIndex();
+
+            return QVariant();
         }
         default:
             return QVariant();
@@ -163,65 +184,47 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
 
 // =============================================================================
 bool TasksModel::setData(const QModelIndex &index,
-                             const QVariant &value,
-                             int role)
+                         const QVariant &value,
+                         int role)
 {
-    /*if (!index.isValid())
+    if (!index.isValid())
         return false;
+
+    const auto& field = fieldByColumn(index.column());
+    auto task = static_cast<Task*>(objectByIndex(index));
 
     switch (role)
     {
-        case Qt::DisplayRole:
         case Qt::EditRole:
         {
-            // Если изменение состояния
-            if (index.column() == 2)
+            // Если колонка с состоянием
+            if (field == "stateDisplay")
             {
-                auto taskObject = taskObjectByIndex(index);
-                taskObject->setStateString(value.toString());
-
-                Task task;
-                task.setId(taskObject->id());
-                task.setName(taskObject->name());
-                task.setState(taskObject->state());
-                task.setDeadline(taskObject->deadline());
-                task.setParentId(taskObject->parentId());
-                task.setExecutorId(taskObject->executorId());
-                task.setDescription(taskObject->description());
-
-                m_httpClient->changeTask(task.id(), task);
-
-                return true;
+                task->setStateIndex(value.toInt());
+                return m_dbManager->changeTask(task);
             }
 
-            return taskObjectByIndex(index)->setProperty
-            (
-                m_columns.at(index.column()).toUtf8(),
-                value
-            );
+            return false;
         }
         default:
             return false;
-    }*/
-
-    return false;
+    }
 }
 
 // =============================================================================
 Qt::ItemFlags TasksModel::flags(const QModelIndex& index) const
 {
-    /*if (!index.isValid())
-        return Qt::NoItemFlags;
+    auto flags = ObjectsModel::flags(index);
 
-    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    if (!index.isValid())
+        return flags;
 
-    // Для колонки состояния, делает так чтобы ее можно было редактировать
-    if (index.column() == 2)
+    // Колонку с отображаемым состоянием задачи можно редактировать
+    const auto& field = fieldByColumn(index.column());
+    if (field == "stateDisplay")
         flags |= Qt::ItemIsEditable;
 
-    return flags;*/
-
-    return ObjectsModel::flags(index);
+    return flags;
 }
 
 // =============================================================================

@@ -14,10 +14,10 @@ class Task : public QObject
 public:
     enum class State
     {
-        NotStarted, // Не начата
-        Work,       // В работе
-        Suspended,  // Приостановлена
-        Completed   // Завершено
+        NotStarted = 0,     // Не начата
+        Work       = 1,     // В работе
+        Suspended  = 2,     // Приостановлена
+        Completed  = 3      // Завершено
     };
 
 public:
@@ -36,6 +36,9 @@ public:
 
     void setStateString(const QString& stateString);
     QString stateString() const;
+
+    void setStateIndex(int index);
+    int stateIndex() const;
 
     void setExecutorId(qint32 executorId);
     qint32 executorId() const;
@@ -83,7 +86,8 @@ public:
 public:
     Q_PROPERTY(qint32 id READ id WRITE setId);
     Q_PROPERTY(QString name READ name WRITE setName);
-    Q_PROPERTY(QString state READ stateString WRITE setStateString);
+    Q_PROPERTY(QString stateString READ stateString WRITE setStateString);
+    Q_PROPERTY(int stateIndex READ stateIndex WRITE setStateIndex);
     Q_PROPERTY(qint32 executorId READ executorId WRITE setExecutorId);
     Q_PROPERTY(QDate deadline READ deadline WRITE setDeadline);
     Q_PROPERTY(qint32 parentId READ parentId WRITE setParentId);

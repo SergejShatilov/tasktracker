@@ -4,11 +4,26 @@
 #include <QMessageBox>
 
 #include "dialogs/taskdialog.h"
+#include "models/tasksmodel.h"
 
 // =============================================================================
 TasksViewer::TasksViewer(DbRemoteManager* dbManager, QWidget *parent) :
-    Viewer(dbManager, parent)
+    Viewer(dbManager, parent),
+    m_stateDelegate(new StateDelegate(this))
 {
+}
+
+// =============================================================================
+void TasksViewer::setModel(QAbstractItemModel* model)
+{
+    Viewer::setModel(model);
+
+    auto tasksModel = static_cast<TasksModel*>(model);
+
+    treeView()->setItemDelegateForColumn(
+        tasksModel->columnByField("stateDisplay"),
+        m_stateDelegate
+    );
 }
 
 // =============================================================================
@@ -104,6 +119,17 @@ void TasksViewer::customContextMenu(QMenu* menu, const QModelIndex& index)
 // =============================================================================
 void TasksViewer::itemDoubleClicked(const QModelIndex& index)
 {
+    if (!index.isValid())
+        return;
+
+    auto field = index.model()->headerData(
+        index.column(), Qt::Horizontal, (Qt::UserRole + 1)
+    );
+
+    // Колонку с состоянием не обрабатываем двойным нажатием
+    if (field == "stateDisplay")
+        return;
+
     editByIndex(index);
 }
 

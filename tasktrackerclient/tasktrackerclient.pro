@@ -27,8 +27,8 @@ SOURCES += \
     models/objectsmodel.cpp \
     models/employeesmodel.cpp \
     #models/taskexecutorfiltermodel.cpp \
-    #views/taskstatedelegate.cpp \
     #views/tasksdelegate.cpp \
+    delegates/statedelegate.cpp     \
     models/viewerproxymodel.cpp     \
     widgets/tasksviewer.cpp         \
     widgets/employeesviewer.cpp     \
@@ -49,8 +49,8 @@ HEADERS += \
     models/objectsmodel.h \
     models/employeesmodel.h \
     #models/taskexecutorfiltermodel.h \
-    #views/taskstatedelegate.h \
     #views/tasksdelegate.h \
+    delegates/statedelegate.h       \
     models/viewerproxymodel.h       \
     widgets/tasksviewer.h           \
     widgets/employeesviewer.h       \

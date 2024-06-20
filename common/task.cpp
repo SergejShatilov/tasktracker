@@ -86,6 +86,15 @@ QString Task::stateString() const
 }
 
 // =============================================================================
+void Task::setStateIndex(int index) {
+    m_state = static_cast<State>(index);
+}
+
+int Task::stateIndex() const {
+    return static_cast<int>(m_state);
+}
+
+// =============================================================================
 void Task::setExecutorId(qint32 executorId) {
     m_executorId = executorId;
 }

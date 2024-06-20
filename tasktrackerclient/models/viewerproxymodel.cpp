@@ -27,19 +27,15 @@ bool ViewerProxyModel::filterAcceptsRow(
     int source_row,
     const QModelIndex &source_parent) const
 {
-    if (m_filterValue.isEmpty())
-    {
-        return QSortFilterProxyModel::filterAcceptsRow(
-            source_row, source_parent
-        );
-    }
-
     QModelIndex index = sourceModel()->index(
         source_row, m_fieldIndex, source_parent
     );
 
     if (!index.isValid())
         return false;
+
+    if (m_filterValue.isEmpty())
+        return true;
 
     QVariant value = sourceModel()->data(index, Qt::DisplayRole);
     if (value.isValid())

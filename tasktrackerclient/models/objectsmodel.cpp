@@ -67,9 +67,29 @@ QVariant ObjectsModel::headerData(int section,
             return std::get<1>(m_fields.at(section));
         case Qt::UserRole:
             return std::get<2>(m_fields.at(section));
+        case Qt::UserRole + 1:
+            return std::get<0>(m_fields.at(section));
         default:
             return QVariant();
     }
+}
+
+// =============================================================================
+int ObjectsModel::columnByField(const QString& field) const
+{
+    auto it = std::find_if(
+        m_fields.cbegin(),
+        m_fields.cend(),
+        [&field](const auto& field_) {
+            return std::get<0>(field_) == field;
+        }
+    );
+
+    return m_fields.indexOf(*it);
+}
+
+const QString& ObjectsModel::fieldByColumn(int column) const {
+    return std::get<0>(m_fields.at(column));
 }
 
 // =============================================================================
@@ -127,24 +147,6 @@ bool ObjectsModel::isChild(QObject* obj) const
     };
 
     return funcIsChild(m_rootObject);
-}
-
-// =============================================================================
-int ObjectsModel::columnByField(const QString& field) const
-{
-    auto it = std::find_if(
-        m_fields.cbegin(),
-        m_fields.cend(),
-        [&field](const auto& field_) {
-            return std::get<0>(field_) == field;
-        }
-    );
-
-    return m_fields.indexOf(*it);
-}
-
-const QString& ObjectsModel::fieldByColumn(int column) const {
-    return std::get<0>(m_fields.at(column));
 }
 
 // =============================================================================

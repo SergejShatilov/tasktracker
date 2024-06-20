@@ -28,13 +28,14 @@ public:
                                 Qt::Orientation orientation,
                                 int role) const override;
 
+public:
+    int columnByField(const QString& field) const;
+    const QString& fieldByColumn(int column) const;
+
 protected:
     QObject* objectByIndex(const QModelIndex& index) const;
     QModelIndex indexOf(QObject* obj) const;
     bool isChild(QObject* obj) const;
-
-    int columnByField(const QString& field) const;
-    const QString& fieldByColumn(int column) const;
 
     void addField(const QString& field,
                   const QString& header = QString(),
