@@ -79,7 +79,6 @@
    <addaction name="menuEmployees"/>
    <addaction name="menuTools"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNewDb">
    <property name="text">
     <string>New DB...</string>

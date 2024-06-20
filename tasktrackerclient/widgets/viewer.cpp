@@ -62,29 +62,45 @@ void Viewer::setModel(QAbstractItemModel* model)
 }
 
 // =============================================================================
-void Viewer::create() {
+void Viewer::selectItem(const QModelIndex& index)
+{
+    auto proxyIndex = m_proxyModel->mapFromSource(index);
+    ui->treeView->setCurrentIndex(proxyIndex);
+}
+
+// =============================================================================
+void Viewer::create()
+{
     createByIndex(QModelIndex());
+    ui->treeView->expandAll();
 }
 
 // =============================================================================
-void Viewer::createSub() {
+void Viewer::createSub()
+{
     createByIndex(currentIndex());
+    ui->treeView->expandAll();
 }
 
 // =============================================================================
-void Viewer::remove() {
+void Viewer::remove()
+{
     removeByIndex(currentIndex());
+    ui->treeView->expandAll();
 }
 
 // =============================================================================
-void Viewer::edit() {
+void Viewer::edit()
+{
     removeByIndex(currentIndex());
+    ui->treeView->expandAll();
 }
 
 // =============================================================================
 void Viewer::update()
 {
     m_dbManager->update();
+    ui->treeView->expandAll();
     QWidget::update();
 }
 

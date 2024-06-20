@@ -38,6 +38,9 @@ QWidget* ExpiredTasksDelegate::createEditor(
         })
     );
 
+    connect(treeView, &QTreeView::doubleClicked,
+            this, &ExpiredTasksDelegate::doubleClicked);
+
     return treeView;
 }
 
@@ -77,6 +80,15 @@ void ExpiredTasksDelegate::hideAllColumnExcept(
         if (!listFields.contains(field))
             treeView->setColumnHidden(i, true);
     }
+}
+
+// =============================================================================
+void ExpiredTasksDelegate::doubleClicked(const QModelIndex& proxyIndex)
+{
+    auto index = m_proxyModel->mapToSource(proxyIndex);
+
+    emit closeEditor(static_cast<QWidget*>(sender()));
+    emit gotoItem(index);
 }
 
 // =============================================================================

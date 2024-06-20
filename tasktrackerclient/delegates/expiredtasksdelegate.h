@@ -26,9 +26,15 @@ public:
                               const QStyleOptionViewItem& option,
                               const QModelIndex& index) const override;
 
+signals:
+    void gotoItem(const QModelIndex& index);
+
 private:
     void hideAllColumnExcept(QTreeView* treeView,
                              const QStringList& listFields) const;
+
+private slots:
+    void doubleClicked(const QModelIndex& proxyIndex);
 
 private:
     TasksModel*             m_tasksModel;

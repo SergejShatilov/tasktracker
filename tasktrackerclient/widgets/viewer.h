@@ -21,6 +21,7 @@ public:
     virtual ~Viewer();
 
     void setModel(QAbstractItemModel* model);
+    void selectItem(const QModelIndex& index);
 
 public slots:
     void create();

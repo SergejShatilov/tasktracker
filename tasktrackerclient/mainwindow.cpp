@@ -59,6 +59,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionEmployeesUpdate, &QAction::triggered,
             m_employeesViewer, &EmployeesViewer::update);
 
+    connect(m_expiredTasksDelegate, &ExpiredTasksDelegate::gotoItem,
+            this, [this](const QModelIndex& index) {
+                ui->tabWidget->setCurrentIndex(0);
+                m_tasksViewer->selectItem(index);
+            }
+    );
+
     ui->tabWidget->addTab(m_employeesViewer, tr("Employees"));
     m_employeesViewer->setModel(m_employeesModel);
     m_employeesViewer->setExpiredTasksDelegate(m_expiredTasksDelegate);
