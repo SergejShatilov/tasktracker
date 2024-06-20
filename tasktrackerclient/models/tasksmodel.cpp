@@ -71,6 +71,35 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
                 return executor->fullName();
             }
 
+            // Если отображается срок
+            if (field == "deadline")
+            {
+                // Если имеются подзадачи, то дата определяются
+                // самой поздней подзадачей
+                if (!task->children().isEmpty())
+                {
+                    std::function<QDate(QObject* parent)> funcFindDateLate;
+                    funcFindDateLate = [&funcFindDateLate](QObject* parent)
+                    {
+                        auto task = static_cast<Task*>(parent);
+                        auto date = task->deadline();
+
+                        for (auto child : task->children())
+                        {
+                            auto childredDate = funcFindDateLate(child);
+                            if (date < childredDate)
+                                date = childredDate;
+                        }
+
+                        return date;
+                    };
+
+                    return funcFindDateLate(task);
+                }
+
+                return task->deadline();
+            }
+
             return task->property(field.toLocal8Bit());
         }
         case Qt::EditRole:
@@ -190,7 +219,12 @@ Qt::ItemFlags TasksModel::flags(const QModelIndex& index) const
     // Колонку с отображаемым состоянием задачи можно редактировать
     const auto& field = fieldByColumn(index.column());
     if (field == "stateDisplay")
-        flags |= Qt::ItemIsEditable;
+    {
+        // Если у задачи есть подзадачи, то состояние ее менять нельзя
+        auto task = static_cast<Task*>(index.internalPointer());
+        if (task->children().isEmpty())
+            flags |= Qt::ItemIsEditable;
+    }
 
     return flags;
 }
@@ -200,16 +234,12 @@ void TasksModel::addTask(Task* task)
 {
     QObject* parent = task->parent();
 
-    //qDebug() << parent;
-
     // Если родитель не найден во всей модели,
     // то родителем назначаем корневой объект
     if (!isChild(parent))
         parent = m_rootObject;
 
     const QModelIndex parentIndex = indexOf(parent);
-
-    //qDebug() << parent << parentIndex << m_rootObject;
 
     beginInsertRows(parentIndex, rowCount(parentIndex), rowCount(parentIndex));
 

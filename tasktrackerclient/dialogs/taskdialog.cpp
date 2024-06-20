@@ -46,6 +46,10 @@ TaskDialog::TaskDialog(DbRemoteManager* dbManager,
         ui->textEditDescription->setText(m_task->description());
         ui->dateEditDeadline->setDate(m_task->deadline());
 
+        // Если задача содержит подзадачи, то редактировать дату нельзя
+        if (!m_task->children().isEmpty())
+            ui->dateEditDeadline->setEnabled(false);
+
         int currentIndex = 0;
 
         if (m_task->executor() != nullptr)
