@@ -15,6 +15,9 @@ public:
 
     void setModel(QAbstractItemModel* model);
 
+signals:
+    void gotoEmployee(Employee* employee);
+
 private:
     void createByIndex(const QModelIndex& index) override;
     void editByIndex(const QModelIndex& index) override;

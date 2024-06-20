@@ -16,6 +16,7 @@ Viewer::Viewer(DbRemoteManager* dbManager, QWidget *parent) :
     ui->treeView->setModel(m_proxyModel);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->treeView->setSortingEnabled(true);
+    ui->treeView->setExpandsOnDoubleClick(false);
 
     connect(ui->treeView, &QTreeView::customContextMenuRequested,
             this, &Viewer::showCustomContextMenu);

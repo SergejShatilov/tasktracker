@@ -32,9 +32,10 @@ public:
     int columnByField(const QString& field) const;
     const QString& fieldByColumn(int column) const;
 
-protected:
     QObject* objectByIndex(const QModelIndex& index) const;
     QModelIndex indexOf(QObject* obj) const;
+
+protected:
     bool isChild(QObject* obj) const;
 
     void addField(const QString& field,

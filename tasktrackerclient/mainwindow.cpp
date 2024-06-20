@@ -43,6 +43,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionTasksUpdate, &QAction::triggered,
             m_tasksViewer, &TasksViewer::update);
 
+    connect(m_tasksViewer, &TasksViewer::gotoEmployee,
+            this, [this](Employee* employee) {
+                ui->tabWidget->setCurrentIndex(1);
+                auto index = m_employeesModel->indexOf(employee);
+                m_employeesViewer->selectItem(index);
+            }
+    );
+
     ui->tabWidget->addTab(m_tasksViewer, tr("Tasks"));
     m_tasksViewer->setModel(m_tasksModel);
 

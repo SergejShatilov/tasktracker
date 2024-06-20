@@ -87,39 +87,7 @@ QVariant TasksModel::data(const QModelIndex &index, int role) const
 
     /*switch (role)
     {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-        {
-            const auto& propertyName = m_columns.at(index.column());
-            const auto obj = taskObjectByIndex(index);
 
-            // Если колонка с исполнителем
-            if (propertyName == "executorId" && m_employeesModel != nullptr)
-            {
-                return m_employeesModel->fullNameById(obj->executorId());
-            }
-
-            // Если колонка с состоянием
-            if (propertyName == "state")
-            {
-                const QString state = obj->stateString();
-
-                static QHash<QString, QString> const tableStates = {
-                    {"NotStarted",  tr("Not Started")},
-                    {"Work",        tr("Work")},
-                    {"Suspended",   tr("Suspended")},
-                    {"Completed",   tr("Completed")}
-                };
-
-                auto it = tableStates.find(state);
-                if (it == tableStates.end())
-                    return obj->property(propertyName.toUtf8());
-
-                return *it;
-            }
-
-            return obj->property(propertyName.toUtf8());
-        }
         case Qt::BackgroundRole:
         {
             const auto& propertyName = m_columns.at(index.column());

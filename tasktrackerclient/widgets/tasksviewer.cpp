@@ -130,6 +130,16 @@ void TasksViewer::itemDoubleClicked(const QModelIndex& index)
     if (field == "stateDisplay")
         return;
 
+    // Если колонка с исполнителем, тогда переходим к нему
+    if (field == "executor")
+    {
+        auto task = static_cast<Task*>(index.internalPointer());
+        if (task->executor() != nullptr)
+            emit gotoEmployee(static_cast<Employee*>(task->executor()));
+
+        return;
+    }
+
     editByIndex(index);
 }
 
