@@ -1,8 +1,7 @@
 
 #include "employeesmodel.h"
 
-//#include "tasksmodel.h"
-//#include <QBrush>
+#include <QBrush>
 
 // =============================================================================
 EmployeesModel::EmployeesModel(DbRemoteManager* dbManager, QObject* parent) :
@@ -70,62 +69,25 @@ QVariant EmployeesModel::data(const QModelIndex &index, int role) const
 
             return QVariant();
         }
+        case Qt::BackgroundRole:
+        {
+            // Если поле с задачами с истекшим временем выполнения
+            if (field == "expiredTasks")
+            {
+                int columnExpiredTasks = columnByField(field);
+                auto indexExpiredTasks = this->index(
+                    index.row(), columnExpiredTasks, index.parent()
+                );
+
+                if (data(indexExpiredTasks, Qt::DisplayRole).toInt() > 0)
+                    return QBrush(QColor(200, 120, 120));
+
+            }
+        }
         default:
             return QVariant();
     }
 
-
-    /*
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-        {
-            const auto& propertyName = m_columns.at(index.column());
-            const auto obj = employeeObjectByIndex(index);
-
-            // Если колонка с задачами
-            if (propertyName == "tasks" && m_tasksModel != nullptr)
-            {
-                auto executorId = obj->id();
-                const auto listTasks = static_cast<TasksModel*>(m_tasksModel)->findByExecutorId(executorId);
-
-                int count = 0;
-
-                for (const auto taskObject : listTasks)
-                {
-                    if (taskObject->state() == Task::State::Completed)
-                        continue;
-
-                    if (taskObject->deadline() >= QDate::currentDate())
-                        continue;
-
-                    count++;
-                }
-
-                return QVariant(count);
-            }
-
-            return obj->property(propertyName.toUtf8());
-        }
-        case Qt::BackgroundRole :
-        {
-            const auto& propertyName = m_columns.at(index.column());
-
-            // Если колонка с задачами
-            if (propertyName == "tasks" && m_tasksModel != nullptr)
-            {
-                auto count = data(index, Qt::DisplayRole);
-                if (count > 0)
-                    return QBrush(Qt::red);
-            }
-
-            return QVariant();
-        }
-        default:
-            return QVariant();
-    }*/
     return QVariant();
 }
 
