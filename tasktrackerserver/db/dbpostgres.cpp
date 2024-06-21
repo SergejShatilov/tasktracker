@@ -135,12 +135,9 @@ void DbPostgres::createDb(const QString& dbName)
             "\tWITH\r\n"
             "\tOWNER = postgres\r\n"
             "\tENCODING = 'UTF8'\r\n"
-            "\tLC_COLLATE = 'Russian_Russia.1251'\r\n"
-            "\tLC_CTYPE = 'Russian_Russia.1251'\r\n"
-            "\tLOCALE_PROVIDER = 'libc'\r\n"
-            "\tTABLESPACE = pg_default\r\n"
-            "\tCONNECTION LIMIT = -1\r\n"
-            "\tIS_TEMPLATE = False;"
+            "\tLC_COLLATE = 'ru_RU.UTF-8'\r\n"
+            "\tLC_CTYPE = 'ru_RU.UTF-8'\r\n"
+            "\tTEMPLATE template0;\r\n"
         )
         .arg(dbName)
     );

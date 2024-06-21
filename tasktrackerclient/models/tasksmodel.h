@@ -13,11 +13,24 @@ public:
                         QObject* parent = nullptr);
 
 public:
-    QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index,
                  const QVariant &value,
                  int role) override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
+
+protected:
+    virtual QVariant dataDisplayRole(const QModelIndex &index,
+                                     QObject* obj,
+                                     const QString& field) const override;
+    virtual QVariant dataEditRole(const QModelIndex &index,
+                                  QObject* obj,
+                                  const QString& field) const override;
+    virtual QVariant dataBackgroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const override;
+    virtual QVariant dataForegroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const override;
 
 private slots:
     void addTask(Task* task);

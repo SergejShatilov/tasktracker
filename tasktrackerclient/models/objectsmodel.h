@@ -28,6 +28,8 @@ public:
                                 Qt::Orientation orientation,
                                 int role) const override;
 
+    QVariant data(const QModelIndex &index, int role) const override;
+
 public:
     int columnByField(const QString& field) const;
     const QString& fieldByColumn(int column) const;
@@ -44,6 +46,20 @@ protected:
     void clearFields();
 
     void reset();
+
+protected:
+    virtual QVariant dataDisplayRole(const QModelIndex &index,
+                                     QObject* obj,
+                                     const QString& field) const = 0;
+    virtual QVariant dataEditRole(const QModelIndex &index,
+                                  QObject* obj,
+                                  const QString& field) const = 0;
+    virtual QVariant dataBackgroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const = 0;
+    virtual QVariant dataForegroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const = 0;
 
 protected:
     DbRemoteManager* m_dbManager;

@@ -40,68 +40,46 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="actionNewDb"/>
     <addaction name="actionConnectToDb"/>
     <addaction name="separator"/>
     <addaction name="actionCloseDb"/>
    </widget>
-   <widget class="QMenu" name="menuEmployees">
-    <property name="title">
-     <string>Employees</string>
-    </property>
-    <addaction name="actionEmployeeAdd"/>
-    <addaction name="separator"/>
-    <addaction name="actionEmployeeEdit"/>
-    <addaction name="actionEmployeeDelete"/>
-    <addaction name="separator"/>
-    <addaction name="actionEmployeesUpdate"/>
-   </widget>
-   <widget class="QMenu" name="menuTasks">
-    <property name="title">
-     <string>Tasks</string>
-    </property>
-    <addaction name="actionTaskAdd"/>
-    <addaction name="actionTaskAddSub"/>
-    <addaction name="separator"/>
-    <addaction name="actionTaskEdit"/>
-    <addaction name="actionTaskDelete"/>
-    <addaction name="separator"/>
-    <addaction name="actionTasksUpdate"/>
-   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddTask"/>
+    <addaction name="actionAddSubTask"/>
+    <addaction name="actionAddEmployee"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditTask"/>
+    <addaction name="actionEditEmployee"/>
+    <addaction name="actionDeleteTask"/>
+    <addaction name="actionDeleteEmployee"/>
+    <addaction name="separator"/>
+    <addaction name="actionUpdate"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuTasks"/>
-   <addaction name="menuEmployees"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuTools"/>
   </widget>
   <action name="actionNewDb">
    <property name="text">
-    <string>New DB...</string>
+    <string>New DB ...</string>
    </property>
   </action>
   <action name="actionConnectToDb">
    <property name="text">
-    <string>Connect To DB...</string>
-   </property>
-  </action>
-  <action name="actionNewEmployee">
-   <property name="text">
-    <string>New Employee</string>
-   </property>
-  </action>
-  <action name="actionDeleteEmployee">
-   <property name="text">
-    <string>Delete Employee</string>
-   </property>
-  </action>
-  <action name="actionCreateTask">
-   <property name="text">
-    <string>Create Task ...</string>
+    <string>Connect to DB ...</string>
    </property>
   </action>
   <action name="actionCloseDb">
@@ -109,62 +87,44 @@
     <string>Close DB</string>
    </property>
   </action>
-  <action name="actionEmployeeAdd">
+  <action name="actionAddTask">
    <property name="text">
-    <string>Add...</string>
+    <string>Add Task ...</string>
    </property>
   </action>
-  <action name="actionEmployeeEdit">
+  <action name="actionAddSubTask">
    <property name="text">
-    <string>Edit...</string>
+    <string>Add Subtask ...</string>
    </property>
   </action>
-  <action name="actionEmployeeDelete">
+  <action name="actionAddEmployee">
    <property name="text">
-    <string>Delete</string>
+    <string>Add Employee ...</string>
    </property>
   </action>
-  <action name="actionEmployeesUpdate">
+  <action name="actionEditTask">
+   <property name="text">
+    <string>Edit Task ...</string>
+   </property>
+  </action>
+  <action name="actionEditEmployee">
+   <property name="text">
+    <string>Edit Employee ...</string>
+   </property>
+  </action>
+  <action name="actionDeleteTask">
+   <property name="text">
+    <string>Delete Task</string>
+   </property>
+  </action>
+  <action name="actionDeleteEmployee">
+   <property name="text">
+    <string>Delete Employee</string>
+   </property>
+  </action>
+  <action name="actionUpdate">
    <property name="text">
     <string>Update</string>
-   </property>
-  </action>
-  <action name="actionTaskAdd">
-   <property name="text">
-    <string>Add...</string>
-   </property>
-  </action>
-  <action name="actionTaskAddSub">
-   <property name="text">
-    <string>Add Subtask...</string>
-   </property>
-  </action>
-  <action name="actionTaskEdit">
-   <property name="text">
-    <string>Edit...</string>
-   </property>
-  </action>
-  <action name="actionTaskDelete">
-   <property name="text">
-    <string>Delete</string>
-   </property>
-  </action>
-  <action name="actionTasksUpdate">
-   <property name="text">
-    <string>Update</string>
-   </property>
-  </action>
-  <action name="actionSettings">
-   <property name="text">
-    <string>Settings...</string>
-   </property>
-  </action>
-  <action name="actionFilters">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Filters</string>
    </property>
   </action>
  </widget>

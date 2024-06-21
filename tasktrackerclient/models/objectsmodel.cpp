@@ -75,6 +75,30 @@ QVariant ObjectsModel::headerData(int section,
 }
 
 // =============================================================================
+QVariant ObjectsModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    const auto& field = fieldByColumn(index.column());
+    auto obj = static_cast<QObject*>(objectByIndex(index));
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return dataDisplayRole(index, obj, field);
+        case Qt::EditRole:
+            return dataEditRole(index, obj, field);
+        case Qt::BackgroundRole:
+            return dataBackgroundRole(index, obj, field);
+        case Qt::ForegroundRole:
+            return dataForegroundRole(index, obj, field);
+        default:
+            return QVariant();
+    }
+}
+
+// =============================================================================
 int ObjectsModel::columnByField(const QString& field) const
 {
     auto it = std::find_if(

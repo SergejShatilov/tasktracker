@@ -28,70 +28,6 @@ EmployeesModel::EmployeesModel(DbRemoteManager* dbManager, QObject* parent) :
 }
 
 // =============================================================================
-QVariant EmployeesModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    const auto& field = fieldByColumn(index.column());
-    auto employee = static_cast<Employee*>(objectByIndex(index));
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        {
-            // Если поле с задачами с истекшим временем выполнения
-            if (field == "expiredTasks")
-            {
-                // Отображаем кол-во задач с истекшим временем исполнения
-                int expiredTasksCount = 0;
-
-                for (auto obj : employee->tasks())
-                {
-                    auto task = static_cast<Task*>(obj);
-                    if ((task->state() != Task::State::Completed) &&
-                        (task->deadline() < QDate::currentDate()))
-                    {
-                         ++(expiredTasksCount);
-                    }
-                }
-
-                return expiredTasksCount;
-            }
-
-            return employee->property(field.toLocal8Bit());
-        }
-        case Qt::EditRole:
-        {
-            // Для просроченных задач выдаем id исполнителя
-            if (field == "expiredTasks")
-                return employee->id();
-
-            return QVariant();
-        }
-        case Qt::BackgroundRole:
-        {
-            // Если поле с задачами с истекшим временем выполнения
-            if (field == "expiredTasks")
-            {
-                int columnExpiredTasks = columnByField(field);
-                auto indexExpiredTasks = this->index(
-                    index.row(), columnExpiredTasks, index.parent()
-                );
-
-                if (data(indexExpiredTasks, Qt::DisplayRole).toInt() > 0)
-                    return QBrush(QColor(200, 120, 120));
-
-            }
-        }
-        default:
-            return QVariant();
-    }
-
-    return QVariant();
-}
-
-// =============================================================================
 Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
 {
     auto flags = ObjectsModel::flags(index);
@@ -110,6 +46,95 @@ Qt::ItemFlags EmployeesModel::flags(const QModelIndex &index) const
     }
 
     return flags;
+}
+
+// =============================================================================
+QVariant EmployeesModel::dataDisplayRole(const QModelIndex &index,
+                                         QObject* obj,
+                                         const QString& field) const
+{
+    Q_UNUSED(index);
+    auto employee = static_cast<Employee*>(obj);
+
+    // Если поле с задачами с истекшим временем выполнения
+    if (field == "expiredTasks")
+    {
+        // Отображаем кол-во задач с истекшим временем исполнения
+        int expiredTasksCount = 0;
+
+        for (auto obj : employee->tasks())
+        {
+            auto task = static_cast<Task*>(obj);
+            if ((task->state() != Task::State::Completed) &&
+                (task->deadline() < QDate::currentDate()))
+            {
+                 ++(expiredTasksCount);
+            }
+        }
+
+        return expiredTasksCount;
+    }
+
+    return employee->property(field.toLocal8Bit());
+}
+
+// =============================================================================
+QVariant EmployeesModel::dataEditRole(const QModelIndex &index,
+                                      QObject* obj,
+                                      const QString& field) const
+{
+    Q_UNUSED(index);
+    auto employee = static_cast<Employee*>(obj);
+
+    // Для просроченных задач выдаем id исполнителя
+    if (field == "expiredTasks")
+        return employee->id();
+
+    return QVariant();
+}
+
+// =============================================================================
+QVariant EmployeesModel::dataBackgroundRole(const QModelIndex &index,
+                                            QObject* obj,
+                                            const QString& field) const
+{
+    Q_UNUSED(obj);
+
+    // Если поле с задачами с истекшим временем выполнения
+    if (field == "expiredTasks")
+    {
+        int columnExpiredTasks = columnByField(field);
+        auto indexExpiredTasks = this->index(
+            index.row(), columnExpiredTasks, index.parent()
+        );
+
+        if (data(indexExpiredTasks, Qt::DisplayRole).toInt() > 0)
+            return QBrush(QColor(200, 120, 120));
+    }
+
+    return QVariant();
+}
+
+// =============================================================================
+QVariant EmployeesModel::dataForegroundRole(const QModelIndex &index,
+                                            QObject* obj,
+                                            const QString& field) const
+{
+    Q_UNUSED(obj);
+
+    // Если поле с задачами с истекшим временем выполнения
+    if (field == "expiredTasks")
+    {
+        int columnExpiredTasks = columnByField(field);
+        auto indexExpiredTasks = this->index(
+            index.row(), columnExpiredTasks, index.parent()
+        );
+
+        if (data(indexExpiredTasks, Qt::DisplayRole).toInt() > 0)
+            return QColor(Qt::white);
+    }
+
+    return QVariant();
 }
 
 // =============================================================================

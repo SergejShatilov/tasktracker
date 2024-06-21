@@ -138,7 +138,7 @@ void HttpRequest::checkContent()
         return;
 
     // Проверяем размер контента
-    auto it = m_headers.find("Content-Length");
+    /*auto it = m_headers.find("Content-Length");
     if (it != m_headers.end()) {
         if (m_content.length() != it.value().toInt()) {
             throw std::runtime_error("Size of the content does not match");
@@ -146,7 +146,7 @@ void HttpRequest::checkContent()
         return;
     }
 
-    throw std::runtime_error("Header 'Content-Length' not found");
+    throw std::runtime_error("Header 'Content-Length' not found");*/
 }
 
 // =============================================================================

@@ -30,212 +30,6 @@ TasksModel::TasksModel(DbRemoteManager* dbManager, QObject* parent) :
 }
 
 // =============================================================================
-QVariant TasksModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    const auto& field = fieldByColumn(index.column());
-    auto task = static_cast<Task*>(objectByIndex(index));
-    auto executor = static_cast<Employee*>(task->executor());
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        {
-            // Если отображаемое состояние задачи
-            if (field == "stateDisplay")
-            {
-                switch(task->state())
-                {
-                    case Task::State::NotStarted:
-                        return QString(tr("Not Started"));
-                    case Task::State::Work:
-                        return QString(tr("Work"));
-                    case Task::State::Suspended:
-                        return QString(tr("Suspended"));
-                    case Task::State::Completed:
-                        return QString(tr("Completed"));
-                    default:
-                        return QString(tr("<Unknown>"));
-                }
-            }
-
-            // Если отображаемые ФИО исполнителя
-            if (field == "executor")
-            {
-                // Если исполнитель не назначен, то отображаем "<Не выбрано>"
-                if (executor == nullptr)
-                    return QString(tr("<Not Selected>"));
-
-                return executor->fullName();
-            }
-
-            // Если отображается срок
-            if (field == "deadline")
-            {
-                // Если имеются подзадачи, то дата определяются
-                // самой поздней подзадачей
-                /*if (!task->children().isEmpty())
-                {
-                    std::function<QDate(QObject* parent)> funcFindDateLate;
-                    funcFindDateLate = [&funcFindDateLate](QObject* parent)
-                    {
-                        auto task = static_cast<Task*>(parent);
-                        auto date = task->deadline();
-
-                        for (auto child : task->children())
-                        {
-                            auto childredDate = funcFindDateLate(child);
-                            if (date < childredDate)
-                                date = childredDate;
-                        }
-
-                        return date;
-                    };
-
-                    return funcFindDateLate(task);
-                }*/
-
-                return task->deadline();
-            }
-
-            return task->property(field.toLocal8Bit());
-        }
-        case Qt::EditRole:
-        {
-            // Для отображаемого состояния возвращаем индекс этого состояния
-            if (field == "stateDisplay")
-                return task->stateIndex();
-
-            return QVariant();
-        }
-        case Qt::BackgroundRole:
-        {
-            // Если отображаемое состояние задачи
-            if (field == "stateDisplay")
-            {
-                switch(task->state())
-                {
-                    case Task::State::Suspended:
-                        return QBrush(QColor(50, 50, 50));
-                    case Task::State::Completed:
-                        return QBrush(QColor(100, 150, 120));
-                    default:
-                        break;
-                }
-            }
-
-            // Если срок задачи
-            if (field == "deadline")
-            {
-                // Если задача завершена, то уже не важно
-                if (task->state() == Task::State::Completed)
-                    return QVariant();
-
-                // Если задача просрочена
-                if (task->deadline() < QDate::currentDate())
-                    return QBrush(QColor(200, 120, 120));
-
-                // Если дедлайн сегодня
-                if (task->deadline() == QDate::currentDate())
-                    return QBrush(QColor(240, 240, 160));
-            }
-
-            // Если задача корневая и она имеет подзадачи
-            if (task->parentId() == 0 && !task->children().isEmpty())
-                return QBrush(QColor(220, 220, 220));
-
-            return QVariant();
-        }
-        case Qt::ForegroundRole:
-        {
-            // Если отображаемое состояние задачи
-            if (field == "stateDisplay")
-            {
-                switch(task->state())
-                {
-                    case Task::State::NotStarted:
-                        return QColor(Qt::darkGray);
-                    case Task::State::Suspended:
-                        return QColor(Qt::white);
-                    case Task::State::Completed:
-                        return QColor(Qt::white);
-                    default:
-                        return QVariant();
-                }
-            }
-
-            // Если срок задачи
-            if (field == "deadline")
-            {
-                // Если задача завершена, то уже не важно
-                if (task->state() == Task::State::Completed)
-                    return QVariant();
-
-                // Если задача просрочена
-                if (task->deadline() < QDate::currentDate())
-                    return QColor(Qt::white);
-
-                // Если дедлайн седня
-                if (task->deadline() == QDate::currentDate())
-                    return QColor(Qt::darkGray);
-            }
-
-            // Если отображается исполнитель
-            if (field == "executor")
-            {
-                if (task->executor() == nullptr || task->executorId() == 0)
-                    return QColor(Qt::darkGray);
-            }
-
-            return QVariant();
-        }
-        default:
-            return QVariant();
-    }
-
-    /*switch (role)
-    {
-
-        case Qt::BackgroundRole:
-        {
-            const auto& propertyName = m_columns.at(index.column());
-            const auto obj = taskObjectByIndex(index);
-
-            // Если колонка с состоянием
-            if (propertyName == "state")
-            {
-                // Если задача выполнена, то отображаем ее зеленой,
-                // независимо от дедлайна
-                if (obj->state() == Task::State::Completed)
-                    return QBrush(Qt::green);
-
-                // Если задача просрочена, то отображаем поле
-                // состояние красным
-                if (obj->deadline() < QDate::currentDate())
-                    return QBrush(Qt::red);
-
-                switch (obj->state())
-                {
-                    case Task::State::NotStarted:
-                    case Task::State::Suspended:
-                        return QBrush(Qt::lightGray);
-                    default:
-                        return QVariant();
-                }
-            }
-
-            return QVariant();
-        }
-        default:
-            return QVariant();
-    }*/
-
-    return QVariant();
-}
-
-// =============================================================================
 bool TasksModel::setData(const QModelIndex &index,
                          const QVariant &value,
                          int role)
@@ -283,6 +77,186 @@ Qt::ItemFlags TasksModel::flags(const QModelIndex& index) const
     }
 
     return flags;
+}
+
+// =============================================================================
+QVariant TasksModel::dataDisplayRole(const QModelIndex &index,
+                                     QObject* obj,
+                                     const QString& field) const
+{
+    Q_UNUSED(index);
+
+    auto task = static_cast<Task*>(obj);
+    auto executor = static_cast<Employee*>(task->executor());
+
+    // Если отображаемое состояние задачи
+    if (field == "stateDisplay")
+    {
+        switch(task->state())
+        {
+            case Task::State::NotStarted:
+                return QString(tr("Not Started"));
+            case Task::State::Work:
+                return QString(tr("Work"));
+            case Task::State::Suspended:
+                return QString(tr("Suspended"));
+            case Task::State::Completed:
+                return QString(tr("Completed"));
+            default:
+                return QString(tr("<Unknown>"));
+        }
+    }
+
+    // Если отображаемые ФИО исполнителя
+    else if (field == "executor")
+    {
+        // Если исполнитель не назначен, то отображаем "<Не выбрано>"
+        if (executor == nullptr)
+            return QString(tr("<Not Selected>"));
+
+        return executor->fullName();
+    }
+
+    // Если отображается срок
+    else if (field == "deadline")
+    {
+        // Если имеются подзадачи, то дата определяются
+        // самой поздней подзадачей
+        /*if (!task->children().isEmpty())
+        {
+            std::function<QDate(QObject* parent)> funcFindDateLate;
+            funcFindDateLate = [&funcFindDateLate](QObject* parent)
+            {
+                auto task = static_cast<Task*>(parent);
+                auto date = task->deadline();
+
+                for (auto child : task->children())
+                {
+                    auto childredDate = funcFindDateLate(child);
+                    if (date < childredDate)
+                        date = childredDate;
+                }
+
+                return date;
+            };
+
+            return funcFindDateLate(task);
+        }*/
+
+        return task->deadline();
+    }
+
+    return task->property(field.toLocal8Bit());
+}
+
+// =============================================================================
+QVariant TasksModel::dataEditRole(const QModelIndex &index,
+                                  QObject* obj,
+                                  const QString& field) const
+{
+    Q_UNUSED(index);
+    auto task = static_cast<Task*>(obj);
+
+    // Для отображаемого состояния возвращаем индекс этого состояния
+    if (field == "stateDisplay")
+        return task->stateIndex();
+
+    return QVariant();
+}
+
+// =============================================================================
+QVariant TasksModel::dataBackgroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const
+{
+    Q_UNUSED(index);
+    auto task = static_cast<Task*>(obj);
+
+    // Если отображаемое состояние задачи
+    if (field == "stateDisplay")
+    {
+        switch(task->state())
+        {
+            case Task::State::Suspended:
+                return QBrush(QColor(50, 50, 50));
+            case Task::State::Completed:
+                return QBrush(QColor(100, 150, 120));
+            default:
+                break;
+        }
+    }
+
+    // Если срок задачи
+    else if (field == "deadline")
+    {
+        // Если задача завершена, то уже не важно
+        if (task->state() == Task::State::Completed)
+            return QVariant();
+
+        // Если задача просрочена
+        else if (task->deadline() < QDate::currentDate())
+            return QBrush(QColor(200, 120, 120));
+
+        // Если дедлайн сегодня
+        else if (task->deadline() == QDate::currentDate())
+            return QBrush(QColor(240, 240, 160));
+    }
+
+    // Если задача корневая и она имеет подзадачи
+    if (task->parentId() == 0 && !task->children().isEmpty())
+        return QBrush(QColor(220, 220, 220));
+
+    return QVariant();
+}
+
+// =============================================================================
+QVariant TasksModel::dataForegroundRole(const QModelIndex &index,
+                                        QObject* obj,
+                                        const QString& field) const
+{
+    Q_UNUSED(index);
+    auto task = static_cast<Task*>(obj);
+
+    // Если отображаемое состояние задачи
+    if (field == "stateDisplay")
+    {
+        switch(task->state())
+        {
+            case Task::State::NotStarted:
+                return QColor(Qt::darkGray);
+            case Task::State::Suspended:
+                return QColor(Qt::white);
+            case Task::State::Completed:
+                return QColor(Qt::white);
+            default:
+                return QVariant();
+        }
+    }
+
+    // Если срок задачи
+    else if (field == "deadline")
+    {
+        // Если задача завершена, то уже не важно
+        if (task->state() == Task::State::Completed)
+            return QVariant();
+
+        // Если задача просрочена
+        else if (task->deadline() < QDate::currentDate())
+            return QColor(Qt::white);
+
+        // Если дедлайн седня
+        else if (task->deadline() == QDate::currentDate())
+            return QColor(Qt::darkGray);
+    }
+
+    // Если отображается исполнитель
+    else if (field == "executor")
+    {
+        if (task->executor() == nullptr || task->executorId() == 0)
+            return QColor(Qt::darkGray);
+    }
+
+    return QVariant();
 }
 
 // =============================================================================

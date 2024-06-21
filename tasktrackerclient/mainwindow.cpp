@@ -1,7 +1,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include "dialogs/connectdialog.h"
 
 // =============================================================================
@@ -27,22 +26,32 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCloseDb, &QAction::triggered,
             this, &MainWindow::closeDb);
 
-    // Tasks
-    connect(ui->actionTaskAdd, &QAction::triggered,
+    // Edit
+    connect(ui->actionAddTask, &QAction::triggered,
             m_tasksViewer, &TasksViewer::create);
 
-    connect(ui->actionTaskAddSub, &QAction::triggered,
+    connect(ui->actionAddSubTask, &QAction::triggered,
             m_tasksViewer, &TasksViewer::createSub);
 
-    connect(ui->actionTaskEdit, &QAction::triggered,
+    connect(ui->actionAddEmployee, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::create);
+
+    connect(ui->actionEditTask, &QAction::triggered,
             m_tasksViewer, &TasksViewer::edit);
 
-    connect(ui->actionTaskDelete, &QAction::triggered,
-            m_tasksViewer, &TasksViewer::remove);
+    connect(ui->actionEditEmployee, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::edit);
 
-    connect(ui->actionTasksUpdate, &QAction::triggered,
+    connect(ui->actionDeleteTask, &QAction::triggered,
+        m_tasksViewer, &TasksViewer::remove);
+
+    connect(ui->actionDeleteEmployee, &QAction::triggered,
+            m_employeesViewer, &EmployeesViewer::remove);
+
+    connect(ui->actionUpdate, &QAction::triggered,
             m_tasksViewer, &TasksViewer::update);
 
+    // Tables
     connect(m_tasksViewer, &TasksViewer::gotoEmployee,
             this, [this](Employee* employee) {
                 ui->tabWidget->setCurrentIndex(1);
@@ -53,19 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tabWidget->addTab(m_tasksViewer, tr("Tasks"));
     m_tasksViewer->setModel(m_tasksModel);
-
-    // Employees
-    connect(ui->actionEmployeeAdd, &QAction::triggered,
-            m_employeesViewer, &EmployeesViewer::create);
-
-    connect(ui->actionEmployeeEdit, &QAction::triggered,
-            m_employeesViewer, &EmployeesViewer::edit);
-
-    connect(ui->actionEmployeeDelete, &QAction::triggered,
-            m_employeesViewer, &EmployeesViewer::remove);
-
-    connect(ui->actionEmployeesUpdate, &QAction::triggered,
-            m_employeesViewer, &EmployeesViewer::update);
 
     connect(m_expiredTasksDelegate, &ExpiredTasksDelegate::gotoItem,
             this, [this](const QModelIndex& index) {
@@ -98,6 +94,8 @@ void MainWindow::newDb()
 
     if (dialog->exec() != QDialog::Accepted)
         return;
+
+    m_tasksViewer->update();
 
     setViewConnected();
 }
@@ -139,17 +137,13 @@ void MainWindow::setViewDisconnected()
     // File
     ui->actionCloseDb->setVisible(false);
 
-    // Tasks
-    ui->menuTasks->menuAction()->setVisible(false);
-    ui->actionTaskAddSub->setVisible(false);
-    ui->actionTaskEdit->setVisible(false);
-    ui->actionTaskDelete->setVisible(false);
-
-    // Employees
-    ui->menuEmployees->menuAction()->setVisible(false);
-    ui->actionEmployeeEdit->setVisible(false);
-    ui->actionEmployeeDelete->setVisible(false);
-
+    // Edit
+    ui->menuEdit->menuAction()->setVisible(false);
+    ui->actionAddSubTask->setVisible(false);
+    ui->actionEditTask->setVisible(false);
+    ui->actionEditEmployee->setVisible(false);
+    ui->actionDeleteTask->setVisible(false);
+    ui->actionDeleteEmployee->setVisible(false);
 }
 
 // =============================================================================
@@ -165,11 +159,8 @@ void MainWindow::setViewConnected()
     // File
     ui->actionCloseDb->setVisible(true);
 
-    // Tasks
-    ui->menuTasks->menuAction()->setVisible(true);
-
-    // Employees
-    ui->menuEmployees->menuAction()->setVisible(true);
+    // Edit
+    ui->menuEdit->menuAction()->setVisible(true);
 }
 
 // =============================================================================
