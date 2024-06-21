@@ -9,6 +9,7 @@
 #include "models/tasksmodel.h"
 #include "models/employeesmodel.h"
 #include "delegates/expiredtasksdelegate.h"
+#include "settings.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,8 +27,10 @@ private slots:
     void newDb();
     void openDb();
     void closeDb();
+    void settings();
 
 private:
+    void connectServer(bool isNeedCreate);
     void setViewDisconnected();
     void setViewConnected();
 
@@ -39,6 +42,7 @@ private:
     TasksModel*             m_tasksModel;
     EmployeesModel*         m_employeesModel;
     ExpiredTasksDelegate*   m_expiredTasksDelegate;
+    Settings*               m_settings;
 };
 
 #endif // MAINWINDOW_H

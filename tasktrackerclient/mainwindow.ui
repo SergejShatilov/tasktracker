@@ -50,6 +50,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -89,27 +90,27 @@
   </action>
   <action name="actionAddTask">
    <property name="text">
-    <string>Add Task ...</string>
+    <string>Add Task...</string>
    </property>
   </action>
   <action name="actionAddSubTask">
    <property name="text">
-    <string>Add Subtask ...</string>
+    <string>Add Subtask...</string>
    </property>
   </action>
   <action name="actionAddEmployee">
    <property name="text">
-    <string>Add Employee ...</string>
+    <string>Add Employee...</string>
    </property>
   </action>
   <action name="actionEditTask">
    <property name="text">
-    <string>Edit Task ...</string>
+    <string>Edit Task...</string>
    </property>
   </action>
   <action name="actionEditEmployee">
    <property name="text">
-    <string>Edit Employee ...</string>
+    <string>Edit Employee...</string>
    </property>
   </action>
   <action name="actionDeleteTask">
@@ -125,6 +126,11 @@
   <action name="actionUpdate">
    <property name="text">
     <string>Update</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings...</string>
    </property>
   </action>
  </widget>

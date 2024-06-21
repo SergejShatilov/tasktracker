@@ -23,6 +23,7 @@ INCLUDEPATH += \
 
 # ------------------------------------------------------------------------------
 SOURCES +=                              \
+    dialogs/settingsdialog.cpp \
     models/tasksmodel.cpp               \
     models/objectsmodel.cpp             \
     models/employeesmodel.cpp           \
@@ -42,9 +43,11 @@ SOURCES +=                              \
     main.cpp                            \
     mainwindow.cpp                      \
     widgets/viewer.cpp                  \
+    settings.cpp                        \
 
 # ------------------------------------------------------------------------------
 HEADERS +=                              \
+    dialogs/settingsdialog.h \
     models/tasksmodel.h                 \
     models/objectsmodel.h               \
     models/employeesmodel.h             \
@@ -63,9 +66,11 @@ HEADERS +=                              \
     $${COMMON}/task.h                   \
     mainwindow.h                        \
     widgets/viewer.h                    \
+    settings.h                          \
 
 # ------------------------------------------------------------------------------
 FORMS +=                                \
+    dialogs/settingsdialog.ui \
     dialogs/taskdialog.ui               \
     dialogs/employeedialog.ui           \
     dialogs/connectdialog.ui            \
