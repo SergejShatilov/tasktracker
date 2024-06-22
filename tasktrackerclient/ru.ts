@@ -261,12 +261,12 @@ Are you sure you want to delete an employee?</source>
         <translation>Настройки...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="74"/>
+        <location filename="mainwindow.cpp" line="69"/>
         <source>Tasks</source>
         <translation>Задачи</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="84"/>
+        <location filename="mainwindow.cpp" line="79"/>
         <source>Employees</source>
         <translation>Сотрудники</translation>
     </message>
@@ -274,9 +274,13 @@ Are you sure you want to delete an employee?</source>
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="dialogs/settingsdialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation>Диалог</translation>
+        <translation type="vanished">Диалог</translation>
+    </message>
+    <message>
+        <location filename="dialogs/settingsdialog.ui" line="14"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location filename="dialogs/settingsdialog.ui" line="20"/>
@@ -329,7 +333,7 @@ Are you sure you want to delete an employee?</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="dialogs/settingsdialog.cpp" line="37"/>
+        <location filename="dialogs/settingsdialog.cpp" line="44"/>
         <source>To apply the settings, you need to restart the application!</source>
         <translation>Чтобы применить настройки, вам необходимо перезапустить приложение!</translation>
     </message>
