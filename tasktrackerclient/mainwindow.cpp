@@ -5,7 +5,7 @@
 #include "dialogs/settingsdialog.h"
 
 // =============================================================================
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(Settings* settings, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_dbManager(new DbRemoteManager(this)),
@@ -14,13 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_tasksModel(new TasksModel(m_dbManager, this)),
     m_employeesModel(new EmployeesModel(m_dbManager, this)),
     m_expiredTasksDelegate(new ExpiredTasksDelegate(m_tasksModel, this)),
-    m_settings(new Settings("settings.ini", this))
+    m_settings(settings)
 {
-    // Settings
-    m_dbManager->setHostName(m_settings->hostName());
-    m_dbManager->setPort(m_settings->port());
-
-    // GUI
     ui->setupUi(this);
 
     // File
@@ -84,6 +79,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->addTab(m_employeesViewer, tr("Employees"));
     m_employeesViewer->setModel(m_employeesModel);
     m_employeesViewer->setExpiredTasksDelegate(m_expiredTasksDelegate);
+
+    // Settings
+    m_dbManager->setHostName(m_settings->hostName());
+    m_dbManager->setPort(m_settings->port());
 
     setViewDisconnected();
 }

@@ -2,8 +2,10 @@
 
 #include <QApplication>
 #include <QTextCodec>
+#include <QTranslator>
 
 #include "mainwindow.h"
+#include "settings.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +14,13 @@ int main(int argc, char *argv[])
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
-    MainWindow w;
+    Settings settings("settings.ini");
+
+    QTranslator translator;
+    translator.load(settings.language());
+    app.installTranslator(&translator);
+
+    MainWindow w(&settings);
     w.show();
 
     return app.exec();

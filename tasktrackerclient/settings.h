@@ -20,9 +20,13 @@ public:
     void setPort(int port);
     int port() const;
 
+    void setLanguage(const QString& language);
+    const QString& language() const;
+
 private:
     QSettings*  m_settings;
     QString     m_hostName;
     int         m_port;
+    QString     m_language;
 
 };

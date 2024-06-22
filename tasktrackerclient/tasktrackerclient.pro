@@ -77,6 +77,10 @@ FORMS +=                                \
     widgets/viewer.ui                   \
     mainwindow.ui                       \
 
+# ------------------------------------------------------------------------------
+TRANSLATIONS += ru.ts
+
+CODECFORSRC = UTF-8
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
